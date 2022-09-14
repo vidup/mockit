@@ -1,10 +1,4 @@
 class Mock {
-  private calls: Record<string, any> = {};
-  //   private calls: {
-  //     key: string;
-  //     whatToDo: (...args: any[]) => any;
-  //   }[] = [];
-
   private callsMap: Map<string, any> = new Map();
   constructor() {}
 
@@ -13,12 +7,9 @@ class Mock {
     args: any[],
     whatToDo: (...args: any[]) => any
   ) {
-    if (!this.calls[functionName]) {
-      this.calls[functionName] = {};
+    if (!this.callsMap.get(functionName)) {
       this.callsMap.set(functionName, new Map());
     }
-
-    this.calls[functionName][this.parseArgs(args)] = whatToDo;
 
     const funcMockMap = this.callsMap.get(functionName);
     funcMockMap.set(this.parseArgs(args), whatToDo);
@@ -35,22 +26,22 @@ class Mock {
   public refreshMockFunction(name: string) {
     this[name] = (...args: any[]) => {
       const key = this.parseArgs(args);
-      const mockedFunction = this.calls[name][key];
-      if (mockedFunction) {
-        return mockedFunction(...args);
-      } else {
-        throw new Error(
-          `No mocked function found for ${name} with args ${args}`
-        );
-        // should i do nothing ?
+      const mockedFunction = this.callsMap.get(name);
+      if (!mockedFunction) {
+        throw new Error(`Function ${name} is not mocked`);
       }
+
+      const mockedBehaviour = mockedFunction.get(key);
+      if (!mockedBehaviour) {
+        throw new Error(`Function ${name} is not mocked with args ${key}`);
+      }
+
+      return mockedBehaviour(...args);
     };
   }
 }
 
 export class Mockit {
-  constructor() {}
-
   static mock<T extends any>(_clazz: T): T {
     return new Mock() as T;
   }
