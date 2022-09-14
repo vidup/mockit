@@ -26,6 +26,11 @@ export class Mockit {
               throw error;
             };
           },
+          thenCall(f: (...args: any[]) => any) {
+            mock[func] = () => {
+              return f();
+            };
+          },
         };
       },
     };

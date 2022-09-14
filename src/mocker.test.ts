@@ -61,4 +61,32 @@ describe("Mockit", () => {
       mockDog.makeSound();
     }).toThrowError("CROA ERROR 2!");
   });
+
+  test("it should allow to set a custom call", () => {
+    class BackgroundCheck {
+      private calls = 0;
+      constructor() {}
+
+      check(): void {
+        this.calls++;
+      }
+
+      getCalls(): number {
+        return this.calls;
+      }
+    }
+
+    const backgroundCheck = new BackgroundCheck();
+    expect(backgroundCheck.getCalls()).toBe(0);
+
+    const mockDog = Mockit.mock(new Dog());
+    Mockit.when(mockDog)
+      .calls("makeSound", [])
+      .thenCall(() => {
+        backgroundCheck.check();
+      });
+
+    mockDog.makeSound();
+    expect(backgroundCheck.getCalls()).toBe(1);
+  });
 });
