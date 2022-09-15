@@ -19,7 +19,7 @@ class Dog implements Animal {
   }
 }
 
-describe("Mockit", () => {
+describe("Mockit > thenReturn", () => {
   test("it should allow to replace a class function returned value", () => {
     const dog = new Dog();
     expect(dog.makeSound()).toBe("Woof!");
@@ -42,23 +42,9 @@ describe("Mockit", () => {
     expect(mockDog.repeatSound("B")).toBe("HELLAW!");
     expect(mockDog.repeatSound("A")).toBe("yo");
   });
+});
 
-  test("it should allow to replace a throwing method by a returning one", () => {
-    class BasicAnimal extends Animal {
-      makeSound(): string {
-        throw new Error("Method not implemented.");
-      }
-    }
-
-    expect(() => {
-      Mockit.mock(new BasicAnimal()).makeSound();
-    }).toThrow();
-
-    const mockDog = Mockit.mock(new BasicAnimal());
-    Mockit.when(mockDog).calls("makeSound", []).thenReturn("CROAAA!");
-    expect(mockDog.makeSound()).toBe("CROAAA!");
-  });
-
+describe("Mockit > thenThrow", () => {
   test("it should allow to set a custom throw message", () => {
     const dog = new Dog();
     expect(dog.makeSound()).toBe("Woof!");
@@ -83,6 +69,24 @@ describe("Mockit", () => {
     expect(() => {
       mockDog.makeSound();
     }).toThrowError("CROA ERROR 2!");
+  });
+});
+
+describe("Mockit > thenCall", () => {
+  test("it should allow to replace a throwing method by a returning one", () => {
+    class BasicAnimal extends Animal {
+      makeSound(): string {
+        throw new Error("Method not implemented.");
+      }
+    }
+
+    expect(() => {
+      Mockit.mock(new BasicAnimal()).makeSound();
+    }).toThrow();
+
+    const mockDog = Mockit.mock(new BasicAnimal());
+    Mockit.when(mockDog).calls("makeSound", []).thenReturn("CROAAA!");
+    expect(mockDog.makeSound()).toBe("CROAAA!");
   });
 
   test("it should allow to set a custom call", () => {
@@ -112,7 +116,9 @@ describe("Mockit", () => {
     mockDog.makeSound();
     expect(backgroundCheck.getCalls()).toBe(1);
   });
+});
 
+describe("Mockit > thenResolve", () => {
   test("it should allow to set a custom promise response", () => {
     const dog = new Dog();
     expect(dog.makeSound()).toBe("Woof!");
@@ -124,7 +130,9 @@ describe("Mockit", () => {
       expect(result).toBe("CROAAA!");
     });
   });
+});
 
+describe("Mockit > thenReject", () => {
   test("it should allow to set a custom promise rejection", () => {
     const dog = new Dog();
     expect(dog.makeSound()).toBe("Woof!");
