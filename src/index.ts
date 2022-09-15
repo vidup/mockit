@@ -1,3 +1,2 @@
-export type Test = string;
-
-export function test() {}
+import { Mockit } from "./mocker";
+export { Mockit };

@@ -139,3 +139,31 @@ describe("Mockit", () => {
     });
   });
 });
+
+describe("Mockit > Spying", () => {
+  test("It should allow to access the function calls history for given parameters", () => {
+    const dog = new Dog();
+    const mockDog = Mockit.mock(dog);
+    Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
+
+    mockDog.repeatSound("A");
+    mockDog.repeatSound("A");
+    mockDog.repeatSound("A");
+
+    expect(
+      Mockit.spy(mockDog).callsTo("repeatSound").withArgs(["A"]).length
+    ).toBe(3);
+  });
+
+  test("It should also allow to access the whole function call history", () => {
+    const dog = new Dog();
+    const mockDog = Mockit.mock(dog);
+    Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
+    Mockit.when(mockDog).calls("repeatSound", ["B"]).thenReturn("CROAAA!");
+    mockDog.repeatSound("A");
+    mockDog.repeatSound("A");
+    mockDog.repeatSound("B");
+
+    expect(Mockit.spy(mockDog).callsTo("repeatSound").inTotal().length).toBe(3);
+  });
+});

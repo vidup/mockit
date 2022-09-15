@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
     // enabling declaration (.d.ts) emit
     "declaration": true,
 
