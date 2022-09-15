@@ -82,10 +82,12 @@ class Mock {
         args,
         key,
         date: new Date().toISOString(),
+        mockedBehaviour: mockedBehaviour.get("mock"),
+        previousCalls: mockedBehaviour.get("calls"),
       };
 
       this.saveMockedCallWithArgs(mockedBehaviour, newCall);
-      this.saveFunctionCall(mockedFunction, newCall, mockedBehaviour);
+      this.saveFunctionCall(mockedFunction, newCall);
 
       return mockedBehaviour.get("mock")(...args);
     };
@@ -100,16 +102,9 @@ class Mock {
 
   private saveFunctionCall(
     mockedFunction: any,
-    newCall: { args: any[]; key: string; date: string },
-    mockedBehaviour: any
+    newCall: { args: any[]; key: string; date: string }
   ) {
-    mockedFunction.set(
-      "_calls",
-      mockedFunction.get("_calls").concat({
-        ...newCall,
-        mockedBehaviour: mockedBehaviour.get("mock"),
-      })
-    );
+    mockedFunction.set("_calls", mockedFunction.get("_calls").concat(newCall));
   }
 }
 

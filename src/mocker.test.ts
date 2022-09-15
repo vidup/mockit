@@ -141,6 +141,38 @@ describe("Mockit", () => {
 });
 
 describe("Mockit > Spying", () => {
+  test("It should give information about the calls", () => {
+    const dog = new Dog();
+    const mockDog = Mockit.mock(dog);
+    Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
+    mockDog.repeatSound("A");
+
+    const expectedFirstCall = {
+      date: expect.any(String),
+      args: ["A"],
+      key: '"A"',
+      mockedBehaviour: expect.any(Function),
+      previousCalls: [],
+    };
+    expect(Mockit.spy(mockDog).callsTo("repeatSound").inTotal()).toEqual([
+      expectedFirstCall,
+    ]);
+
+    mockDog.repeatSound("A");
+    const expectedSecondCall = {
+      date: expect.any(String),
+      args: ["A"],
+      key: '"A"',
+      mockedBehaviour: expect.any(Function),
+      previousCalls: [expectedFirstCall],
+    };
+
+    expect(Mockit.spy(mockDog).callsTo("repeatSound").inTotal()).toEqual([
+      expectedFirstCall,
+      expectedSecondCall,
+    ]);
+  });
+
   test("It should allow to access the function calls history for different sets of parameters", () => {
     const dog = new Dog();
     const mockDog = Mockit.mock(dog);
