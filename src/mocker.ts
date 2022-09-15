@@ -20,6 +20,7 @@ class Mock {
   }
 
   private parseArgs(args: any[]) {
+    // todo: for objects we should use a hash or order the keys alphabetically
     return args.map((arg) => JSON.stringify(arg)).join(",");
   }
 
@@ -61,6 +62,16 @@ export class Mockit {
           thenCall(f: (...args: any[]) => any) {
             mock.registerMock(func, withArgs, () => {
               return f();
+            });
+          },
+          thenResolve(returnValue: any) {
+            mock.registerMock(func, withArgs, async () => {
+              return returnValue;
+            });
+          },
+          thenReject(error: any extends Error ? Error : string) {
+            mock.registerMock(func, withArgs, async () => {
+              throw error;
             });
           },
         };

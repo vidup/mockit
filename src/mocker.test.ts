@@ -10,6 +10,10 @@ class Dog implements Animal {
     return "Woof!";
   }
 
+  async makeAsyncSound() {
+    return "Woof!";
+  }
+
   repeatSound(sound: string) {
     return "Woof " + sound;
   }
@@ -22,6 +26,7 @@ describe("Mockit", () => {
 
     const mockDog = Mockit.mock(dog);
     Mockit.when(mockDog).calls("makeSound", []).thenReturn("CROAAA!");
+
     expect(mockDog.makeSound()).toBe("CROAAA!");
   });
 
@@ -74,6 +79,7 @@ describe("Mockit", () => {
     Mockit.when(mockDog)
       .calls("makeSound", [])
       .thenThrow(new Error("CROA ERROR 2!"));
+
     expect(() => {
       mockDog.makeSound();
     }).toThrowError("CROA ERROR 2!");
@@ -105,5 +111,31 @@ describe("Mockit", () => {
 
     mockDog.makeSound();
     expect(backgroundCheck.getCalls()).toBe(1);
+  });
+
+  test("it should allow to set a custom promise response", () => {
+    const dog = new Dog();
+    expect(dog.makeSound()).toBe("Woof!");
+
+    const mockDog = Mockit.mock(dog);
+    Mockit.when(mockDog).calls("makeAsyncSound", []).thenResolve("CROAAA!");
+
+    return mockDog.makeAsyncSound().then((result) => {
+      expect(result).toBe("CROAAA!");
+    });
+  });
+
+  test("it should allow to set a custom promise rejection", () => {
+    const dog = new Dog();
+    expect(dog.makeSound()).toBe("Woof!");
+
+    const mockDog = Mockit.mock(dog);
+    Mockit.when(mockDog)
+      .calls("makeAsyncSound", [])
+      .thenReject(new Error("CROA ERROR 2!"));
+
+    return mockDog.makeAsyncSound().catch((error) => {
+      expect(error.message).toBe("CROA ERROR 2!");
+    });
   });
 });
