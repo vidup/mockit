@@ -2,7 +2,10 @@
     "name": "@vidup/mockit",
     "version": "0.0.1",
     "description": "mocking library experiment",
-    "main": "index.js",
+    "main": "dist/index.js",
+    "files": [
+        "dist/index.js"
+    ],
     "scripts": {
         "test": "jest",
         "test:watch": "jest --watch",
@@ -10,7 +13,8 @@
         "build": "rollup -c"
     },
     "author": "Victor Dupuy <vdcd120491@gmail.com>",
-    "license": "UNLICENSED",
+    "license": "MIT",
+    "private": false,
     "devDependencies": {
         "@rollup/plugin-typescript": "^8.5.0",
         "@types/jest": "^29.0.2",
