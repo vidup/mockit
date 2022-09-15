@@ -145,10 +145,19 @@ describe("Mockit > Spying", () => {
     const dog = new Dog();
     const mockDog = Mockit.mock(dog);
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
+    Mockit.when(mockDog).calls("repeatSound", ["B"]).thenReturn("CROAAA!");
 
     mockDog.repeatSound("A");
     mockDog.repeatSound("A");
     mockDog.repeatSound("A");
+
+    expect(
+      Mockit.spy(mockDog).callsTo("repeatSound").withArgs(["A"]).length
+    ).toBe(3);
+    mockDog.repeatSound("B");
+    expect(
+      Mockit.spy(mockDog).callsTo("repeatSound").withArgs(["B"]).length
+    ).toBe(1);
 
     expect(
       Mockit.spy(mockDog).callsTo("repeatSound").withArgs(["A"]).length
