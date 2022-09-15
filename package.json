@@ -1,5 +1,5 @@
 {
-    "name": "@vidup/mockit",
+    "name": "@vdcode/mockit",
     "version": "0.0.1",
     "description": "mocking library experiment",
     "main": "dist/index.js",
