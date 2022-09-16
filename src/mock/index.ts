@@ -4,8 +4,10 @@ import { Parser } from "../parser";
 import type { Call } from "../types/call";
 
 export class Mock {
-  private callsMap: hMap = new hMap();
-  constructor() {}
+  private callsMap: hMap;
+  constructor() {
+    this.callsMap = new hMap();
+  }
 
   registerMock(
     functionName: string,

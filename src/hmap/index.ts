@@ -1,8 +1,12 @@
 import { AbstractParser, Parser } from "../parser";
 
 export class hMap extends Map {
-  private map: Map<string, any> = new Map();
-  private parser: AbstractParser = new Parser();
+  constructor(
+    private readonly map = new Map(),
+    private readonly parser: AbstractParser = new Parser()
+  ) {
+    super();
+  }
 
   get<T>(args: any): T {
     const hashedArgs = this.parser.hash(args);
