@@ -1,4 +1,5 @@
-import { Mockit, Parser } from "./mocker";
+import { Mockit } from "./mocker";
+import { Parser } from "./parser";
 
 abstract class Animal {
   abstract makeSound(): string;
