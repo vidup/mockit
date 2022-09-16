@@ -29,5 +29,8 @@
     },
     "lint-staged": {
         "**/*": "prettier --write --ignore-unknown"
+    },
+    "dependencies": {
+        "object-hash": "^3.0.0"
     }
 }

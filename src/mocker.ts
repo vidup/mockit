@@ -1,3 +1,5 @@
+import hasher from "object-hash";
+
 type Call = {
   args: any[];
   key: string;
@@ -5,7 +7,7 @@ type Call = {
 };
 
 class Mock {
-  private callsMap: Map<string, any> = new Map();
+  private callsMap: ComplexMap = new ComplexMap();
   constructor() {}
 
   registerMock(
@@ -16,13 +18,13 @@ class Mock {
     this.protectReservedKeys(functionName);
 
     if (!this.callsMap.get(functionName)) {
-      this.callsMap.set(functionName, new Map().set("_calls", []));
+      this.callsMap.set(functionName, new ComplexMap().set("_calls", []));
     }
 
-    const funcMockMap = this.callsMap.get(functionName);
+    const funcMockMap = this.callsMap.get<ComplexMap>(functionName);
     funcMockMap.set(
-      this.parseArgs(args),
-      new Map().set("mock", whatToDo).set("calls", [])
+      args,
+      new ComplexMap().set("mock", whatToDo).set("calls", [])
     );
 
     this.callsMap.set(functionName, funcMockMap);
@@ -35,52 +37,45 @@ class Mock {
     }
   }
 
-  private parseArgs(args: any[]) {
-    // todo: for objects we should use a hash or order the keys alphabetically
-    return args.map((arg) => JSON.stringify(arg)).join(",");
-  }
-
   public callsTo(name: string, args: any[]): Call[] {
-    const func = this.callsMap.get(name);
+    const func = this.callsMap.get<ComplexMap>(name);
     if (!func) {
       throw new Error(`Function ${name} is not mocked`);
     }
 
-    const key = this.parseArgs(args);
-    const mockedBehaviour = func.get(key);
+    const mockedBehaviour = func.get<ComplexMap>(args);
 
     if (!mockedBehaviour) {
-      throw new Error(`Function ${name} is not mocked with args ${key}`);
+      throw new Error(`Function ${name} is not mocked with args ${args}`);
     }
 
     return mockedBehaviour.get("calls");
   }
 
   public totalCallsTo(name: string): Call[] {
-    const func = this.callsMap.get(name);
+    const func = this.callsMap.get<ComplexMap>(name);
     if (!func) {
       throw new Error(`Function ${name} is not mocked`);
     }
 
-    return func.get("_calls");
+    return func.get<Call[]>("_calls");
   }
 
   public refreshMockFunction(name: string) {
     this[name] = (...args: any[]) => {
-      const key = this.parseArgs(args);
-      const mockedFunction = this.callsMap.get(name);
+      const mockedFunction = this.callsMap.get<ComplexMap>(name);
       if (!mockedFunction) {
         throw new Error(`Function ${name} is not mocked`);
       }
 
-      const mockedBehaviour = mockedFunction.get(key);
+      const mockedBehaviour = mockedFunction.get<ComplexMap>(args);
       if (!mockedBehaviour) {
-        throw new Error(`Function ${name} is not mocked with args ${key}`);
+        throw new Error(`Function ${name} is not mocked with args ${args}`);
       }
 
       const newCall = {
         args,
-        key,
+        key: new Parser().hash(args),
         date: new Date().toISOString(),
         mockedBehaviour: mockedBehaviour.get("mock"),
         previousCalls: mockedBehaviour.get("calls"),
@@ -89,7 +84,7 @@ class Mock {
       this.saveMockedCallWithArgs(mockedBehaviour, newCall);
       this.saveFunctionCall(mockedFunction, newCall);
 
-      return mockedBehaviour.get("mock")(...args);
+      return mockedBehaviour.get<Function>("mock")(...args);
     };
   }
 
@@ -160,5 +155,32 @@ export class Mockit {
         };
       },
     };
+  }
+}
+
+export class Parser {
+  hash(args: any) {
+    return hasher(args);
+  }
+}
+
+abstract class AbstractParser {
+  abstract hash(args: any): string;
+}
+
+export class ComplexMap extends Map {
+  private map: Map<string, any> = new Map();
+  private parser: AbstractParser = new Parser();
+
+  get<T>(args: any): T {
+    const hashedArgs = this.parser.hash(args);
+    return this.map.get(hashedArgs);
+  }
+
+  set(args: any, value: any): this {
+    const hashedArgs = this.parser.hash(args);
+    this.map.set(hashedArgs, value);
+
+    return this;
   }
 }

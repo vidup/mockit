@@ -1,4 +1,4 @@
-import { Mockit } from "./mocker";
+import { Mockit, Parser } from "./mocker";
 
 abstract class Animal {
   abstract makeSound(): string;
@@ -158,7 +158,7 @@ describe("Mockit > Spying", () => {
     const expectedFirstCall = {
       date: expect.any(String),
       args: ["A"],
-      key: '"A"',
+      key: new Parser().hash(["A"]),
       mockedBehaviour: expect.any(Function),
       previousCalls: [],
     };
@@ -170,7 +170,7 @@ describe("Mockit > Spying", () => {
     const expectedSecondCall = {
       date: expect.any(String),
       args: ["A"],
-      key: '"A"',
+      key: new Parser().hash(["A"]),
       mockedBehaviour: expect.any(Function),
       previousCalls: [expectedFirstCall],
     };
