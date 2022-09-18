@@ -211,7 +211,7 @@ describe("Mockit > Spying", () => {
   });
 
   test("It should also allow to check if a function has been called with a specific set of parameters", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock<Dog>(Mockit.stub(Dog));
     const repeatSoundMethod = Mockit.spy<Dog>(mockDog).method("repeatSound");
 
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");

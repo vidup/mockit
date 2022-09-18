@@ -1,12 +1,13 @@
 import { Mock } from ".";
+import { GetClassMethods } from "../types/GetClassMethods";
 
 export class MockInjector<T> {
-  private readonly mock: Mock;
+  private readonly mock: Mock<T>;
   constructor(mock: any) {
-    this.mock = mock as Mock;
+    this.mock = mock as Mock<T>;
   }
 
-  public calls(func: string, withArgs: any[]) {
+  public calls(func: GetClassMethods<T>, withArgs: any[]) {
     const mock = this.mock;
     return {
       thenReturn(returnValue: any) {

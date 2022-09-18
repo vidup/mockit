@@ -4,20 +4,20 @@ import type { Call } from "../types/call";
 import type { GetClassMethods } from "../types/GetClassMethods";
 
 export class Spy<T> {
-  private mock: Mock;
+  private mock: Mock<T>;
   constructor(mock: any) {
-    this.mock = mock as Mock;
+    this.mock = mock as Mock<T>;
   }
 
   public callsTo(func: GetClassMethods<T>) {
     const mock = this.mock;
     return {
       withArgs: (args: any[]): Array<Call> => {
-        const mockedCalls = mock.callsTo(func as string, args);
+        const mockedCalls = mock.callsTo(func, args);
         return mockedCalls;
       },
       inTotal: (): Array<Call> => {
-        const mockedCalls = mock.totalCallsTo(func as string);
+        const mockedCalls = mock.totalCallsTo(func);
         return mockedCalls;
       },
     };
@@ -27,18 +27,18 @@ export class Spy<T> {
     const mock = this.mock;
     return {
       hasBeenCalled(): boolean {
-        return mock.totalCallsTo(func as string).length > 0;
+        return mock.totalCallsTo(func).length > 0;
       },
       hasBeenCalledWith: (args: any[]): boolean => {
-        const mockedCalls = mock.callsTo(func as string, args);
+        const mockedCalls = mock.callsTo(func, args);
         return mockedCalls.length > 0;
       },
       hasBeenCalledNTimes: (times: number): boolean => {
-        const mockedCalls = mock.totalCallsTo(func as string);
+        const mockedCalls = mock.totalCallsTo(func);
         return mockedCalls.length === times;
       },
       hasBeenCalledNTimesWith(args: any[], times: number): boolean {
-        const mockedCalls = mock.callsTo(func as string, args);
+        const mockedCalls = mock.callsTo(func, args);
         return mockedCalls.length === times;
       },
     };
