@@ -1,5 +1,6 @@
 import { Mock } from "./mock";
 import { MockInjector } from "./mock/MockInjector";
+import { Copy } from "./mock/Copy";
 import { Spy } from "./mock/Spy";
 
 export class Mockit {
@@ -13,5 +14,9 @@ export class Mockit {
 
   static when<T>(mock) {
     return new MockInjector(mock);
+  }
+
+  static stub<T>(original: new () => T) {
+    return new Copy(original) as T;
   }
 }
