@@ -1,5 +1,5 @@
-import { Call } from "./types/call";
-import { Mock } from "./mock";
+import { Call } from "../types/call";
+import { Mock } from ".";
 
 export class Spy {
   private mock: Mock;
