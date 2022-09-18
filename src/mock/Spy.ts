@@ -1,21 +1,23 @@
-import { Call } from "../types/call";
 import { Mock } from ".";
 
-export class Spy {
+import type { Call } from "../types/call";
+import type { GetClassMethods } from "../types/GetClassMethods";
+
+export class Spy<T> {
   private mock: Mock;
   constructor(mock: any) {
     this.mock = mock as Mock;
   }
 
-  public callsTo(func: string) {
+  public callsTo(func: keyof GetClassMethods<T, Function>) {
     const mock = this.mock;
     return {
       withArgs: (args: any[]): Array<Call> => {
-        const mockedCalls = mock.callsTo(func, args);
+        const mockedCalls = mock.callsTo(func as string, args);
         return mockedCalls;
       },
       inTotal: (): Array<Call> => {
-        const mockedCalls = mock.totalCallsTo(func);
+        const mockedCalls = mock.totalCallsTo(func as string);
         return mockedCalls;
       },
     };

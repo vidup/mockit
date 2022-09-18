@@ -7,11 +7,11 @@ export class Mockit {
     return new Mock() as T;
   }
 
-  static spy(mock) {
-    return new Spy(mock);
+  static spy<T>(mock) {
+    return new Spy<T>(mock);
   }
 
-  static when(mock) {
+  static when<T>(mock) {
     return new MockInjector(mock);
   }
 }

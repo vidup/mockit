@@ -163,7 +163,7 @@ describe("Mockit > Spying", () => {
       mockedBehaviour: expect.any(Function),
       previousCalls: [],
     };
-    expect(Mockit.spy(mockDog).callsTo("repeatSound").inTotal()).toEqual([
+    expect(Mockit.spy<Dog>(mockDog).callsTo("repeatSound").inTotal()).toEqual([
       expectedFirstCall,
     ]);
 
@@ -176,7 +176,7 @@ describe("Mockit > Spying", () => {
       previousCalls: [expectedFirstCall],
     };
 
-    expect(Mockit.spy(mockDog).callsTo("repeatSound").inTotal()).toEqual([
+    expect(Mockit.spy<Dog>(mockDog).callsTo("repeatSound").inTotal()).toEqual([
       expectedFirstCall,
       expectedSecondCall,
     ]);
@@ -193,16 +193,16 @@ describe("Mockit > Spying", () => {
     mockDog.repeatSound("A");
 
     expect(
-      Mockit.spy(mockDog).callsTo("repeatSound").withArgs(["A"]).length
+      Mockit.spy<Dog>(mockDog).callsTo("repeatSound").withArgs(["A"]).length
     ).toBe(3);
     mockDog.repeatSound("B");
 
     expect(
-      Mockit.spy(mockDog).callsTo("repeatSound").withArgs(["B"]).length
+      Mockit.spy<Dog>(mockDog).callsTo("repeatSound").withArgs(["B"]).length
     ).toBe(1);
 
     expect(
-      Mockit.spy(mockDog).callsTo("repeatSound").withArgs(["A"]).length
+      Mockit.spy<Dog>(mockDog).callsTo("repeatSound").withArgs(["A"]).length
     ).toBe(3);
   });
 
@@ -214,13 +214,19 @@ describe("Mockit > Spying", () => {
     Mockit.when(mockDog).calls("repeatSound", ["B"]).thenReturn("CROAAA!");
 
     mockDog.repeatSound("A");
-    expect(Mockit.spy(mockDog).callsTo("repeatSound").inTotal().length).toBe(1);
+    expect(
+      Mockit.spy<Dog>(mockDog).callsTo("repeatSound").inTotal().length
+    ).toBe(1);
 
     mockDog.repeatSound("B");
-    expect(Mockit.spy(mockDog).callsTo("repeatSound").inTotal().length).toBe(2);
+    expect(
+      Mockit.spy<Dog>(mockDog).callsTo("repeatSound").inTotal().length
+    ).toBe(2);
 
     mockDog.repeatSound("A");
-    expect(Mockit.spy(mockDog).callsTo("repeatSound").inTotal().length).toBe(3);
+    expect(
+      Mockit.spy<Dog>(mockDog).callsTo("repeatSound").inTotal().length
+    ).toBe(3);
   });
 
   test("It should also allow to check if a function has been called", () => {
