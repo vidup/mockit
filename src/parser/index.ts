@@ -1,4 +1,4 @@
-import hasher from "object-hash";
+import * as hasher from "object-hash";
 
 export class Parser {
   hash(args: any) {
