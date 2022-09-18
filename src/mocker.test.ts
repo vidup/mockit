@@ -222,4 +222,120 @@ describe("Mockit > Spying", () => {
     mockDog.repeatSound("A");
     expect(Mockit.spy(mockDog).callsTo("repeatSound").inTotal().length).toBe(3);
   });
+
+  test("It should also allow to check if a function has been called", () => {
+    const dog = new Dog();
+    const mockDog = Mockit.mock(dog);
+
+    Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
+    expect(Mockit.spy(mockDog).method("repeatSound").hasBeenCalled()).toBe(
+      false
+    );
+
+    mockDog.repeatSound("A");
+
+    expect(Mockit.spy(mockDog).method("repeatSound").hasBeenCalled()).toBe(
+      true
+    );
+  });
+
+  test("It should also allow to check if a function has been called with a specific set of parameters", () => {
+    const dog = new Dog();
+    const mockDog = Mockit.mock(dog);
+
+    Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
+    Mockit.when(mockDog).calls("repeatSound", ["B"]).thenReturn("CROBBB!");
+    expect(
+      Mockit.spy(mockDog).method("repeatSound").hasBeenCalledWith(["A"])
+    ).toBe(false);
+    expect(
+      Mockit.spy(mockDog).method("repeatSound").hasBeenCalledWith(["B"])
+    ).toBe(false);
+
+    mockDog.repeatSound("A");
+
+    expect(
+      Mockit.spy(mockDog).method("repeatSound").hasBeenCalledWith(["A"])
+    ).toBe(true);
+    expect(
+      Mockit.spy(mockDog).method("repeatSound").hasBeenCalledWith(["B"])
+    ).toBe(false);
+  });
+
+  test("It should allow to check if a function has been called n times", () => {
+    const dog = new Dog();
+    const mockDog = Mockit.mock(dog);
+
+    Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
+    expect(
+      Mockit.spy(mockDog).method("repeatSound").hasBeenCalledNTimes(0)
+    ).toBe(true);
+
+    mockDog.repeatSound("A");
+    expect(
+      Mockit.spy(mockDog).method("repeatSound").hasBeenCalledNTimes(1)
+    ).toBe(true);
+
+    mockDog.repeatSound("A");
+    expect(
+      Mockit.spy(mockDog).method("repeatSound").hasBeenCalledNTimes(2)
+    ).toBe(true);
+  });
+
+  it("It should allow to check if a function has been called with a specific set of parameters n times", () => {
+    const dog = new Dog();
+    const mockDog = Mockit.mock(dog);
+
+    Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
+    Mockit.when(mockDog).calls("repeatSound", ["B"]).thenReturn("CROBBB!");
+    expect(
+      Mockit.spy(mockDog)
+        .method("repeatSound")
+        .hasBeenCalledNTimesWith(["A"], 0)
+    ).toBe(true);
+    expect(
+      Mockit.spy(mockDog)
+        .method("repeatSound")
+        .hasBeenCalledNTimesWith(["B"], 0)
+    ).toBe(true);
+
+    mockDog.repeatSound("A");
+    expect(
+      Mockit.spy(mockDog)
+        .method("repeatSound")
+        .hasBeenCalledNTimesWith(["A"], 1)
+    ).toBe(true);
+    expect(
+      Mockit.spy(mockDog)
+        .method("repeatSound")
+        .hasBeenCalledNTimesWith(["A"], 0)
+    ).toBe(false);
+    expect(
+      Mockit.spy(mockDog)
+        .method("repeatSound")
+        .hasBeenCalledNTimesWith(["B"], 1)
+    ).toBe(false);
+    expect(
+      Mockit.spy(mockDog)
+        .method("repeatSound")
+        .hasBeenCalledNTimesWith(["B"], 0)
+    ).toBe(true);
+
+    mockDog.repeatSound("A");
+    expect(
+      Mockit.spy(mockDog)
+        .method("repeatSound")
+        .hasBeenCalledNTimesWith(["A"], 2)
+    ).toBe(true);
+    expect(
+      Mockit.spy(mockDog)
+        .method("repeatSound")
+        .hasBeenCalledNTimesWith(["B"], 2)
+    ).toBe(false);
+    expect(
+      Mockit.spy(mockDog)
+        .method("repeatSound")
+        .hasBeenCalledNTimesWith(["B"], 0)
+    ).toBe(true);
+  });
 });
