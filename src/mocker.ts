@@ -4,7 +4,7 @@ import { Copy } from "./mock/Copy";
 import { Spy } from "./mock/Spy";
 
 export class Mockit {
-  static mock<T>(_clazz: T): T {
+  static mock<T>(_original: new () => T): T {
     return new Mock<T>() as T;
   }
 

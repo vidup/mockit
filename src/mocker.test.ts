@@ -21,17 +21,14 @@ class Dog implements Animal {
 
 describe("Mockit > thenReturn", () => {
   test("it should allow to replace a class function returned value", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     Mockit.when(mockDog).calls("makeSound", []).thenReturn("CROAAA!");
 
     expect(mockDog.makeSound()).toBe("CROAAA!");
   });
 
   test("it should be able to mock different calls separately", () => {
-    const dog = new Dog();
-    expect(dog.repeatSound("yo")).toBe("Woof yo");
-
-    const mockDog = Mockit.mock(dog);
+    const mockDog = Mockit.mock(Dog);
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("yo");
     Mockit.when(mockDog).calls("repeatSound", ["B"]).thenReturn("HELLAW!");
 
@@ -43,7 +40,7 @@ describe("Mockit > thenReturn", () => {
 
 describe("Mockit > thenThrow", () => {
   test("it should allow to set a custom throw message", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     Mockit.when(mockDog).calls("makeSound", []).thenThrow("CROA ERROR!");
 
     expect(() => {
@@ -52,7 +49,7 @@ describe("Mockit > thenThrow", () => {
   });
 
   test("it should allow to set a custom Error", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     Mockit.when(mockDog)
       .calls("makeSound", [])
       .thenThrow(new Error("CROA ERROR 2!"));
@@ -72,10 +69,10 @@ describe("Mockit > thenCall", () => {
     }
 
     expect(() => {
-      Mockit.mock(new BasicAnimal()).makeSound();
+      Mockit.mock(BasicAnimal).makeSound();
     }).toThrow();
 
-    const mockDog = Mockit.mock(new BasicAnimal());
+    const mockDog = Mockit.mock(BasicAnimal);
     Mockit.when(mockDog).calls("makeSound", []).thenReturn("CROAAA!");
     expect(mockDog.makeSound()).toBe("CROAAA!");
   });
@@ -96,7 +93,7 @@ describe("Mockit > thenCall", () => {
     const backgroundCheck = new BackgroundCheck();
     expect(backgroundCheck.getCalls()).toBe(0);
 
-    const mockDog = Mockit.mock(new Dog());
+    const mockDog = Mockit.mock(Dog);
     Mockit.when(mockDog)
       .calls("makeSound", [])
       .thenCall(() => {
@@ -110,7 +107,7 @@ describe("Mockit > thenCall", () => {
 
 describe("Mockit > thenResolve", () => {
   test("it should allow to set a custom promise response", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     Mockit.when(mockDog).calls("makeAsyncSound", []).thenResolve("CROAAA!");
 
     return mockDog.makeAsyncSound().then((result) => {
@@ -121,7 +118,7 @@ describe("Mockit > thenResolve", () => {
 
 describe("Mockit > thenReject", () => {
   test("it should allow to set a custom promise rejection", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     Mockit.when(mockDog)
       .calls("makeAsyncSound", [])
       .thenReject(new Error("CROA ERROR 2!"));
@@ -134,7 +131,7 @@ describe("Mockit > thenReject", () => {
 
 describe("Mockit > Spying", () => {
   test("It should give information about the calls", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     const repeatSoundMethod = Mockit.spy<Dog>(mockDog).callsTo("repeatSound");
 
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
@@ -165,7 +162,7 @@ describe("Mockit > Spying", () => {
   });
 
   test("It should allow to access the function calls history for different sets of parameters", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     const repeatSoundCalls = Mockit.spy<Dog>(mockDog).callsTo("repeatSound");
 
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
@@ -184,7 +181,7 @@ describe("Mockit > Spying", () => {
   });
 
   test("It should also allow to access the whole function call history", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     const repeatSoundCalls = Mockit.spy<Dog>(mockDog).callsTo("repeatSound");
 
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
@@ -201,7 +198,7 @@ describe("Mockit > Spying", () => {
   });
 
   test("It should also allow to check if a function has been called", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     const repeatSoundMethod = Mockit.spy<Dog>(mockDog).method("repeatSound");
 
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
@@ -211,7 +208,7 @@ describe("Mockit > Spying", () => {
   });
 
   test("It should also allow to check if a function has been called with a specific set of parameters", () => {
-    const mockDog = Mockit.mock<Dog>(Mockit.stub(Dog));
+    const mockDog = Mockit.mock<Dog>(Dog);
     const repeatSoundMethod = Mockit.spy<Dog>(mockDog).method("repeatSound");
 
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
@@ -227,7 +224,7 @@ describe("Mockit > Spying", () => {
   });
 
   test("It should allow to check if a function has been called n times", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     const repeatSoundMethod = Mockit.spy<Dog>(mockDog).method("repeatSound");
 
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
@@ -241,7 +238,7 @@ describe("Mockit > Spying", () => {
   });
 
   it("It should allow to check if a function has been called with a specific set of parameters n times", () => {
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(Dog);
     const repeatSoundMethod = Mockit.spy<Dog>(mockDog).method("repeatSound");
 
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
