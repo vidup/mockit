@@ -6,7 +6,6 @@ abstract class Animal {
 }
 
 class Dog implements Animal {
-  constructor() {}
   makeSound() {
     return "Woof!";
   }
@@ -22,8 +21,6 @@ class Dog implements Animal {
 
 describe("Mockit > thenReturn", () => {
   test("it should allow to replace a class function returned value", () => {
-    expect(dog.makeSound()).toBe("Woof!");
-
     const mockDog = Mockit.mock(Mockit.stub(Dog));
     Mockit.when(mockDog).calls("makeSound", []).thenReturn("CROAAA!");
 
@@ -31,9 +28,10 @@ describe("Mockit > thenReturn", () => {
   });
 
   test("it should be able to mock different calls separately", () => {
+    const dog = new Dog();
     expect(dog.repeatSound("yo")).toBe("Woof yo");
 
-    const mockDog = Mockit.mock(Mockit.stub(Dog));
+    const mockDog = Mockit.mock(dog);
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("yo");
     Mockit.when(mockDog).calls("repeatSound", ["B"]).thenReturn("HELLAW!");
 
@@ -45,8 +43,6 @@ describe("Mockit > thenReturn", () => {
 
 describe("Mockit > thenThrow", () => {
   test("it should allow to set a custom throw message", () => {
-    expect(dog.makeSound()).toBe("Woof!");
-
     const mockDog = Mockit.mock(Mockit.stub(Dog));
     Mockit.when(mockDog).calls("makeSound", []).thenThrow("CROA ERROR!");
 
@@ -56,8 +52,6 @@ describe("Mockit > thenThrow", () => {
   });
 
   test("it should allow to set a custom Error", () => {
-    expect(dog.makeSound()).toBe("Woof!");
-
     const mockDog = Mockit.mock(Mockit.stub(Dog));
     Mockit.when(mockDog)
       .calls("makeSound", [])
@@ -89,7 +83,6 @@ describe("Mockit > thenCall", () => {
   test("it should allow to set a custom call", () => {
     class BackgroundCheck {
       private calls = 0;
-      constructor() {}
 
       check(): void {
         this.calls++;
@@ -117,8 +110,6 @@ describe("Mockit > thenCall", () => {
 
 describe("Mockit > thenResolve", () => {
   test("it should allow to set a custom promise response", () => {
-    expect(dog.makeSound()).toBe("Woof!");
-
     const mockDog = Mockit.mock(Mockit.stub(Dog));
     Mockit.when(mockDog).calls("makeAsyncSound", []).thenResolve("CROAAA!");
 
@@ -130,8 +121,6 @@ describe("Mockit > thenResolve", () => {
 
 describe("Mockit > thenReject", () => {
   test("it should allow to set a custom promise rejection", () => {
-    expect(dog.makeSound()).toBe("Woof!");
-
     const mockDog = Mockit.mock(Mockit.stub(Dog));
     Mockit.when(mockDog)
       .calls("makeAsyncSound", [])
