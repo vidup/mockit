@@ -1,6 +1,6 @@
 import { AbstractParser, Parser } from "../parser";
 
-export class hMap extends Map {
+export class HashingMap extends Map {
   constructor(
     private readonly map = new Map(),
     private readonly parser: AbstractParser = new Parser()

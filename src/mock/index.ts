@@ -1,12 +1,12 @@
-import { hMap } from "../hmap";
+import { HashingMap } from "../HashingMap";
 import { Parser } from "../parser";
 
 import type { Call } from "../types/call";
 
 export class Mock {
-  private callsMap: hMap;
+  private callsMap: HashingMap;
   constructor() {
-    this.callsMap = new hMap();
+    this.callsMap = new HashingMap();
   }
 
   registerMock(
@@ -17,11 +17,14 @@ export class Mock {
     this.protectReservedKeys(functionName);
 
     if (!this.callsMap.get(functionName)) {
-      this.callsMap.set(functionName, new hMap().set("_calls", []));
+      this.callsMap.set(functionName, new HashingMap().set("_calls", []));
     }
 
-    const funcMockMap = this.callsMap.get<hMap>(functionName);
-    funcMockMap.set(args, new hMap().set("mock", whatToDo).set("calls", []));
+    const funcMockMap = this.callsMap.get<HashingMap>(functionName);
+    funcMockMap.set(
+      args,
+      new HashingMap().set("mock", whatToDo).set("calls", [])
+    );
 
     this.callsMap.set(functionName, funcMockMap);
     this.refreshMockFunction(functionName);
@@ -34,12 +37,12 @@ export class Mock {
   }
 
   public callsTo(name: string, args: any[]): Call[] {
-    const func = this.callsMap.get<hMap>(name);
+    const func = this.callsMap.get<HashingMap>(name);
     if (!func) {
       throw new Error(`Function ${name} is not mocked`);
     }
 
-    const mockedBehaviour = func.get<hMap>(args);
+    const mockedBehaviour = func.get<HashingMap>(args);
 
     if (!mockedBehaviour) {
       throw new Error(`Function ${name} is not mocked with args ${args}`);
@@ -49,7 +52,7 @@ export class Mock {
   }
 
   public totalCallsTo(name: string): Call[] {
-    const func = this.callsMap.get<hMap>(name);
+    const func = this.callsMap.get<HashingMap>(name);
     if (!func) {
       throw new Error(`Function ${name} is not mocked`);
     }
@@ -59,12 +62,12 @@ export class Mock {
 
   public refreshMockFunction(name: string) {
     this[name] = (...args: any[]) => {
-      const mockedFunction = this.callsMap.get<hMap>(name);
+      const mockedFunction = this.callsMap.get<HashingMap>(name);
       if (!mockedFunction) {
         throw new Error(`Function ${name} is not mocked`);
       }
 
-      const mockedBehaviour = mockedFunction.get<hMap>(args);
+      const mockedBehaviour = mockedFunction.get<HashingMap>(args);
       if (!mockedBehaviour) {
         throw new Error(`Function ${name} is not mocked with args ${args}`);
       }
