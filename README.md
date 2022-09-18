@@ -5,4 +5,8 @@ executing a custom function, or throwing a custom exception as well as a custom 
 
 Next steps:
 
-- [ ] Add support for calls verification (spy-like behaviour)
+- [x] Check if the mock has been called.
+- [x] Check if the mock has been called a specific number of times.
+- [x] Check if the mock has been called with specific arguments.
+- [x] Check if the mock has been called with specific arguments a specific number of times.
+- [ ] Use prototype to generate mocks that cover all the functions of a class.
