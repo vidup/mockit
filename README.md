@@ -9,4 +9,6 @@ Next steps:
 - [x] Check if the mock has been called a specific number of times.
 - [x] Check if the mock has been called with specific arguments.
 - [x] Check if the mock has been called with specific arguments a specific number of times.
-- [ ] Use prototype to generate mocks that cover all the functions of a class.
+- [x] Use prototype to generate stubs that cover all the functions of a class.
+- [x] Use generics to provide auto-completion for the mock, spy and when functions.
+- [x] Use generics to avoid requiring to pass an instance of the class instead of the class itself.
