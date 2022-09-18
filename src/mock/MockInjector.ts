@@ -1,6 +1,6 @@
 import { Mock } from ".";
 
-export class MockInjector {
+export class MockInjector<T> {
   private readonly mock: Mock;
   constructor(mock: any) {
     this.mock = mock as Mock;

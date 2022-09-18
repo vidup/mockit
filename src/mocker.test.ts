@@ -266,7 +266,7 @@ describe("Mockit > Spying", () => {
   it("It should allow to check if a function has been called with a specific set of parameters n times", () => {
     const dog = new Dog();
     const mockDog = Mockit.mock(dog);
-    const spy = Mockit.spy(mockDog);
+    const spy = Mockit.spy<Dog>(mockDog);
 
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
     Mockit.when(mockDog).calls("repeatSound", ["B"]).thenReturn("CROBBB!");

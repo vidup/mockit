@@ -9,7 +9,7 @@ export class Spy<T> {
     this.mock = mock as Mock;
   }
 
-  public callsTo(func: keyof GetClassMethods<T, Function>) {
+  public callsTo(func: GetClassMethods<T>) {
     const mock = this.mock;
     return {
       withArgs: (args: any[]): Array<Call> => {
