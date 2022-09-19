@@ -6,6 +6,7 @@
 
     // optional - in general it's a good practice to decouple declaration files from your actual transpiled JavaScript files
     "declarationDir": "dist/dts",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   }
 }

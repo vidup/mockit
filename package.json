@@ -31,6 +31,6 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
-    "object-hash": "^3.0.0"
+    "node-object-hash": "^2.3.10"
   }
 }

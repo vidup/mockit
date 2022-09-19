@@ -1,8 +1,10 @@
-import hasher from "object-hash";
+import hash from "node-object-hash";
 
 export class Parser {
+  private hasher = hash({ coerce: { set: true, symbol: true } });
+
   hash(args: any) {
-    return hasher(args);
+    return this.hasher.hash(args);
   }
 }
 
