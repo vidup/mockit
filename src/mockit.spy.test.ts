@@ -1,11 +1,7 @@
-import { Mockit } from "./mocker";
+import { Mockit } from "./mockit";
 import { Parser } from "./parser";
 
-abstract class Animal {
-  abstract makeSound(): string;
-}
-
-class Dog implements Animal {
+class Dog {
   makeSound() {
     return "Woof!";
   }
@@ -18,116 +14,6 @@ class Dog implements Animal {
     return "Woof " + sound;
   }
 }
-
-describe("Mockit > thenReturn", () => {
-  test("it should allow to replace a class function returned value", () => {
-    const mockDog = Mockit.mock(Dog);
-    Mockit.when(mockDog).calls("makeSound", []).thenReturn("CROAAA!");
-
-    expect(mockDog.makeSound()).toBe("CROAAA!");
-  });
-
-  test("it should be able to mock different calls separately", () => {
-    const mockDog = Mockit.mock(Dog);
-    Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("yo");
-    Mockit.when(mockDog).calls("repeatSound", ["B"]).thenReturn("HELLAW!");
-
-    expect(mockDog.repeatSound("A")).toBe("yo");
-    expect(mockDog.repeatSound("B")).toBe("HELLAW!");
-    expect(mockDog.repeatSound("A")).toBe("yo");
-  });
-});
-
-describe("Mockit > thenThrow", () => {
-  test("it should allow to set a custom throw message", () => {
-    const mockDog = Mockit.mock(Dog);
-    Mockit.when(mockDog).calls("makeSound", []).thenThrow("CROA ERROR!");
-
-    expect(() => {
-      mockDog.makeSound();
-    }).toThrowError("CROA ERROR!");
-  });
-
-  test("it should allow to set a custom Error", () => {
-    const mockDog = Mockit.mock(Dog);
-    Mockit.when(mockDog)
-      .calls("makeSound", [])
-      .thenThrow(new Error("CROA ERROR 2!"));
-
-    expect(() => {
-      mockDog.makeSound();
-    }).toThrowError("CROA ERROR 2!");
-  });
-});
-
-describe("Mockit > thenCall", () => {
-  test("it should allow to replace a throwing method by a returning one", () => {
-    class BasicAnimal extends Animal {
-      makeSound(): string {
-        throw new Error("Method not implemented.");
-      }
-    }
-
-    expect(() => {
-      Mockit.mock(BasicAnimal).makeSound();
-    }).toThrow();
-
-    const mockDog = Mockit.mock(BasicAnimal);
-    Mockit.when(mockDog).calls("makeSound", []).thenReturn("CROAAA!");
-    expect(mockDog.makeSound()).toBe("CROAAA!");
-  });
-
-  test("it should allow to set a custom call", () => {
-    class BackgroundCheck {
-      private calls = 0;
-
-      check(): void {
-        this.calls++;
-      }
-
-      getCalls(): number {
-        return this.calls;
-      }
-    }
-
-    const backgroundCheck = new BackgroundCheck();
-    expect(backgroundCheck.getCalls()).toBe(0);
-
-    const mockDog = Mockit.mock(Dog);
-    Mockit.when(mockDog)
-      .calls("makeSound", [])
-      .thenCall(() => {
-        backgroundCheck.check();
-      });
-
-    mockDog.makeSound();
-    expect(backgroundCheck.getCalls()).toBe(1);
-  });
-});
-
-describe("Mockit > thenResolve", () => {
-  test("it should allow to set a custom promise response", () => {
-    const mockDog = Mockit.mock(Dog);
-    Mockit.when(mockDog).calls("makeAsyncSound", []).thenResolve("CROAAA!");
-
-    return mockDog.makeAsyncSound().then((result) => {
-      expect(result).toBe("CROAAA!");
-    });
-  });
-});
-
-describe("Mockit > thenReject", () => {
-  test("it should allow to set a custom promise rejection", () => {
-    const mockDog = Mockit.mock(Dog);
-    Mockit.when(mockDog)
-      .calls("makeAsyncSound", [])
-      .thenReject(new Error("CROA ERROR 2!"));
-
-    return mockDog.makeAsyncSound().catch((error) => {
-      expect(error.message).toBe("CROA ERROR 2!");
-    });
-  });
-});
 
 describe("Mockit > Spying", () => {
   test("It should give information about the calls", () => {
