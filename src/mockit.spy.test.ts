@@ -1,5 +1,6 @@
 import { Mockit } from "./mockit";
 import { Parser } from "./parser";
+import { Call } from "./types/call";
 
 class Dog {
   makeSound() {
@@ -23,7 +24,7 @@ describe("Mockit > Spying", () => {
     Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
     mockDog.repeatSound("A");
 
-    const expectedFirstCall = {
+    const expectedFirstCall: Call = {
       date: expect.any(String),
       args: ["A"],
       key: new Parser().hash(["A"]),
