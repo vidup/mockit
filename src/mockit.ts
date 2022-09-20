@@ -1,6 +1,6 @@
 import { Mock } from "./mock";
 import { MockInjector } from "./mock/MockInjector";
-import { Copy } from "./mock/Copy";
+import { Behaviour, Copy } from "./mock/Copy";
 import { Spy } from "./mock/Spy";
 
 export class Mockit {
@@ -18,5 +18,43 @@ export class Mockit {
 
   static stub<T>(original: new () => T) {
     return new Copy(original) as T;
+  }
+
+  static stubThatThrows<T>(original: new () => T, threwValue: any) {
+    return new Copy(original).setupBehaviour({
+      behaviour: Behaviour.Throw,
+      error: threwValue,
+    }) as T;
+  }
+
+  static stubThatReturns<T>(original: new () => T, returnedValue: any) {
+    return new Copy(original).setupBehaviour({
+      behaviour: Behaviour.Return,
+      returnedValue,
+    }) as T;
+  }
+
+  static stubThatResolves<T>(original: new () => T, resolvedValue: any) {
+    return new Copy(original).setupBehaviour({
+      behaviour: Behaviour.Resolve,
+      resolvedValue,
+    }) as T;
+  }
+
+  static stubThatRejects<T>(original: new () => T, rejectedValue: any) {
+    return new Copy(original).setupBehaviour({
+      behaviour: Behaviour.Reject,
+      rejectedValue,
+    }) as T;
+  }
+
+  static stubThatCallsSomething<T>(
+    original: new () => T,
+    callback: (...args: any[]) => any
+  ) {
+    return new Copy(original).setupBehaviour({
+      behaviour: Behaviour.Call,
+      callback,
+    }) as T;
   }
 }
