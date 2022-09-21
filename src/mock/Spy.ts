@@ -1,4 +1,5 @@
 import { Mock } from ".";
+import { Any } from "../Any";
 
 import type { Call } from "../types/call";
 import type { GetClassMethods } from "../types/GetClassMethods";
@@ -38,6 +39,9 @@ export class Spy<T> {
         return mockedCalls.length === times;
       },
       hasBeenCalledNTimesWith(args: any[], times: number): boolean {
+        if (args.some((arg) => arg instanceof Any)) {
+          return this.hasBeenCalledOnceWithAnyArgs(func, args, times);
+        }
         const mockedCalls = mock.callsTo(func, args);
         return mockedCalls.length === times;
       },
@@ -59,6 +63,37 @@ export class Spy<T> {
       },
       hasBeenCalledThriceWith(args: any[]): boolean {
         return this.hasBeenCalledNTimesWith(args, 3);
+      },
+
+      hasBeenCalledOnceWithAnyArgs(
+        func: GetClassMethods<T>,
+        args: any[],
+        times: number
+      ): boolean {
+        const calls = mock.totalCallsTo(func);
+
+        const notAnyArgs = args
+          .map((arg, index) => [arg, index])
+          .filter(([arg]) => !(arg instanceof Any));
+
+        const anyArgs: [Any, number][] = args
+          .map<[Any, number]>((arg, index) => [arg, index])
+          .filter(([arg]) => arg instanceof Any);
+
+        if (
+          calls.filter((call) => {
+            return (
+              notAnyArgs.every(([arg, index]) => call.args[index] === arg) &&
+              anyArgs.every(([arg, index]) => {
+                return arg.isValid(call.args[index]);
+              })
+            );
+          }).length === times
+        ) {
+          return true;
+        }
+
+        return false;
       },
     };
   }

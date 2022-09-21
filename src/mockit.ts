@@ -2,6 +2,7 @@ import { Mock } from "./mock";
 import { MockInjector } from "./mock/MockInjector";
 import { Behaviour, Copy } from "./mock/Copy";
 import { Spy } from "./mock/Spy";
+import { Any } from "./Any";
 
 export class Mockit {
   static mock<T>(_original: new () => T): T {
@@ -56,5 +57,9 @@ export class Mockit {
       behaviour: Behaviour.Call,
       callback,
     }) as T;
+  }
+
+  static any(val: String | Object | Number | Boolean) {
+    return new Any(val);
   }
 }
