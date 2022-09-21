@@ -5,10 +5,8 @@ import type { Call } from "../types/call";
 import { GetClassMethods } from "../types/GetClassMethods";
 
 export class Mock<T> {
-  private callsMap: HashingMap;
-  constructor() {
-    this.callsMap = new HashingMap();
-  }
+  private callsMap: HashingMap = new HashingMap();
+  constructor() {}
 
   registerMock(
     functionName: GetClassMethods<T>,

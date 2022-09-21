@@ -1,12 +1,10 @@
 import { AbstractParser, Parser } from "../parser";
 
-export class HashingMap extends Map {
+export class HashingMap {
   constructor(
     private readonly map = new Map(),
     private readonly parser: AbstractParser = new Parser()
-  ) {
-    super();
-  }
+  ) {}
 
   get<T>(args: any): T {
     const hashedArgs = this.parser.hash(args);
@@ -18,5 +16,23 @@ export class HashingMap extends Map {
     this.map.set(hashedArgs, value);
 
     return this;
+  }
+
+  size(): number {
+    return this.map.size;
+  }
+
+  has(args: any): boolean {
+    const hashedArgs = this.parser.hash(args);
+    return this.map.has(hashedArgs);
+  }
+
+  delete(args: any): boolean {
+    const hashedArgs = this.parser.hash(args);
+    return this.map.delete(hashedArgs);
+  }
+
+  clear(): void {
+    this.map.clear();
   }
 }
