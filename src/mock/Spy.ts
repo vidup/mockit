@@ -41,6 +41,25 @@ export class Spy<T> {
         const mockedCalls = mock.callsTo(func, args);
         return mockedCalls.length === times;
       },
+      hasBeenCalledOnce(): boolean {
+        return this.hasBeenCalledNTimes(1);
+      },
+      hasBeenCalledTwice(): boolean {
+        return this.hasBeenCalledNTimes(2);
+      },
+      hasBeenCalledThrice(): boolean {
+        return this.hasBeenCalledNTimes(3);
+      },
+
+      hasBeenCalledOnceWith(args: any[]): boolean {
+        return this.hasBeenCalledNTimesWith(args, 1);
+      },
+      hasBeenCalledTwiceWith(args: any[]): boolean {
+        return this.hasBeenCalledNTimesWith(args, 2);
+      },
+      hasBeenCalledThriceWith(args: any[]): boolean {
+        return this.hasBeenCalledNTimesWith(args, 3);
+      },
     };
   }
 }

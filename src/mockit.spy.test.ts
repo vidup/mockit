@@ -144,4 +144,26 @@ describe("Mockit > Spying", () => {
     expect(repeatSoundMethod.hasBeenCalledNTimesWith(["B"], 2)).toBe(false);
     expect(repeatSoundMethod.hasBeenCalledNTimesWith(["B"], 0)).toBe(true);
   });
+
+  test("It should provide syntactic helpers for 1, 2 and three times", () => {
+    const mockDog = Mockit.mock(Dog);
+    const repeatSoundMethod = Mockit.spy<Dog>(mockDog).method("repeatSound");
+
+    Mockit.when(mockDog).calls("repeatSound", ["A"]).thenReturn("CROAAA!");
+
+    mockDog.repeatSound("A");
+    expect(repeatSoundMethod.hasBeenCalledOnce()).toBe(true);
+    expect(repeatSoundMethod.hasBeenCalledTwice()).toBe(false);
+    expect(repeatSoundMethod.hasBeenCalledThrice()).toBe(false);
+
+    mockDog.repeatSound("A");
+    expect(repeatSoundMethod.hasBeenCalledOnce()).toBe(false);
+    expect(repeatSoundMethod.hasBeenCalledTwice()).toBe(true);
+    expect(repeatSoundMethod.hasBeenCalledThrice()).toBe(false);
+
+    mockDog.repeatSound("A");
+    expect(repeatSoundMethod.hasBeenCalledOnce()).toBe(false);
+    expect(repeatSoundMethod.hasBeenCalledTwice()).toBe(false);
+    expect(repeatSoundMethod.hasBeenCalledThrice()).toBe(true);
+  });
 });

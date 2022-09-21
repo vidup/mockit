@@ -111,9 +111,13 @@ You can use these calls for analysis, or to check that you mocked corretly with 
 ```ts
 // These methods are syntactic sugar on top of the previously described methods.
 spy.method("sum").hasBeenCalled();
-spy.method("sum").hasBeenCalledWith([1, 2]);
-spy.method("sum").hasBeenCalledTimes(2);
 spy.method("sum").hasBeenCalledOnce();
+spy.method("sum").hasBeenCalledTwice();
+spy.method("sum").hasBeenCalledThrice();
+
+spy.method("sum").hasBeenCalledWith([1, 2]);
+spy.method("sum").hasBeenCalledNTimes(2);
+spy.method("sum").hasBeenCalledNTimesWith();
 ```
 
 With these helpers, you can pass around spies of individual methods.
