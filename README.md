@@ -84,10 +84,10 @@ myClassMock.sum(1, 2);
 myClassMock.sum(2, 3);
 
 // get the all the calls
-const calls = spy.calls("sum").callsTo("sum").inTotal();
+const calls = spy.callsTo("sum").inTotal();
 
 // get the calls with specific arguments
-const callsFor1And2 = spy.calls("sum").callsTo("sum").withArgs([1, 2]);
+const callsFor1And2 = spy.callsTo("sum").withArgs([1, 2]);
 ```
 
 These calls are objects of type Call.
@@ -114,6 +114,31 @@ spy.method("sum").hasBeenCalled();
 spy.method("sum").hasBeenCalledWith([1, 2]);
 spy.method("sum").hasBeenCalledTimes(2);
 spy.method("sum").hasBeenCalledOnce();
+```
+
+With these helpers, you can pass around spies of individual methods.
+
+```ts
+const spy = Mockit.spy(myClassMock);
+const sumSpy = spy.method("sum"); // this will... spy on the sum method
+```
+
+Once registered, you can keep using the spy
+
+```ts
+const spy = Mockit.spy(myClassMock);
+const sumSpy = spy.method("sum");
+
+Mockit.when(myClassMock).calls("sum", [1, 2]).thenReturns(33);
+
+myClassMock.sum(1, 2);
+
+sumSpy.hasBeenCalledOnce();
+
+myClassMock.sum(1, 2);
+
+// Sumspy gets updated with the new call data
+sumSpy.hasBeenCalledTimes(2);
 ```
 
 # Stubs
