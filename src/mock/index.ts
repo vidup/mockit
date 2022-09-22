@@ -5,8 +5,39 @@ import type { Call } from "../types/call";
 import { GetClassMethods } from "../types/GetClassMethods";
 
 export class Mock<T> {
+  public mocks: { functionName: GetClassMethods<T>; args: any[] }[] = [];
   private callsMap: HashingMap = new HashingMap();
-  constructor() {}
+  constructor(original: new () => T) {
+    Object.getOwnPropertyNames(Object.getPrototypeOf(original)).map((key) => {
+      this.generateInitialMockMethod(key as GetClassMethods<T>);
+    });
+  }
+
+  private generateInitialMockMethod(functionName: GetClassMethods<T>) {
+    this[String(functionName)] = (...args: any[]) => {
+      const functionMock = this.callsMap.get<HashingMap>(functionName);
+      this.callsMap.set(
+        String(functionName),
+        new HashingMap().set("_calls", [])
+      );
+      const argsMock = functionMock?.get<HashingMap>(args);
+
+      if (argsMock) {
+        return argsMock.get<Function>("mock")(...args);
+      } else {
+        this.mocks.push({ functionName, args });
+        argsMock
+          .set("mock", () => {
+            throw new Error(
+              `Function ${String(
+                functionName
+              )} is not mocked with args ${args}. Please setup a behaviour`
+            );
+          })
+          .set("calls", []);
+      }
+    };
+  }
 
   registerMock(
     functionName: GetClassMethods<T>,
