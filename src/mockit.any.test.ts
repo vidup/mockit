@@ -20,7 +20,6 @@ describe("Mockit > any", () => {
 
   it("Calls checks for strings", () => {
     Mockit.when(mock).calls("walk", ["hellaw"]).thenReturn("dudette");
-    Mockit.when2(mock.count(1)).thenReturn(2);
     mock.walk("hellaw");
 
     expect(spy.callsTo("walk").inTotal()).toHaveLength(1);

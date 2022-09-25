@@ -5,8 +5,10 @@ import { Spy } from "./mock/Spy";
 import { Any } from "./Any";
 
 export class Mockit {
+  private mocks: Mock<any>[] = [];
   static mock<T>(_original: new () => T): T {
-    return new Mock<T>(_original) as T;
+    const mock = new Mock<T>(_original);
+    return mock as T;
   }
 
   static spy<T>(mock: T) {
@@ -15,10 +17,6 @@ export class Mockit {
 
   static when<T>(mock: T) {
     return new MockInjector<T>(mock as Mock<T>);
-  }
-
-  static when2<T>(mockCall: any) {
-    return new MockInjector<T>();
   }
 
   static stub<T>(original: new () => T) {

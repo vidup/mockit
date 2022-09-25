@@ -39,6 +39,12 @@ export class Mock<T> {
     };
   }
 
+  registerMockRespons(whatToDo: (...args: any[]) => any) {
+    const lastRegistratedMock = this.mocks.pop();
+    if (!lastRegistratedMock) throw new Error("No mock to register");
+    this.registerMock(lastRegistratedMock.functionName, lastRegistratedMock.args, whatToDo);
+  }
+
   registerMock(
     functionName: GetClassMethods<T>,
     args: any[],
