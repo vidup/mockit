@@ -112,9 +112,7 @@ export class Spy<T> {
 
         const containingAnyArgs: [Object, number][] = args
           .map<[Any, number]>((arg, index) => [arg, index])
-          .filter(([arg]) => containsAny(arg));
-
-        console.log(containingAnyArgs);
+          .filter(([arg]) => containsAny(arg) && !isAny(arg));
 
         const matchingCalls = calls.filter((call) => {
           const args = call.args;
@@ -133,36 +131,10 @@ export class Spy<T> {
             }
           );
 
-          console.log({
-            notAnyArgsMatch,
-            anyArgsMatch,
-            containingAnyArgsMatch,
-          });
-
           return notAnyArgsMatch && anyArgsMatch && containingAnyArgsMatch;
         });
 
-        console.log(matchingCalls);
-
         return matchingCalls.length === times;
-
-        if (
-          calls.filter((call) => {
-            return (
-              notAnyArgs.every(([arg, index]) => call.args[index] === arg) &&
-              anyArgs.every(([arg, index]) => {
-                return arg.isValid(call.args[index]);
-              }) &&
-              containingAnyArgs.every(([arg, index]) => {
-                return deepValidate(call.args[index], arg);
-              })
-            );
-          }).length === times
-        ) {
-          return true;
-        }
-
-        return false;
       },
     };
   }
