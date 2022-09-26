@@ -12,13 +12,15 @@ class Human {
   public takeBoolean(_val: boolean) {}
 
   public takeObject(_val: object) {}
+
+  public takeDeepObject(_val: object) {}
 }
 
 describe("Mockit > any", () => {
   const mock = Mockit.mock(Human);
   const spy = Mockit.spy(mock);
 
-  it.skip("Calls checks for strings", () => {
+  it("Calls checks for strings", () => {
     Mockit.when(mock).calls("walk", ["hellaw"]).thenReturn("dudette");
     mock.walk("hellaw");
 
@@ -94,5 +96,42 @@ describe("Mockit > any", () => {
     expect(
       spy.method("takeObject").hasBeenCalledTwiceWith([Mockit.any(Object)])
     );
+  });
+
+  it("should allow checks for deep object properties", () => {
+    const obj = {
+      name: "John",
+      age: 30,
+      address: {
+        street: "Main Street",
+        number: 123,
+      },
+      createdAt: new Date("2019-01-01").toISOString(),
+    };
+    Mockit.when(mock).calls("takeDeepObject", [obj]).thenReturn("dudette");
+
+    expect(spy.callsTo("takeDeepObject").inTotal()).toHaveLength(0);
+
+    mock.takeDeepObject(obj);
+
+    expect(spy.callsTo("takeDeepObject").inTotal()).toHaveLength(1);
+
+    expect(
+      spy.method("takeDeepObject").hasBeenCalledOnceWith([obj])
+    ).toBeTruthy();
+
+    expect(
+      spy.method("takeDeepObject").hasBeenCalledOnceWith([
+        {
+          name: Mockit.any(String),
+          age: Mockit.any(Number),
+          address: {
+            street: Mockit.any(String),
+            number: Mockit.any(Number),
+          },
+          createdAt: Mockit.any(String),
+        },
+      ])
+    ).toBeTruthy();
   });
 });
