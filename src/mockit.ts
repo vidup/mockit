@@ -1,4 +1,4 @@
-import { Mock } from "./mock";
+import { Mock, Mock2 } from "./mock";
 import { MockInjector } from "./mock/MockInjector";
 import { Behaviour, Copy } from "./mock/Copy";
 import { Spy } from "./mock/Spy";
@@ -7,6 +7,10 @@ import { Any } from "./Any";
 export class Mockit {
   static mock<T>(_original: new () => T): T {
     return new Mock<T>() as T;
+  }
+
+  static mock2<T>(original: new () => T): T {
+    return new Mock2<T>(original) as T;
   }
 
   static spy<T>(mock: T) {
