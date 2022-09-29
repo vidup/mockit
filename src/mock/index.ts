@@ -113,7 +113,6 @@ type NewBehaviourParam =
   | { behaviour: Behaviour.Resolve; resolvedValue: any }
   | { behaviour: Behaviour.Reject; rejectedValue: any };
 
-
 export class Mock2<T> {
   public calls: Calls<T> = new Calls<T>();
   private stubies: Stubies<T>;
@@ -121,15 +120,20 @@ export class Mock2<T> {
 
   constructor(private readonly original: new () => T) {
     this.propagateBehaviour();
-    this.stubies = new Stubies<T>(original, this.getActionByBehaviour({
-      behaviour: this.behaviour as Behaviour.Return,
-      returnedValue: undefined,
-    }));
+    this.stubies = new Stubies<T>(
+      original,
+      this.getActionByBehaviour({
+        behaviour: this.behaviour as Behaviour.Return,
+        returnedValue: undefined,
+      })
+    );
   }
 
   setupBehaviour(newBehaviour: NewBehaviourParam) {
     this.behaviour = newBehaviour.behaviour;
-    this.propagateBehaviour();
+    this.stubies.changeDefaultBehaviour(
+      this.getActionByBehaviour(newBehaviour)
+    );
 
     return this;
   }
@@ -152,14 +156,20 @@ export class Mock2<T> {
     }
 
     if (newBehaviour.behaviour === Behaviour.Throw) {
-      return () => { throw newBehaviour.error };
+      return () => {
+        throw newBehaviour.error;
+      };
     }
 
-    return () => { throw new Error("Behaviour not implemented") };
+    return () => {
+      throw new Error("Behaviour not implemented");
+    };
   }
 
   private propagateBehaviour() {
-    const keys = Object.getOwnPropertyNames(this.original.prototype) as GetClassMethods<T>[];
+    const keys = Object.getOwnPropertyNames(
+      this.original.prototype
+    ) as GetClassMethods<T>[];
     keys.forEach((key) => {
       if (key !== "constructor") {
         this[String(key)] = (...args: any[]) => {
@@ -170,16 +180,32 @@ export class Mock2<T> {
       }
     });
   }
+
+  getStubsInstance() {
+    return this.stubies;
+  }
+
+  getCallsInstance() {
+    return this.calls;
+  }
 }
 
 class Stubies<T> {
   private stubiesMap: HashingMap = new HashingMap();
 
-  constructor(original: new () => T, private action: Function) {
-    const keys = Object.getOwnPropertyNames(original.prototype) as GetClassMethods<T>[];
-    keys.forEach((key) => {
-      this.registerMock(key, [], action);
-    });
+  constructor(
+    private readonly original: new () => T,
+    private action: Function
+  ) {
+    const keys = Object.getOwnPropertyNames(
+      original.prototype
+    ) as GetClassMethods<T>[];
+
+    keys
+      .filter((key) => key !== "constructor")
+      .forEach((key) => {
+        this.createDefaultMock(key, action);
+      });
   }
 
   public registerMock<T>(
@@ -188,13 +214,35 @@ class Stubies<T> {
     whatToDo: Function
   ) {
     if (!this.stubiesMap.get(functionName)) {
-      this.stubiesMap.set(functionName, new HashingMap().set("_default", this.action));
+      this.createDefaultMock<T>(functionName, this.action);
     }
 
     const funcMockMap = this.stubiesMap.get<HashingMap>(functionName);
     funcMockMap.set(args, whatToDo);
 
     this.stubiesMap.set(functionName, funcMockMap);
+  }
+
+  private createDefaultMock<T>(functionName: GetClassMethods<T>, action: any) {
+    this.stubiesMap.set(functionName, new HashingMap().set("_default", action));
+  }
+
+  private changeDefaultMock<T>(functionName: GetClassMethods<T>, action: any) {
+    const funcMockMap = this.stubiesMap.get<HashingMap>(functionName);
+    funcMockMap.set("_default", action);
+    this.stubiesMap.set(functionName, funcMockMap);
+  }
+
+  public changeDefaultBehaviour<T>(action: Function) {
+    const keys = Object.getOwnPropertyNames(
+      this.original.prototype
+    ) as GetClassMethods<T>[];
+
+    keys
+      .filter((key) => key !== "constructor")
+      .forEach((key) => {
+        this.changeDefaultMock(key, action);
+      });
   }
 
   public getMock<T>(functionName: GetClassMethods<T>, args: any[]): Function {
@@ -211,19 +259,13 @@ class Stubies<T> {
 
 class Calls<T> {
   private callsMap: HashingMap = new HashingMap();
-  public registerCall(
-    functionName: GetClassMethods<T>,
-    args?: any[],
-  ) {
+  public registerCall(functionName: GetClassMethods<T>, args?: any[]) {
     if (!this.callsMap.get(functionName)) {
       this.callsMap.set(functionName, new HashingMap().set("_calls", []));
     }
 
     const funcMockMap = this.callsMap.get<HashingMap>(functionName);
-    funcMockMap.set(
-      args,
-      new HashingMap().set("calls", [])
-    );
+    funcMockMap.set(args, new HashingMap().set("calls", []));
 
     this.callsMap.set(functionName, funcMockMap);
   }

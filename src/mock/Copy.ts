@@ -6,7 +6,7 @@ export enum Behaviour {
   Throw,
 }
 
-type NewBehaviourParam =
+export type NewBehaviourParam =
   | { behaviour: Behaviour.Throw; error?: any }
   | { behaviour: Behaviour.Call; callback: (...args: any[]) => any }
   | { behaviour: Behaviour.Return; returnedValue: any }

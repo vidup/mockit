@@ -18,6 +18,10 @@ export class HashingMap {
     return this;
   }
 
+  keys(): any[] {
+    return Array.from(this.map.keys());
+  }
+
   size(): number {
     return this.map.size;
   }
