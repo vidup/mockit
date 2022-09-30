@@ -203,6 +203,11 @@ export class Mock2<T> {
   }
 }
 
+type FunctionStub = {
+  action: Function,
+  args?: any[],
+}
+
 class Stubies<T> {
   private stubiesMap: HashingMap = new HashingMap();
 
@@ -231,18 +236,25 @@ class Stubies<T> {
     }
 
     const funcMockMap = this.stubiesMap.get<HashingMap>(functionName);
-    funcMockMap.set(args, whatToDo);
+    funcMockMap.set(args, this.buildMock(whatToDo, args));
 
     this.stubiesMap.set(functionName, funcMockMap);
   }
 
+  private buildMock<T>(whatToDo: Function, args?: any[] ): FunctionStub {
+    return {
+      args,
+      action: whatToDo,
+    };
+  }
+
   private createDefaultMock<T>(functionName: GetClassMethods<T>, action: any) {
-    this.stubiesMap.set(functionName, new HashingMap().set("_default", action));
+    this.stubiesMap.set(functionName, new HashingMap().set("_default", this.buildMock(action)));
   }
 
   private changeDefaultMock<T>(functionName: GetClassMethods<T>, action: any) {
     const funcMockMap = this.stubiesMap.get<HashingMap>(functionName);
-    funcMockMap.set("_default", action);
+    funcMockMap.set("_default", this.buildMock(action));
     this.stubiesMap.set(functionName, funcMockMap);
   }
 
@@ -260,13 +272,14 @@ class Stubies<T> {
 
   public getMock<T>(functionName: GetClassMethods<T>, args: any[]): Function {
     const funcMockMap = this.stubiesMap.get<HashingMap>(functionName);
-    const mockedBehaviour = funcMockMap.get<Function>(args);
 
+    const mockedBehaviour = funcMockMap.get<FunctionStub>(args);
+    
     if (!mockedBehaviour) {
-      return funcMockMap.get("_default");
+      return funcMockMap.get<FunctionStub>("_default").action;
     }
 
-    return mockedBehaviour;
+    return mockedBehaviour.action;
   }
 }
 

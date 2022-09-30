@@ -22,6 +22,10 @@ export class HashingMap {
     return Array.from(this.map.keys());
   }
 
+  values<T>(): T[] {
+    return Array.from(this.map.values());
+  }
+
   size(): number {
     return this.map.size;
   }

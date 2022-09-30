@@ -1,8 +1,8 @@
 export class Person {
-    public walk(): string {
+    public walk(_p?: any): string {
         return "walking";
     }
-    public run(): string {
+    public run(_p?: any): string {
         return "running";
     }
     public talk(phrase: string): string {

@@ -8,7 +8,6 @@ describe("Mockit > change default behaviour", () => {
     
         const args = [1, true, {}, [], "string", undefined, null];
         args.forEach((arg) => {
-          // @ts-expect-error we passing dumb things on purpose
           expect(mock.walk(arg)).toBe(undefined);
         });
       });
@@ -20,7 +19,7 @@ describe("Mockit > change default behaviour", () => {
             returnedValue: 42,
           },
         });
-    
+
         expect(mock.walk()).toBe(42);
         expect(mock.run()).toBe(42);
     });
@@ -86,6 +85,4 @@ describe("Mockit > change default behaviour", () => {
         mock.walk();
         expect(counter).toBe(1);
     });
-
-
-})
+});
