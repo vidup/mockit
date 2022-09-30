@@ -25,6 +25,10 @@ export class Mockit {
     return mock as T;
   }
 
+  static changeDefaultBehaviour<T>(mock: T, newBehaviour: NewBehaviourParam) {
+    (mock as Mock2<T>).setupBehaviour(newBehaviour);
+  }
+
   static spy<T>(mock: T) {
     return new Spy<T>(mock as Mock<T>);
   }
