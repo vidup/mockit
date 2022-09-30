@@ -25,12 +25,16 @@ describe("Mockit > thenReturn", () => {
 });
 
 describe("Mockit > Mock 2 > thenReturn", () => {
-  test("it should allow to replace a class function by a simple returning function", () => {
+  test("it should allow to replace a class function by a simple returning function, while maintaining basic mock", () => {
     const mockDog = Mockit.mock2(Dog);
+    // @ts-expect-error we are passing nothing on purpose
+    expect(mockDog.repeatSound()).toBe(undefined);
     expect(mockDog.repeatSound("A")).toBe(undefined);
 
     Mockit.when2(mockDog).calls("repeatSound").withArgs("A").thenReturn("AAA!");
 
+    // @ts-expect-error we are passing nothing on purpose
+    expect(mockDog.repeatSound()).toBe(undefined);
     expect(mockDog.repeatSound("A")).toBe("AAA!");
   });
 });
