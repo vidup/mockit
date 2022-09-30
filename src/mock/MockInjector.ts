@@ -1,4 +1,4 @@
-import { Mock } from ".";
+import { Mock, Mock2 } from ".";
 import { GetClassMethods } from "../types/GetClassMethods";
 
 export class MockInjector<T> {
@@ -31,6 +31,36 @@ export class MockInjector<T> {
       thenReject(error: any extends Error ? Error : string) {
         mock.registerMock(func, withArgs, async () => {
           throw error;
+        });
+      },
+    };
+  }
+}
+
+export class MockInjector2<T> {
+  private readonly mock: Mock2<T>;
+  constructor(mock: any) {
+    this.mock = mock as Mock2<T>;
+  }
+
+  public calls(func: GetClassMethods<T>) {
+    return new WithArgs(func, this.mock);
+  }
+}
+
+export class WithArgs<T> {
+  constructor(
+    private readonly funcName: GetClassMethods<T>,
+    private readonly mock: Mock2<T>
+  ) {}
+  public withArgs(...args: any[]) {
+    const { mock } = this;
+    return {
+      thenReturn(returnValue: any) {
+        mock.setupFunctionBehaviour({
+          funcName: this.funcName,
+          args,
+          newBehaviour: () => returnValue,
         });
       },
     };

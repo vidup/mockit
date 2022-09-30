@@ -138,6 +138,19 @@ export class Mock2<T> {
     return this;
   }
 
+  setupFunctionBehaviour({
+    funcName,
+    newBehaviour,
+    args,
+  }: {
+    funcName: GetClassMethods<T>;
+    args?: any[];
+    newBehaviour: any;
+  }) {
+    this.stubies.registerMock(funcName, args, newBehaviour);
+    return this;
+  }
+
   private getActionByBehaviour(newBehaviour: NewBehaviourParam) {
     if (newBehaviour.behaviour === Behaviour.Call) {
       return newBehaviour.callback;
@@ -249,6 +262,7 @@ class Stubies<T> {
     const funcMockMap = this.stubiesMap.get<HashingMap>(functionName);
     const mockedBehaviour = funcMockMap.get<Function>(args);
 
+    console.log({ mockedBehaviour, args, functionName });
     if (!mockedBehaviour) {
       return funcMockMap.get("_default");
     }
