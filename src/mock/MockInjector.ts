@@ -63,6 +63,40 @@ export class Injector<T> {
           newBehaviour: () => returnValue,
         });
       },
+
+      thenThrow(error: any) {
+        mock.setupFunctionBehaviour({
+          funcName,
+          args,
+          newBehaviour: () => {
+            throw error;
+          },
+        });
+      },
+
+      thenResolve(resolvedValue: any) {
+        mock.setupFunctionBehaviour({
+          funcName,
+          args,
+          newBehaviour: () => Promise.resolve(resolvedValue),
+        });
+      },
+
+      thenReject(rejectedValue: any) {
+        mock.setupFunctionBehaviour({
+          funcName,
+          args,
+          newBehaviour: () => Promise.reject(rejectedValue),
+        });
+      },
+
+      thenCall(f: (...args: any[]) => any) {
+        mock.setupFunctionBehaviour({
+          funcName,
+          args,
+          newBehaviour: () => f(),
+        });
+      }
     };
   }
 }
