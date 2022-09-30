@@ -145,7 +145,7 @@ export class Mock2<T> {
   }: {
     funcName: GetClassMethods<T>;
     args?: any[];
-    newBehaviour: any;
+    newBehaviour: Function;
   }) {
     this.stubies.registerMock(funcName, args, newBehaviour);
     return this;
@@ -262,7 +262,6 @@ class Stubies<T> {
     const funcMockMap = this.stubiesMap.get<HashingMap>(functionName);
     const mockedBehaviour = funcMockMap.get<Function>(args);
 
-    console.log({ mockedBehaviour, args, functionName });
     if (!mockedBehaviour) {
       return funcMockMap.get("_default");
     }

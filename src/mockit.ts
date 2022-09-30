@@ -1,5 +1,5 @@
 import { Mock, Mock2 } from "./mock";
-import { MockInjector, MockInjector2 } from "./mock/MockInjector";
+import { MockInjector, InjectorWrapper } from "./mock/MockInjector";
 import { Behaviour, Copy, NewBehaviourParam } from "./mock/Copy";
 import { Spy } from "./mock/Spy";
 import { Any } from "./Any";
@@ -34,7 +34,7 @@ export class Mockit {
   }
 
   static when2<T>(mock: T) {
-    return new MockInjector2<T>(mock as Mock2<T>);
+    return new InjectorWrapper<T>(mock as Mock2<T>);
   }
 
   static stub<T>(original: new () => T) {

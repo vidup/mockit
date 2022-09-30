@@ -37,28 +37,28 @@ export class MockInjector<T> {
   }
 }
 
-export class MockInjector2<T> {
+export class InjectorWrapper<T> {
   private readonly mock: Mock2<T>;
   constructor(mock: any) {
     this.mock = mock as Mock2<T>;
   }
 
   public calls(func: GetClassMethods<T>) {
-    return new WithArgs(func, this.mock);
+    return new Injector(func, this.mock);
   }
 }
 
-export class WithArgs<T> {
+export class Injector<T> {
   constructor(
     private readonly funcName: GetClassMethods<T>,
     private readonly mock: Mock2<T>
   ) {}
   public withArgs(...args: any[]) {
-    const { mock } = this;
+    const { mock, funcName } = this;
     return {
       thenReturn(returnValue: any) {
         mock.setupFunctionBehaviour({
-          funcName: this.funcName,
+          funcName,
           args,
           newBehaviour: () => returnValue,
         });
