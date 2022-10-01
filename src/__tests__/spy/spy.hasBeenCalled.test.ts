@@ -1,4 +1,4 @@
-import { Mockit } from "../../";
+import { Mockit } from "../..";
 import { Person } from "../../test_utils/Person";
 
 describe("Spy hasBeenCalled", () => {
