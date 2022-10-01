@@ -17,6 +17,7 @@ export class Injector<T> {
     private readonly funcName: GetClassMethods<T>,
     private readonly mock: Mock2<T>
   ) {}
+
   public withArgs(...args: any[]) {
     const { mock, funcName } = this;
     return {
@@ -62,5 +63,42 @@ export class Injector<T> {
         });
       },
     };
+  }
+
+  public thenReturn(returnValue: any) {
+    this.mock.setupFunctionBehaviour({
+      funcName: this.funcName,
+      newBehaviour: () => returnValue,
+    });
+  }
+
+  public thenThrow(error: any) {
+    this.mock.setupFunctionBehaviour({
+      funcName: this.funcName,
+      newBehaviour: () => {
+        throw error;
+      },
+    });
+  }
+
+  public thenResolve(resolvedValue: any) {
+    this.mock.setupFunctionBehaviour({
+      funcName: this.funcName,
+      newBehaviour: () => Promise.resolve(resolvedValue),
+    });
+  }
+
+  public thenReject(rejectedValue: any) {
+    this.mock.setupFunctionBehaviour({
+      funcName: this.funcName,
+      newBehaviour: () => Promise.reject(rejectedValue),
+    });
+  }
+
+  public thenCall(f: (...args: any[]) => any) {
+    this.mock.setupFunctionBehaviour({
+      funcName: this.funcName,
+      newBehaviour: () => f(),
+    });
   }
 }
