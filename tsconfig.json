@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "moduleResolution": "Node",
     "lib": ["esnext", "dom"],
     // enabling declaration (.d.ts) emit
     "declaration": true,
