@@ -59,11 +59,31 @@ export class Spy2<T> {
   }
 }
 
-class MethodAsserter<T> {
+class Stats<T> {
   constructor(
     private readonly mock: Mock2<T>,
     private readonly func: GetClassMethods<T>
   ) {}
+
+  public get calls() {
+    return this.mock.getCallsInstance().totalCallsTo(this.func);
+  }
+
+  public callsWithArgs(args: any[]) {
+    return this.mock.getCallsInstance().callsTo(this.func, args);
+  }
+
+  // todo: call with strings etc...
+}
+
+class MethodAsserter<T> {
+  public stats: Stats<T>;
+  constructor(
+    private readonly mock: Mock2<T>,
+    private readonly func: GetClassMethods<T>
+  ) {
+    this.stats = new Stats<T>(mock, func);
+  }
 
   public get hasBeenCalled(): boolean {
     return this.mock.getCallsInstance().totalCallsTo(this.func).length > 0;
