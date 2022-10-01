@@ -1,8 +1,12 @@
-import { Mock, Mock2 } from "./mock";
-import { MockInjector, InjectorWrapper } from "./mock/MockInjector";
+import { Mock } from "./mock";
+import { Mock2 } from "./mock2";
+
+import { MockInjector } from "./mock/MockInjector";
 import { Behaviour, Copy, NewBehaviourParam } from "./mock/Copy";
 import { Spy } from "./mock/Spy";
 import { Any } from "./Any";
+
+import { InjectorWrapper } from "./mock2/InjectorWrapper";
 
 type MockOptions = {
   defaultBehaviour?: NewBehaviourParam;
@@ -32,6 +36,10 @@ export class Mockit {
   static spy<T>(mock: T) {
     return new Spy<T>(mock as Mock<T>);
   }
+
+  // static spy2<T>(mock: T) {
+  //   return new Spy2<T>(mock as Mock2<T>);
+  // }
 
   static when<T>(mock: T) {
     return new MockInjector<T>(mock as Mock<T>);
