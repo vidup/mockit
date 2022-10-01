@@ -55,87 +55,103 @@ export class Spy2<T> {
   }
 
   public method(func: GetClassMethods<T>) {
-    const mock = this.mock;
-    return {
-      get hasBeenCalled(): boolean {
-        return mock.getCallsInstance().totalCallsTo(func).length > 0;
-      },
-      hasBeenCalledWith: (...args: any[]): boolean => {
-        const mockedCalls = mock.getCallsInstance().callsTo(func, args);
-        return mockedCalls.length > 0;
-      },
-      hasBeenCalledNTimes: (times: number): boolean => {
-        const mockedCalls = mock.getCallsInstance().totalCallsTo(func);
-        return mockedCalls.length === times;
-      },
-      hasBeenCalledNTimesWith(args: any[], times: number): boolean {
-        if (args.some((arg) => isAny(arg) || containsAny(arg))) {
-          return this.hasBeenCalledOnceWithAnyArgs(func, args, times);
-        }
-        const mockedCalls = mock.getCallsInstance().callsTo(func, args);
-        return mockedCalls.length === times;
-      },
-      get hasBeenCalledOnce(): boolean {
-        return this.hasBeenCalledNTimes(1);
-      },
-      get hasBeenCalledTwice(): boolean {
-        return this.hasBeenCalledNTimes(2);
-      },
-      get hasBeenCalledThrice(): boolean {
-        return this.hasBeenCalledNTimes(3);
-      },
+    return new MethodAsserter<T>(this.mock, func);
+  }
+}
 
-      hasBeenCalledOnceWith(...args: any[]): boolean {
-        return this.hasBeenCalledNTimesWith(args, 1);
-      },
-      hasBeenCalledTwiceWith(...args: any[]): boolean {
-        return this.hasBeenCalledNTimesWith(args, 2);
-      },
-      hasBeenCalledThriceWith(...args: any[]): boolean {
-        return this.hasBeenCalledNTimesWith(args, 3);
-      },
+class MethodAsserter<T> {
+  constructor(
+    private readonly mock: Mock2<T>,
+    private readonly func: GetClassMethods<T>
+  ) {}
 
-      hasBeenCalledOnceWithAnyArgs(
-        func: GetClassMethods<T>,
-        args: any[],
-        times: number
-      ): boolean {
-        const calls = mock.getCallsInstance().totalCallsTo(func);
+  public get hasBeenCalled(): boolean {
+    return this.mock.getCallsInstance().totalCallsTo(this.func).length > 0;
+  }
 
-        const notAnyArgs = args
-          .map((arg, index) => [arg, index])
-          .filter(([arg]) => !containsAny(arg) && !isAny(arg));
+  public hasBeenCalledWith(...args: any[]): boolean {
+    if (args.some((arg) => isAny(arg) || containsAny(arg))) {
+      return this.hasBeenCalledOnceWithAnyArgs(args);
+    }
 
-        const anyArgs: [Any, number][] = args
-          .map<[Any, number]>((arg, index) => [arg, index])
-          .filter(([arg]) => isAny(arg));
+    const mockedCalls = this.mock.getCallsInstance().callsTo(this.func, args);
+    return mockedCalls.length > 0;
+  }
 
-        const containingAnyArgs: [Object, number][] = args
-          .map<[Any, number]>((arg, index) => [arg, index])
-          .filter(([arg]) => containsAny(arg) && !isAny(arg));
+  public hasBeenCalledNTimes(times: number): boolean {
+    const mockedCalls = this.mock.getCallsInstance().totalCallsTo(this.func);
+    return mockedCalls.length === times;
+  }
 
-        const matchingCalls = calls.filter((call) => {
-          const args = call.args;
+  public hasBeenCalledNTimesWith(args: any[], times: number): boolean {
+    if (args.some((arg) => isAny(arg) || containsAny(arg))) {
+      return this.hasBeenCalledOnceWithAnyArgs(args, times);
+    }
+    const mockedCalls = this.mock.getCallsInstance().callsTo(this.func, args);
+    return mockedCalls.length === times;
+  }
 
-          const notAnyArgsMatch = notAnyArgs.every(
-            ([arg, index]) => args[index] === arg
-          );
+  public get hasBeenCalledOnce(): boolean {
+    return this.hasBeenCalledNTimes(1);
+  }
 
-          const anyArgsMatch = anyArgs.every(([arg, index]) => {
-            return arg.isValid(args[index]);
-          });
+  public get hasBeenCalledTwice(): boolean {
+    return this.hasBeenCalledNTimes(2);
+  }
 
-          const containingAnyArgsMatch = containingAnyArgs.every(
-            ([arg, index]) => {
-              return deepValidate(args[index], arg);
-            }
-          );
+  public get hasBeenCalledThrice(): boolean {
+    return this.hasBeenCalledNTimes(3);
+  }
 
-          return notAnyArgsMatch && anyArgsMatch && containingAnyArgsMatch;
-        });
+  public hasBeenCalledOnceWith(...args: any[]): boolean {
+    return this.hasBeenCalledNTimesWith(args, 1);
+  }
 
-        return matchingCalls.length === times;
-      },
-    };
+  public hasBeenCalledTwiceWith(...args: any[]): boolean {
+    return this.hasBeenCalledNTimesWith(args, 2);
+  }
+
+  public hasBeenCalledThriceWith(...args: any[]): boolean {
+    return this.hasBeenCalledNTimesWith(args, 3);
+  }
+
+  private hasBeenCalledOnceWithAnyArgs(args: any[], times?: number): boolean {
+    const calls = this.mock.getCallsInstance().totalCallsTo(this.func);
+
+    const notAnyArgs = args
+      .map((arg, index) => [arg, index])
+      .filter(([arg]) => !containsAny(arg) && !isAny(arg));
+
+    const anyArgs: [Any, number][] = args
+      .map<[Any, number]>((arg, index) => [arg, index])
+      .filter(([arg]) => isAny(arg));
+
+    const containingAnyArgs: [Object, number][] = args
+      .map<[Any, number]>((arg, index) => [arg, index])
+      .filter(([arg]) => containsAny(arg) && !isAny(arg));
+
+    const matchingCalls = calls.filter((call) => {
+      const args = call.args;
+
+      const notAnyArgsMatch = notAnyArgs.every(
+        ([arg, index]) => args[index] === arg
+      );
+
+      const anyArgsMatch = anyArgs.every(([arg, index]) => {
+        return arg.isValid(args[index]);
+      });
+
+      const containingAnyArgsMatch = containingAnyArgs.every(([arg, index]) => {
+        return deepValidate(args[index], arg);
+      });
+
+      return notAnyArgsMatch && anyArgsMatch && containingAnyArgsMatch;
+    });
+
+    if (times) {
+      return matchingCalls.length === times;
+    }
+
+    return matchingCalls.length > 0;
   }
 }

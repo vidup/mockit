@@ -15,8 +15,12 @@ export class Any {
       case "boolean":
         this.value = false;
         break;
+      case "function":
+        this.value = () => {};
+        break;
       default:
-        throw new Error("Invalid type");
+        // @ts-expect-error
+        throw new Error("Invalid type " + typeof val());
     }
   }
 
