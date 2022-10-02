@@ -160,4 +160,60 @@ describe("Deeper any scenarios", () => {
       )
     ).toBe(false);
   });
+
+  it("should be able to match deep any properties", () => {
+    const mock = Mockit.mock(Person);
+    const methodSpy = Mockit.spy(mock).method("walk");
+
+    mock.walk({ x: 1, y: { name: "Victor" } });
+
+    expect(
+      methodSpy.hasBeenCalledWith({ x: 1, y: { name: Mockit.any(String) } })
+    ).toBe(true);
+
+    // failcheck
+    expect(
+      methodSpy.hasBeenCalledWith({ x: 1, y: { name: Mockit.any(Number) } })
+    ).toBe(false);
+  });
+
+  it("should be able to match deep any properties with multiple arguments", () => {
+    const mock = Mockit.mock(Person);
+    const methodSpy = Mockit.spy(mock).method("walk");
+
+    // @ts-expect-error
+    mock.walk(1, { x: 1, y: { name: "Victor" } });
+
+    expect(
+      methodSpy.hasBeenCalledWith(1, { x: 1, y: { name: Mockit.any(String) } })
+    ).toBe(true);
+
+    // failcheck
+    expect(
+      methodSpy.hasBeenCalledWith(1, { x: 1, y: { name: Mockit.any(Number) } })
+    ).toBe(false);
+  });
+
+  it("should be able to match multiple any arguments, including deep ones", () => {
+    const mock = Mockit.mock(Person);
+    const methodSpy = Mockit.spy(mock).method("walk");
+
+    // @ts-expect-error
+    mock.walk(1, { x: 1, y: { name: "Victor" } });
+
+    expect(
+      methodSpy.hasBeenCalledWith(Mockit.any(Number), {
+        x: 1,
+        y: { name: Mockit.any(String) },
+      })
+    ).toBe(true);
+
+    // failcheck
+    expect(
+      methodSpy.hasBeenCalledWith(Mockit.any(Number), {
+        x: 1,
+        y: { name: Mockit.any(Number) },
+      })
+    ).toBe(false);
+  });
 });
