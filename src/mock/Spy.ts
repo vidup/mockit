@@ -73,25 +73,8 @@ class MethodAsserter<T> {
     return this.mock.getCallsInstance().totalCallsTo(this.func).length > 0;
   }
 
-  public hasBeenCalledWith(...args: any[]): boolean {
-    if (args.some((arg) => Any.isAny(arg) || Any.containsAny(arg))) {
-      return this.hasBeenCalledOnceWithAnyArgs(args);
-    }
-
-    const mockedCalls = this.mock.getCallsInstance().callsTo(this.func, args);
-    return mockedCalls.length > 0;
-  }
-
   public hasBeenCalledNTimes(times: number): boolean {
     const mockedCalls = this.mock.getCallsInstance().totalCallsTo(this.func);
-    return mockedCalls.length === times;
-  }
-
-  public hasBeenCalledNTimesWith(args: any[], times: number): boolean {
-    if (args.some((arg) => Any.isAny(arg) || Any.containsAny(arg))) {
-      return this.hasBeenCalledOnceWithAnyArgs(args, times);
-    }
-    const mockedCalls = this.mock.getCallsInstance().callsTo(this.func, args);
     return mockedCalls.length === times;
   }
 
@@ -105,6 +88,23 @@ class MethodAsserter<T> {
 
   public get hasBeenCalledThrice(): boolean {
     return this.hasBeenCalledNTimes(3);
+  }
+
+  public hasBeenCalledWith(...args: any[]): boolean {
+    if (args.some((arg) => Any.isAny(arg) || Any.containsAny(arg))) {
+      return this.hasBeenCalledOnceWithAnyArgs(args);
+    }
+
+    const mockedCalls = this.mock.getCallsInstance().callsTo(this.func, args);
+    return mockedCalls.length > 0;
+  }
+
+  public hasBeenCalledNTimesWith(args: any[], times: number): boolean {
+    if (args.some((arg) => Any.isAny(arg) || Any.containsAny(arg))) {
+      return this.hasBeenCalledOnceWithAnyArgs(args, times);
+    }
+    const mockedCalls = this.mock.getCallsInstance().callsTo(this.func, args);
+    return mockedCalls.length === times;
   }
 
   public hasBeenCalledOnceWith(...args: any[]): boolean {
