@@ -1,4 +1,4 @@
-import { Behaviour, NewBehaviourParam } from "../mock/Copy";
+import { Behaviour, NewBehaviourParam } from "../types/behaviour";
 import { GetClassMethods } from "../types/GetClassMethods";
 
 import { Calls } from "./calls";
