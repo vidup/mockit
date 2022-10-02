@@ -216,4 +216,6 @@ describe("Deeper any scenarios", () => {
       })
     ).toBe(false);
   });
+
+  // TODO: add test for deep array properties.
 });
