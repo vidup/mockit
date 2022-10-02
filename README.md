@@ -12,9 +12,9 @@ DISCLAIMER: I'm trying to keep this library as lightweight as possible. I'm not 
 
 The idea behind this library is to provide a simple way to mock dependencies in your code. I'm a big fan of dependency injection as a way to write testable code.
 
-Sadly, I found the mocking ecosystem either too heavy (like the great `ts-mockito` package, sadly it seems it's not maintained that much anymore) or too framework specific (like `jest` utilities like `mockImplementationOnce`, `mockReturnValueOnce`, `fn()`, `spyOn()`, etc.);
+Sadly, I found the mocking ecosystem either too heavy (like the great `ts-mockito` package, sadly it seems it's not that much maintained anymore) or too framework specific (like `jest` utilities like `mockImplementationOnce`, `mockReturnValueOnce`, `fn()`, `spyOn()`, etc.);
 
-I wanted something that was lightweight and easy to use.
+I wanted something that was lightweight and easy to use, potentially out of a test framework too.
 
 # Mocks
 
@@ -40,54 +40,194 @@ class MyClass {
 const myClassMock = Mockit.mock(MyClass);
 ```
 
-**Mockit** allows you to change the behaviour of each function of your mock. Thanks to generics, you have access to auto-complete of the functions of your original class, which is very convenient.
+By default, the mock will return `undefined` for each function of your class.
+
+### Set default behaviour on instanciation
+
+You can set a different default behaviour when you instanciate a mock, like so:
 
 ```ts
-// replace the returned value
-Mockit.when(myClassMock).calls("sum", [1, 2]).thenReturns(3);
+const throwingMock = Mockit.mock(MyClass, {
+  defaultBehaviour: {
+    behaviour: Mockit.behaviours.Throw,
+    error: new Error("hiii"),
+  },
+});
 
-// throw instead
-Mockit.when(myClassMock)
-  .calls("sum", [1, 2])
-  .thenThrows(new Error("Something went wrong"));
+const rejectingMock = Mockit.mock(MyClass, {
+  defaultBehaviour: {
+    behaviour: Mockit.behaviours.Reject,
+    rejectedValue: new Error("rejected"),
+  },
+});
 
-// execute a custom function
-Mockit.when(myClassMock)
-  .calls("sum", [1, 2])
-  .thenCall((a, b) => a - b);
+const resolvingMock = Mockit.mock(MyClass, {
+  defaultBehaviour: {
+    behaviour: Mockit.behaviours.Resolve,
+    resolvedValue: "hii",
+  },
+});
 
-// resolve asynchronously
-Mockit.when(myClassMock).calls("asyncSum", [1, 2]).thenResolve(3);
-
-// reject asynchronously
-Mockit.when(myClassMock)
-  .calls("asyncSum", [1, 2])
-  .thenReject(new Error("Something went wrong"));
+const callBackMock = Mockit.mock(MyClass, {
+  defaultBehaviour: {
+    behaviour: Mockit.behaviours.Callback,
+    callback: () => {
+      console.log("hiii");
+    },
+  },
+});
 ```
+
+### Change default behaviour dynamically
+
+You can also change the default behaviour of a mock dynamically.
+
+```ts
+// This mock will throw on all its functions
+const mock = Mockit.mock(Person, {
+  defaultBehaviour: {
+    behaviour: Mockit.Behaviours.Throw,
+    error: "error",
+  },
+});
+
+try {
+  mock.walk();
+} catch (err) {
+  // will throw and come here
+}
+
+// it will now return by default from here
+Mockit.changeDefaultBehaviour(mock, {
+  behaviour: Mockit.Behaviours.Return,
+  returnedValue: "returned",
+});
+
+const result = mock.walk(); // "returned"
+```
+
+### Function default behaviour
+
+You can change the behaviour of a specific function of your mock, while maintaining a global default behaviour for the others function of a mock. This can be useful if the dependency you're injecting is used multiples times in your module and you need fine grained behaviour.
+
+You have access to helpers for each behaviour:
+
+```ts
+const mock = Mockit.mock(Person);
+Mockit.when(mock).calls("walk").thenReturn("hiii");
+Mockit.when(mock).calls("walk").thenResolve("hiii");
+Mockit.when(mock).calls("walk").thenReject(new Error("hellaw"));
+Mockit.when(mock).calls("walk").thenThrow(new Error("hellaw"));
+Mockit.when(mock)
+  .calls("walk")
+  .thenCallback(() => console.log("hiii"));
+```
+
+Note that in Typescript you get auto-completion of your original class methods.
+
+### Function custom behaviour with specific arguments
+
+**Mockit** also allows you to change the behaviour of a function based on the arguments passed to it. This is useful if you want to test more complex scenarios.
+
+```ts
+const mock = Mockit.mock(Person);
+
+Mockit.when(mock).calls("walk").withArgs(1, 2, 3).thenReturn("hiii");
+
+Mockit.when(mock).calls("walk").withArgs({ x: 1 }).thenThrow(new Error("Nop"));
+
+mock.walk(1, 2, 3); // "hiii"
+mock.walk({ x: 1 }); // throws an error
+```
+
+You get access to the same helpers as those for the default behaviour.
 
 # Spies
 
 ## Raw
 
-**Mockit** also allows you to spy on the calls of your mock.
+**Mockit** also allows you to spy on each of your mocks functions.
+This is useful if you want to test more complex scenarios as well as debug your tests.
 
 ```ts
-const mock = Mockit.mock(MyClass);
+const mock = Mockit.mock(Person);
+const spy = Mockit.spy(mock); // register the spy on the mock
+```
+
+Note that once a spy is registered to your mock, you can keep using it: it will update itself with each new call.
+
+There are two main ways to use Mockit's spies:
+
+### Using a `MethodAsserter` instane.
+
+You get access to a few helper functions and booleans:
+
+```ts
+const walkSpy = spy.method("walk"); // MethodAsserter instance
+
+// Booleans
+walkSpy.hasBeenCalled;
+walkSpy.hasBeenCalledWithOnce;
+walkSpy.hasBeenCalledWithTwice;
+walkSpy.hasBeenCalledWithThrice;
+
+// Basic helpers
+walkSpy.hasBeenCalledWith(...args: any[]);
+walkSpy.hasBeenCalledNTimesWith(args: any[], times: number);
+
+// Combined helpers
+walkSpy.hasBeenCalledOnceWith(args: any[]);
+walkSpy.hasBeenCalledTwiceWith(args: any[]);
+walkSpy.hasBeenCalledThriceWith(args: any[]);
+```
+
+These helper functions can receive a special argument: `Mockit.any`.
+This is very useful if you don't care about the exact value of an argument, but only that it has been called with it.
+A classic example of this is when a creation function returns an UUID, or a dynamic timestamp.
+
+```ts
+const mock = Mockit.mock(Person);
+const walkSpy = Mockit.spy(mock).method("walk");
+mock.walk(
+  new Date().valueOf(),
+  new Date().toISOString(),
+  new Date(),
+  Math.random(),
+  { x: 1 },
+  [1, 2, 3]
+);
+
+walkSpy.hasBeenCalledWith(
+  Mockit.any(Number),
+  Mockit.any(String),
+  Mockit.any(Object),
+  Mockit.any(Number),
+  Mockit.any(Object),
+  Mockit.any(Array)
+);
+```
+
+### Raw calls analysis
+
+You can access the history of the calls made to a function of your mock.
+You can either get the total calls or the calls with specific arguments.
+
+For now you cannot get the calls made with Mockit.any, but that's something I'm considering working on in the future.
+
+Example:
+
+```ts
+const mock = Mockit.mock(Person);
 // register the the mock to the spy
 const spy = Mockit.spy(myClassMock);
 
-Mockit.when(myClassMock).calls("sum", [1, 2]).thenReturns(33);
-Mockit.when(myClassMock).calls("sum", [2, 3]).thenReturns(15);
-
-// call the function
-myClassMock.sum(1, 2);
-myClassMock.sum(2, 3);
+// ... your test code
 
 // get the all the calls
-const calls = spy.callsTo("sum").inTotal();
+const calls = spy.callsTo("walk").inTotal();
 
 // get the calls with specific arguments
-const callsFor1And2 = spy.callsTo("sum").withArgs([1, 2]);
+const callsFor1And2 = spy.callsTo("walk").withArgs(1, 2);
 ```
 
 These calls are objects of type Call.
@@ -102,77 +242,4 @@ export type Call = {
 };
 ```
 
-You can use these calls for analysis, or to check that you mocked corretly with the `mockedBehaviour` key, which is effectively the mock you set up beforehand.
-
-## Helpers
-
-**Mockit** also provides a few helpers to make your life easier.
-
-```ts
-// These methods are syntactic sugar on top of the previously described methods.
-spy.method("sum").hasBeenCalled();
-spy.method("sum").hasBeenCalledOnce();
-spy.method("sum").hasBeenCalledTwice();
-spy.method("sum").hasBeenCalledThrice();
-
-spy.method("sum").hasBeenCalledWith([1, 2]);
-spy.method("sum").hasBeenCalledNTimes(2);
-spy.method("sum").hasBeenCalledNTimesWith();
-```
-
-With these helpers, you can pass around spies of individual methods.
-
-```ts
-const spy = Mockit.spy(myClassMock);
-const sumSpy = spy.method("sum"); // this will... spy on the sum method
-```
-
-Once registered, you can keep using the spy
-
-```ts
-const spy = Mockit.spy(myClassMock);
-const sumSpy = spy.method("sum");
-
-Mockit.when(myClassMock).calls("sum", [1, 2]).thenReturns(33);
-
-myClassMock.sum(1, 2);
-
-sumSpy.hasBeenCalledOnce();
-
-myClassMock.sum(1, 2);
-
-// Sumspy gets updated with the new call data
-sumSpy.hasBeenCalledTimes(2);
-```
-
-# Stubs
-
-Sometimes, you just want to mock a class without having to mock each of its methods. **Mockit** provides a `stub` function to do just that.
-
-Default behaviour is a stub whose functions will return nothing.
-
-```ts
-const myClassMock = Mockit.stub(MyClass);
-myClassMock.sum(1, 2); // returns undefined
-```
-
-You can also specify a custom behaviour to the stub.
-
-```ts
-// Will return a specific value
-Mockit.stubThatReturns(MyClass, 42);
-
-// Will throw anything you pass in
-Mockit.stubThatThrows(MyClass, new Error("Something went wrong"));
-
-// Will execute a custom function
-Mockit.stubThatCalls(MyClass, (a, b) => a - b);
-
-// Will resolve asynchronously
-Mockit.stubThatResolves(MyClass, 42);
-
-// Will reject asynchronously
-Mockit.stubThatRejects(MyClass, new Error("Something went wrong"));
-```
-
-These stubs cannot be spied on, but they're useful when you just want basic mocking injection.
+You can use these calls for analysis, or to check that you mocked correctly with the `mockedBehaviour` key, which is effectively the mock that was executed at the time of the call.

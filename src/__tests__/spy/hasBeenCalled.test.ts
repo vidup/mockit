@@ -92,5 +92,72 @@ describe("Spy hasBeenCalled", () => {
     mock.walk(() => {});
     expect(methodSpy.hasBeenCalledWith(Mockit.any(Function))).toBeTruthy();
     expect(methodSpy.hasBeenCalledOnceWith(Mockit.any(Function))).toBeTruthy();
+
+    mock.walk(
+      new Date().valueOf(),
+      // @ts-expect-error
+      new Date().toISOString(),
+      new Date(),
+      Math.random(),
+      { x: 1, y: { name: "Victor" } },
+      [1, 2, 3]
+    );
+
+    methodSpy.hasBeenCalledWith(
+      Mockit.any(Number),
+      Mockit.any(String),
+      Mockit.any(Object),
+      Mockit.any(Number),
+      Mockit.any(Object),
+      Mockit.any(Array)
+    );
+
+    // methodSpy.hasBeenCalledWith(
+    //   Mockit.any(Number),
+    //   Mockit.any(String),
+    //   Mockit.any(Object),
+    //   Mockit.any(Number),
+    //   { x: 1, y: { name: Mockit.any(String) } },
+    //   Mockit.any(Array)
+    // );
+  });
+});
+
+describe("Deeper any scenarios", () => {
+  it("should be able to check multiple any at the same time", () => {
+    const mock = Mockit.mock(Person);
+    const methodSpy = Mockit.spy(mock).method("walk");
+
+    mock.walk(
+      new Date().valueOf(),
+      // @ts-expect-error
+      new Date().toISOString(),
+      new Date(),
+      Math.random(),
+      { x: 1, y: { name: "Victor" } },
+      [1, 2, 3]
+    );
+
+    expect(
+      methodSpy.hasBeenCalledWith(
+        Mockit.any(Number),
+        Mockit.any(String),
+        Mockit.any(Object),
+        Mockit.any(Number),
+        Mockit.any(Object),
+        Mockit.any(Array)
+      )
+    ).toBe(true);
+
+    expect(
+      methodSpy.hasBeenCalledWith(
+        Mockit.any(Number),
+        Mockit.any(String),
+        Mockit.any(Object),
+        "HELLAW, should fail",
+        Mockit.any(Object),
+        Mockit.any(Array)
+      )
+    ).toBe(false);
   });
 });
