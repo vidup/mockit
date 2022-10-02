@@ -4,7 +4,7 @@ import { GetClassMethods } from "../types/GetClassMethods";
 import { Calls } from "./calls";
 import { Stubies } from "./stubies";
 
-export class Mock2<T> {
+export class Mock<T> {
   public calls: Calls<T>;
   private stubies: Stubies<T>;
   private behaviour: Behaviour = Behaviour.Return;

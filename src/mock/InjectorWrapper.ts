@@ -1,10 +1,10 @@
-import { Mock2 } from "./index";
+import { Mock } from "./index";
 import { GetClassMethods } from "../types/GetClassMethods";
 
 export class InjectorWrapper<T> {
-  private readonly mock: Mock2<T>;
+  private readonly mock: Mock<T>;
   constructor(mock: any) {
-    this.mock = mock as Mock2<T>;
+    this.mock = mock as Mock<T>;
   }
 
   public calls(func: GetClassMethods<T>) {
@@ -15,7 +15,7 @@ export class InjectorWrapper<T> {
 export class Injector<T> {
   constructor(
     private readonly funcName: GetClassMethods<T>,
-    private readonly mock: Mock2<T>
+    private readonly mock: Mock<T>
   ) {}
 
   public withArgs(...args: any[]) {

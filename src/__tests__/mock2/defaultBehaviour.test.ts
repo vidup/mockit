@@ -3,7 +3,7 @@ import { Person } from "../../test_utils/Person";
 
 describe("Mockit > change default behaviour", () => {
   it("should return undefined by default", () => {
-    const mock = Mockit.mock2(Person);
+    const mock = Mockit.mock(Person);
     expect(mock.walk()).toBe(undefined);
 
     const args = [1, true, {}, [], "string", undefined, null];
@@ -13,7 +13,7 @@ describe("Mockit > change default behaviour", () => {
   });
 
   it("should be able to RETURN 42 by default", () => {
-    const mock = Mockit.mock2(Person, {
+    const mock = Mockit.mock(Person, {
       defaultBehaviour: {
         behaviour: Mockit.Behaviours.Return,
         returnedValue: 42,
@@ -26,7 +26,7 @@ describe("Mockit > change default behaviour", () => {
 
   it("should be able to RESOLVE 42 by default", () => {
     expect.assertions(1);
-    const mock = Mockit.mock2(Person, {
+    const mock = Mockit.mock(Person, {
       defaultBehaviour: {
         behaviour: Mockit.Behaviours.Resolve,
         resolvedValue: 42,
@@ -41,7 +41,7 @@ describe("Mockit > change default behaviour", () => {
 
   it("should be able to REJECT an ERROR by default", () => {
     expect.assertions(1);
-    const mock = Mockit.mock2(Person, {
+    const mock = Mockit.mock(Person, {
       defaultBehaviour: {
         behaviour: Mockit.Behaviours.Reject,
         rejectedValue: new Error("rejected"),
@@ -55,7 +55,7 @@ describe("Mockit > change default behaviour", () => {
   });
 
   it("should be able to THROW  by default", () => {
-    const mock = Mockit.mock2(Person, {
+    const mock = Mockit.mock(Person, {
       defaultBehaviour: {
         behaviour: Mockit.Behaviours.Throw,
         error: new Error("Nop"),
@@ -75,7 +75,7 @@ describe("Mockit > change default behaviour", () => {
 
     expect(counter).toBe(0);
 
-    const mock = Mockit.mock2(Person, {
+    const mock = Mockit.mock(Person, {
       defaultBehaviour: {
         behaviour: Mockit.Behaviours.Call,
         callback: increaseCounter,

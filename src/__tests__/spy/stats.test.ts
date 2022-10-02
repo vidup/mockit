@@ -4,8 +4,8 @@ import { Call } from "../../types/call";
 
 describe("Spy callsAnalysis", () => {
   it("should allow to return the total calls of a function", () => {
-    const mock = Mockit.mock2(Person);
-    const walkSpy = Mockit.spy2(mock).method("walk");
+    const mock = Mockit.mock(Person);
+    const walkSpy = Mockit.spy(mock).method("walk");
 
     expect(walkSpy.stats.calls.length).toBe(0);
 
@@ -50,8 +50,8 @@ describe("Spy callsAnalysis", () => {
   });
 
   it("should allow to return the calls of a function with a specific set of arguments", () => {
-    const mock = Mockit.mock2(Person);
-    const walkSpy = Mockit.spy2(mock).method("walk");
+    const mock = Mockit.mock(Person);
+    const walkSpy = Mockit.spy(mock).method("walk");
 
     expect(walkSpy.stats.calls.length).toBe(0);
 

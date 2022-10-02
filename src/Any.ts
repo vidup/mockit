@@ -27,4 +27,20 @@ export class Any {
   public isValid(new_val: any): boolean {
     return typeof this.value === typeof new_val;
   }
+
+  static isAny(arg: any): arg is Any {
+    return arg instanceof Any;
+  }
+
+  static containsAny(arg: any): boolean {
+    if (arg instanceof Any) {
+      return true;
+    }
+
+    if (typeof arg === "object" && arg != null) {
+      return Object.values(arg).some((value) => Any.containsAny(value));
+    }
+
+    return false;
+  }
 }

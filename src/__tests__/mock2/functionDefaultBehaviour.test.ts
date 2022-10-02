@@ -3,17 +3,17 @@ import { Person } from "../../test_utils/Person";
 
 describe("Function default behaviour", () => {
   it("should be able to set a specific function basic behaviour", () => {
-    const mock = Mockit.mock2(Person, {
+    const mock = Mockit.mock(Person, {
       defaultBehaviour: { behaviour: Mockit.Behaviours.Throw },
     });
 
     expect(() => mock.walk()).toThrow();
 
-    Mockit.when2(mock).calls("walk").thenReturn("hello");
+    Mockit.when(mock).calls("walk").thenReturn("hello");
 
     expect(mock.walk()).toBe("hello");
 
-    Mockit.when2(mock).calls("walk").withArgs(1).thenReturn("A");
+    Mockit.when(mock).calls("walk").withArgs(1).thenReturn("A");
 
     expect(mock.walk(1)).toBe("A");
     expect(mock.walk()).toBe("hello");
@@ -21,13 +21,13 @@ describe("Function default behaviour", () => {
   });
 
   it("should be able to do the same for throw", () => {
-    const mock = Mockit.mock2(Person);
+    const mock = Mockit.mock(Person);
 
-    Mockit.when2(mock).calls("walk").thenThrow("hello");
+    Mockit.when(mock).calls("walk").thenThrow("hello");
     expect(() => mock.walk()).toThrow("hello");
 
     // Mock for a specific arg and check it
-    Mockit.when2(mock).calls("walk").withArgs(1).thenThrow("A");
+    Mockit.when(mock).calls("walk").withArgs(1).thenThrow("A");
     expect(() => mock.walk(1)).toThrow("A");
 
     // keep checking the default behaviour
@@ -37,14 +37,14 @@ describe("Function default behaviour", () => {
 
   it("should be able to do the same for promise rejection", () => {
     // expect.assertions(4);
-    const mock = Mockit.mock2(Person);
+    const mock = Mockit.mock(Person);
 
-    Mockit.when2(mock).calls("asyncRun").thenReject(new Error("hiii"));
+    Mockit.when(mock).calls("asyncRun").thenReject(new Error("hiii"));
 
     expect(() => mock.asyncRun()).rejects.toStrictEqual(new Error("hiii"));
 
     // Change the behaviour for a specific argument and check it
-    Mockit.when2(mock).calls("asyncRun").withArgs(1).thenReject("A");
+    Mockit.when(mock).calls("asyncRun").withArgs(1).thenReject("A");
     expect(() => mock.asyncRun(1)).rejects.toStrictEqual("A");
 
     // keep checking the default behaviour
@@ -59,14 +59,14 @@ describe("Function default behaviour", () => {
 
   it("should be able to do the same for promise resolve", () => {
     // expect.assertions(4);
-    const mock = Mockit.mock2(Person);
+    const mock = Mockit.mock(Person);
 
-    Mockit.when2(mock).calls("asyncRun").thenResolve("hiii");
+    Mockit.when(mock).calls("asyncRun").thenResolve("hiii");
 
     expect(mock.asyncRun()).resolves.toEqual("hiii");
 
     // Change the behaviour for a specific argument and check it
-    Mockit.when2(mock).calls("asyncRun").withArgs(1).thenResolve("A");
+    Mockit.when(mock).calls("asyncRun").withArgs(1).thenResolve("A");
     expect(mock.asyncRun(1)).resolves.toEqual("A");
 
     // keep checking the default behaviour
@@ -85,16 +85,16 @@ describe("Function default behaviour", () => {
       counter--;
     }
 
-    const mock = Mockit.mock2(Person);
+    const mock = Mockit.mock(Person);
 
-    Mockit.when2(mock).calls("asyncRun").thenCall(increaseCounter);
+    Mockit.when(mock).calls("asyncRun").thenCall(increaseCounter);
 
     expect(counter).toBe(0);
     mock.asyncRun();
     expect(counter).toBe(1);
 
     // Change the behaviour for a specific argument and check it
-    Mockit.when2(mock).calls("asyncRun").withArgs(1).thenCall(decreaseCounter);
+    Mockit.when(mock).calls("asyncRun").withArgs(1).thenCall(decreaseCounter);
     mock.asyncRun(1);
 
     expect(counter).toBe(0);

@@ -1,32 +1,16 @@
-import { Mock2 } from ".";
+import { Mock } from ".";
 import { Any } from "../Any";
 
 import type { Call } from "../types/call";
 import type { GetClassMethods } from "../types/GetClassMethods";
 
-function containsAny(arg: any): boolean {
-  if (arg instanceof Any) {
-    return true;
-  }
-
-  if (typeof arg === "object" && arg != null) {
-    return Object.values(arg).some((value) => containsAny(value));
-  }
-
-  return false;
-}
-
-function isAny(arg: any): arg is Any {
-  return arg instanceof Any;
-}
-
 function deepValidate(original: Object, objectContainingAny: Object) {
   return Object.entries(objectContainingAny).every(([key, value]) => {
-    if (isAny(value)) {
+    if (Any.isAny(value)) {
       return value.isValid(original[key]);
     }
 
-    if (containsAny(value)) {
+    if (Any.containsAny(value)) {
       return deepValidate(original[key], value);
     }
 
@@ -34,10 +18,10 @@ function deepValidate(original: Object, objectContainingAny: Object) {
   });
 }
 
-export class Spy2<T> {
-  private mock: Mock2<T>;
+export class Spy<T> {
+  private mock: Mock<T>;
   constructor(mock: any) {
-    this.mock = mock as Mock2<T>;
+    this.mock = mock as Mock<T>;
   }
 
   public callsTo(func: GetClassMethods<T>) {
@@ -61,7 +45,7 @@ export class Spy2<T> {
 
 class Stats<T> {
   constructor(
-    private readonly mock: Mock2<T>,
+    private readonly mock: Mock<T>,
     private readonly func: GetClassMethods<T>
   ) {}
 
@@ -79,7 +63,7 @@ class Stats<T> {
 class MethodAsserter<T> {
   public stats: Stats<T>;
   constructor(
-    private readonly mock: Mock2<T>,
+    private readonly mock: Mock<T>,
     private readonly func: GetClassMethods<T>
   ) {
     this.stats = new Stats<T>(mock, func);
@@ -90,7 +74,7 @@ class MethodAsserter<T> {
   }
 
   public hasBeenCalledWith(...args: any[]): boolean {
-    if (args.some((arg) => isAny(arg) || containsAny(arg))) {
+    if (args.some((arg) => Any.isAny(arg) || Any.containsAny(arg))) {
       return this.hasBeenCalledOnceWithAnyArgs(args);
     }
 
@@ -104,7 +88,7 @@ class MethodAsserter<T> {
   }
 
   public hasBeenCalledNTimesWith(args: any[], times: number): boolean {
-    if (args.some((arg) => isAny(arg) || containsAny(arg))) {
+    if (args.some((arg) => Any.isAny(arg) || Any.containsAny(arg))) {
       return this.hasBeenCalledOnceWithAnyArgs(args, times);
     }
     const mockedCalls = this.mock.getCallsInstance().callsTo(this.func, args);
@@ -140,15 +124,15 @@ class MethodAsserter<T> {
 
     const notAnyArgs = args
       .map((arg, index) => [arg, index])
-      .filter(([arg]) => !containsAny(arg) && !isAny(arg));
+      .filter(([arg]) => !Any.containsAny(arg) && !Any.isAny(arg));
 
     const anyArgs: [Any, number][] = args
       .map<[Any, number]>((arg, index) => [arg, index])
-      .filter(([arg]) => isAny(arg));
+      .filter(([arg]) => Any.isAny(arg));
 
     const containingAnyArgs: [Object, number][] = args
       .map<[Any, number]>((arg, index) => [arg, index])
-      .filter(([arg]) => containsAny(arg) && !isAny(arg));
+      .filter(([arg]) => Any.containsAny(arg) && !Any.isAny(arg));
 
     const matchingCalls = calls.filter((call) => {
       const args = call.args;
