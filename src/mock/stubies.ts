@@ -1,4 +1,5 @@
 import { HashingMap } from "../HashingMap";
+import { AnyClass } from "../types/AnyClass";
 import { GetClassMethods } from "../types/GetClassMethods";
 
 type FunctionStub = {
@@ -10,7 +11,7 @@ export class Stubies<T> {
   private stubiesMap: HashingMap = new HashingMap();
 
   constructor(
-    private readonly original: new () => T,
+    private readonly original: AnyClass<T>,
     private action: Function
   ) {
     const keys = Object.getOwnPropertyNames(

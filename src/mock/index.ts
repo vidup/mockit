@@ -1,3 +1,4 @@
+import { AnyClass } from "../types/AnyClass";
 import { Behaviour, NewBehaviourParam } from "../types/behaviour";
 import { GetClassMethods } from "../types/GetClassMethods";
 
@@ -9,7 +10,7 @@ export class Mock<T> {
   private stubies: Stubies<T>;
   private behaviour: Behaviour = Behaviour.Return;
 
-  constructor(private readonly original: new () => T) {
+  constructor(private readonly original: AnyClass<T>) {
     this.propagateBehaviour();
     this.stubies = new Stubies<T>(
       original,

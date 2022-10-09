@@ -1,6 +1,8 @@
 import { Mock } from "./mock";
 
 import { Behaviour, NewBehaviourParam } from "./types/behaviour";
+import { AnyClass } from "./types/AnyClass";
+
 import { Spy } from "./mock/Spy";
 import { Any } from "./Any";
 
@@ -11,7 +13,7 @@ type MockOptions = {
 };
 
 export class Mockit {
-  static mock<T>(original: new () => T, options?: MockOptions): T {
+  static mock<T>(original: AnyClass<T>, options?: MockOptions): T {
     const mock = new Mock<T>(original);
     mock.setupBehaviour(
       options?.defaultBehaviour ?? {
