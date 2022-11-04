@@ -25,6 +25,37 @@ export class Mockit {
     return mock as T;
   }
 
+  static mockFunction<T extends (...args: any[]) => any>(
+    _original: T,
+    options?: MockOptions
+  ): T {
+    return new Proxy(() => {}, {
+      apply: function (_target, _thisArg, argumentsList) {
+        if (options?.defaultBehaviour?.behaviour === Behaviour.Throw) {
+          throw options.defaultBehaviour.error;
+        }
+
+        if (options?.defaultBehaviour?.behaviour === Behaviour.Return) {
+          return options.defaultBehaviour.returnedValue;
+        }
+
+        if (options?.defaultBehaviour?.behaviour === Behaviour.Reject) {
+          return Promise.reject(options.defaultBehaviour.rejectedValue);
+        }
+
+        if (options?.defaultBehaviour?.behaviour === Behaviour.Resolve) {
+          return Promise.resolve(options.defaultBehaviour.resolvedValue);
+        }
+
+        if (options?.defaultBehaviour?.behaviour === Behaviour.Call) {
+          return options.defaultBehaviour.callback(...argumentsList);
+        }
+
+        return undefined;
+      },
+    }) as T;
+  }
+
   static changeDefaultBehaviour<T>(mock: T, newBehaviour: NewBehaviourParam) {
     (mock as Mock<T>).setupBehaviour(newBehaviour);
   }
