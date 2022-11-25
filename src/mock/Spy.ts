@@ -6,6 +6,10 @@ import type { GetClassMethods } from "../types/GetClassMethods";
 
 function deepValidate(original: Object, objectContainingAny: Object) {
   return Object.entries(objectContainingAny).every(([key, value]) => {
+    if (typeof original !== "object") {
+      return false;
+    }
+
     if (Any.isAny(value)) {
       return value.isValid(original[key]);
     }
@@ -135,18 +139,34 @@ class MethodAsserter<T> {
       .filter(([arg]) => Any.containsAny(arg) && !Any.isAny(arg));
 
     const matchingCalls = calls.filter((call) => {
-      const args = call.args;
+      const callArgs = call.args;
 
       const notAnyArgsMatch = notAnyArgs.every(
-        ([arg, index]) => args[index] === arg
+        ([arg, index]) => callArgs[index] === arg
       );
 
       const anyArgsMatch = anyArgs.every(([arg, index]) => {
-        return arg.isValid(args[index]);
+        return arg.isValid(callArgs[index]);
       });
 
       const containingAnyArgsMatch = containingAnyArgs.every(([arg, index]) => {
-        return deepValidate(args[index], arg);
+        // console.log({ arg, index, callArgs });
+        // if (callArgs[index] == null && arg == null) {
+        //   console.log(
+        //     `early return because original=${callArgs[index]} and arg=${arg}`
+        //   );
+        //   return true;
+        // }
+
+        // if (callArgs[index] == null && arg != null) {
+        //   console.log(
+        //     `early return because original=${callArgs[index]} and arg=${arg}`
+        //   );
+        //   return false;
+        // }
+
+        // console.log({ yo: 2 });
+        return deepValidate(callArgs[index], arg);
       });
 
       return notAnyArgsMatch && anyArgsMatch && containingAnyArgsMatch;
