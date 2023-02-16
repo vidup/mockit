@@ -1,5 +1,7 @@
 This is a fun little experiment I'm doing to build a lightweight Mokito inspired mocking library.
 
+[![Wallaby.js](https://img.shields.io/badge/wallaby.js-powered-blue.svg?style=flat&logo=github)](https://wallabyjs.com/oss/)
+
 For now it's functional and allows you to mock classes methods, altering their behaviour with default and args specific mocks.
 It also allows you to spy on these methods and analyze their calls.
 
