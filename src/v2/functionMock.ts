@@ -91,10 +91,7 @@ export function initializeProxy(proxy: any, functionName: string) {
   });
 }
 
-export function changeDefaultBehaviour(
-  proxy: any,
-  newBehaviour: NewBehaviourParam
-) {
+function changeDefaultBehaviour(proxy: any, newBehaviour: NewBehaviourParam) {
   Reflect.set(proxy, "defaultBehaviour", newBehaviour);
 }
 
@@ -107,5 +104,56 @@ export class FunctionMockUtils {
 
   public changeDefaultBehaviour(newBehaviour: NewBehaviourParam) {
     changeDefaultBehaviour(this.proxy, newBehaviour);
+  }
+
+  public defaultBehaviourController() {
+    const self = this;
+    return {
+      /**
+       * @param value value to return when the method is called
+       */
+      thenReturn(value: any) {
+        self.changeDefaultBehaviour({
+          behaviour: Behaviour.Return,
+          returnedValue: value,
+        });
+      },
+      /**
+       * @param error error to throw when the method is called
+       */
+      thenThrow(error: Error) {
+        self.changeDefaultBehaviour({
+          behaviour: Behaviour.Throw,
+          error,
+        });
+      },
+      /**
+       * @param value value to resolve when the method is called
+       */
+      thenResolve(value: any) {
+        self.changeDefaultBehaviour({
+          behaviour: Behaviour.Resolve,
+          resolvedValue: value,
+        });
+      },
+      /**
+       * @param error error to reject when the method is called
+       */
+      thenReject(error: Error) {
+        self.changeDefaultBehaviour({
+          behaviour: Behaviour.Reject,
+          rejectedValue: error,
+        });
+      },
+      /**
+       * @param callback callback to call when the method is called
+       */
+      thenCall(callback: (...args: any[]) => any) {
+        self.changeDefaultBehaviour({
+          behaviour: Behaviour.Call,
+          callback,
+        });
+      },
+    };
   }
 }

@@ -1,9 +1,4 @@
-import { Behaviour } from "../types/behaviour";
-import {
-  changeDefaultBehaviour,
-  FunctionMock,
-  FunctionMockUtils,
-} from "./functionMock";
+import { FunctionMock, FunctionMockUtils } from "./functionMock";
 
 type AbstractClass<T> = abstract new (...args: any[]) => T;
 type Class<T> = new (...args: any[]) => T;
@@ -18,7 +13,7 @@ export class Mockit {
    * (they're not compiled in the JS code)
    */
   static mockAbstract<T>(
-    original: AbstractClass<T>,
+    _original: AbstractClass<T>, // it's here to activate the generic type
     propertiesToMock: Array<keyof T>
   ): T {
     return new Mock<T>(propertiesToMock) as T;
@@ -32,53 +27,7 @@ export class Mockit {
        */
       get isCalled() {
         const utils = new FunctionMockUtils(method);
-        return {
-          /**
-           * @param value value to return when the method is called
-           */
-          thenReturn(value: any) {
-            utils.changeDefaultBehaviour({
-              behaviour: Behaviour.Return,
-              returnedValue: value,
-            });
-          },
-          /**
-           * @param error error to throw when the method is called
-           */
-          thenThrow(error: Error) {
-            utils.changeDefaultBehaviour({
-              behaviour: Behaviour.Throw,
-              error,
-            });
-          },
-          /**
-           * @param value value to resolve when the method is called
-           */
-          thenResolve(value: any) {
-            utils.changeDefaultBehaviour({
-              behaviour: Behaviour.Resolve,
-              resolvedValue: value,
-            });
-          },
-          /**
-           * @param error error to reject when the method is called
-           */
-          thenReject(error: Error) {
-            utils.changeDefaultBehaviour({
-              behaviour: Behaviour.Reject,
-              rejectedValue: error,
-            });
-          },
-          /**
-           * @param callback callback to call when the method is called
-           */
-          thenCall(callback: (...args: any[]) => any) {
-            utils.changeDefaultBehaviour({
-              behaviour: Behaviour.Call,
-              callback,
-            });
-          },
-        };
+        return utils.defaultBehaviourController();
       },
     };
   }
