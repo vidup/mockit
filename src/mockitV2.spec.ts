@@ -7,7 +7,6 @@ abstract class Hellaw {
 
 type AbstractClass<T> = abstract new (...args: any[]) => T;
 type Class<T> = new (...args: any[]) => T;
-
 type FunctionOf<T> = T extends (...args: any[]) => any ? T : never;
 
 class Mockit {
@@ -25,7 +24,7 @@ class Mockit {
           thenReturn(value: any) {
             console.log(
               "mocking method",
-              Reflect.get(method, "mockOf"),
+              Reflect.get(method, "defaultBehaviour"),
               "with args",
               args,
               "returning",
@@ -39,9 +38,11 @@ class Mockit {
 }
 
 class Mock<T> {
+  // private data = {};
   constructor(propertiesToMock: Array<keyof T>) {
     for (const property of propertiesToMock) {
-      this[property as string] = FunctionMock(property as string);
+      const fMock = FunctionMock(property as string);
+      this[property as string] = fMock;
     }
   }
 }
@@ -49,7 +50,6 @@ class Mock<T> {
 describe("v2", () => {
   it("should not throw if calling abstract method", () => {
     const mock = Mockit.mockAbstract(Hellaw, ["hello"]);
-    console.log(mock.hello);
     Mockit.whenMethod(mock.hello).isCalledWith("a", "b").thenReturn("c");
     const x = mock.hello();
     console.log(x);
@@ -62,32 +62,41 @@ const defaultBehaviour: NewBehaviourParam = {
 };
 
 function FunctionMock(functionName: string) {
-  return new Proxy(
-    {
-      isMocked: true,
-      defaultBehaviour,
-      functionName,
-      calls: [],
+  const proxy = new Proxy(() => {}, {
+    apply: function (_target, _thisArg, argumentsList) {
+      const behaviour = Reflect.get(_target, "defaultBehaviour");
+
+      switch (behaviour.behaviour) {
+        case Behaviour.Return:
+          return behaviour.returnedValue;
+        default:
+          throw new Error("Mock logic not implemented yet");
+      }
     },
-    {
-      apply: function (_target, _thisArg, argumentsList) {
-        // mock part
-        const behaviour = Reflect.get(
-          _target,
-          "defaultBehaviour"
-        ) as NewBehaviourParam;
 
-        switch (behaviour.behaviour) {
-          case Behaviour.Return:
-            return behaviour.returnedValue;
-          default:
-            throw new Error("Mock logic not implemented yet");
-        }
-      },
+    get: function (target, prop, _receiver) {
+      return Reflect.get(target, "functionName");
+    },
 
-      get: function (target, prop, _receiver) {
-        return Reflect.get(target, "functionName");
-      },
-    }
-  );
+    set: function (target, prop, newValue, receiver) {
+      if (prop === "init") {
+        Reflect.set(target, "defaultBehaviour", newValue.defaultBehaviour);
+        Reflect.set(target, "calls", []);
+        Reflect.set(target, "functionName", newValue.functionName);
+        return true;
+      }
+    },
+  });
+
+  initializeProxy(proxy, functionName);
+
+  return proxy;
+}
+
+function initializeProxy(proxy: any, functionName: string) {
+  Reflect.set(proxy, "init", {
+    defaultBehaviour,
+    functionName,
+    calls: [],
+  });
 }
