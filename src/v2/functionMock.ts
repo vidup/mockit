@@ -10,6 +10,11 @@ export const Behaviours = {
 
 export type BehaviourType = typeof Behaviours[keyof typeof Behaviours];
 
+type Call = {
+  args: any[];
+  behaviour: NewBehaviourParam;
+};
+
 export function FunctionMock(functionName: string) {
   const proxy = new Proxy(() => {}, {
     apply: function (_target, _thisArg, argumentsList) {
@@ -35,7 +40,14 @@ export function FunctionMock(functionName: string) {
     },
 
     get: function (target, prop, _receiver) {
-      return Reflect.get(target, "functionName");
+      switch (prop) {
+        case "calls":
+        case "defaultBehaviour":
+        case "functionName":
+          return Reflect.get(target, prop);
+        default:
+          throw new Error("Unauthorized property");
+      }
     },
 
     set: function (target, prop, newValue, receiver) {
@@ -62,7 +74,7 @@ export function FunctionMock(functionName: string) {
     },
   });
 
-  initializeProxy(proxy, functionName);
+  new FunctionMockUtils(proxy).initialize(functionName);
   return proxy;
 }
 
@@ -84,4 +96,16 @@ export function changeDefaultBehaviour(
   newBehaviour: NewBehaviourParam
 ) {
   Reflect.set(proxy, "defaultBehaviour", newBehaviour);
+}
+
+export class FunctionMockUtils {
+  constructor(private proxy: any) {}
+
+  public initialize(functionName: string) {
+    initializeProxy(this.proxy, functionName);
+  }
+
+  public changeDefaultBehaviour(newBehaviour: NewBehaviourParam) {
+    changeDefaultBehaviour(this.proxy, newBehaviour);
+  }
 }

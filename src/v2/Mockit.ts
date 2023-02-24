@@ -1,5 +1,9 @@
 import { Behaviour } from "../types/behaviour";
-import { changeDefaultBehaviour, FunctionMock } from "./functionMock";
+import {
+  changeDefaultBehaviour,
+  FunctionMock,
+  FunctionMockUtils,
+} from "./functionMock";
 
 type AbstractClass<T> = abstract new (...args: any[]) => T;
 type Class<T> = new (...args: any[]) => T;
@@ -27,12 +31,13 @@ export class Mockit {
        * If the mocked method is called with parameters that are not setup for custom behaviour, this will be the default behaviour
        */
       get isCalled() {
+        const utils = new FunctionMockUtils(method);
         return {
           /**
            * @param value value to return when the method is called
            */
           thenReturn(value: any) {
-            changeDefaultBehaviour(method, {
+            utils.changeDefaultBehaviour({
               behaviour: Behaviour.Return,
               returnedValue: value,
             });
@@ -41,7 +46,7 @@ export class Mockit {
            * @param error error to throw when the method is called
            */
           thenThrow(error: Error) {
-            changeDefaultBehaviour(method, {
+            utils.changeDefaultBehaviour({
               behaviour: Behaviour.Throw,
               error,
             });
@@ -50,7 +55,7 @@ export class Mockit {
            * @param value value to resolve when the method is called
            */
           thenResolve(value: any) {
-            changeDefaultBehaviour(method, {
+            utils.changeDefaultBehaviour({
               behaviour: Behaviour.Resolve,
               resolvedValue: value,
             });
@@ -59,7 +64,7 @@ export class Mockit {
            * @param error error to reject when the method is called
            */
           thenReject(error: Error) {
-            changeDefaultBehaviour(method, {
+            utils.changeDefaultBehaviour({
               behaviour: Behaviour.Reject,
               rejectedValue: error,
             });
@@ -68,7 +73,7 @@ export class Mockit {
            * @param callback callback to call when the method is called
            */
           thenCall(callback: (...args: any[]) => any) {
-            changeDefaultBehaviour(method, {
+            utils.changeDefaultBehaviour({
               behaviour: Behaviour.Call,
               callback,
             });
