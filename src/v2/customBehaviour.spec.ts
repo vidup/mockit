@@ -89,4 +89,27 @@ describe("v2 function", () => {
     expect(rejectingMock()).rejects.toBe("undefinedinput");
     expect(rejectingMock({ az: 2, y: 3 })).rejects.toBe("default");
   });
+
+  it("should be able to specific different behaviours for the same function", () => {
+    const mock = Mockit.mockFunction(hello);
+    let counter = 0;
+    Mockit.whenMethod(mock).isCalledWith("hello").thenReturn("hello");
+    Mockit.whenMethod(mock).isCalledWith("world").thenThrow("world");
+    Mockit.whenMethod(mock)
+      .isCalledWith()
+      .thenCall(() => {
+        counter++;
+      });
+    Mockit.whenMethod(mock).isCalled.thenResolve("default");
+    Mockit.whenMethod(mock).isCalledWith("NOOO").thenReject("NOOO");
+
+    expect(mock("hello")).toBe("hello");
+    expect(() => mock("world")).toThrow("world");
+    mock();
+    expect(counter).toBe(1);
+    mock();
+    expect(counter).toBe(2);
+    expect(mock("NOOO")).rejects.toBe("NOOO");
+    expect(mock(undefined)).resolves.toBe("default");
+  });
 });

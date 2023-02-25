@@ -1,6 +1,6 @@
 import { Mockit } from "./Mockit";
 
-function hellaw() {
+function hellaw(...args: any[]) {
   return "hello world";
 }
 
