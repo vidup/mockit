@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { GetClassMethods } from "../types/GetClassMethods";
 import { FunctionMock, FunctionMockUtils } from "./functionMock";
 
 type AbstractClass<T> = abstract new (...args: any[]) => T;
@@ -16,7 +18,7 @@ export class Mockit {
     _original: AbstractClass<T>, // it's here to activate the generic type
     propertiesToMock: Array<keyof T>
   ): T {
-    return new Mock<T>(propertiesToMock) as T;
+    return new AbstractMock<T>(propertiesToMock) as T;
   }
 
   static whenMethod<T>(method: any) {
@@ -31,14 +33,40 @@ export class Mockit {
       },
     };
   }
+
+  static mock<T>(_original: Class<T>): T {
+    return new Mock<T>(_original) as T;
+  }
 }
 
-class Mock<T> {
+class AbstractMock<T> {
   // private data = {};
   constructor(propertiesToMock: Array<keyof T>) {
     for (const property of propertiesToMock) {
       const fMock = FunctionMock(property as string);
       this[property as string] = fMock;
+    }
+  }
+}
+
+const functionSchema = z.function();
+
+class Mock<T> {
+  constructor(original: Class<T>) {
+    const properties = Object.getOwnPropertyNames(
+      original.prototype
+    ) as GetClassMethods<T>[];
+
+    const instance = new original();
+    const methods = properties.filter(
+      (method) =>
+        method !== "constructor" &&
+        functionSchema.safeParse(instance[method]).success
+    );
+
+    for (const method of methods) {
+      const fMock = FunctionMock(method as string);
+      this[method as string] = fMock;
     }
   }
 }
