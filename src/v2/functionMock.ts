@@ -1,3 +1,4 @@
+import { HashingMap } from "../HashingMap";
 import { Behaviour, NewBehaviourParam } from "../types/behaviour";
 
 export const Behaviours = {
@@ -18,10 +19,18 @@ type Call = {
 export function FunctionMock(functionName: string) {
   const proxy = new Proxy(() => {}, {
     apply: function (_target, _thisArg, argumentsList) {
-      const behaviour: NewBehaviourParam = Reflect.get(
-        _target,
-        "defaultBehaviour"
-      );
+      // Checking if there is a custom behaviour for this call
+      const mockMap: HashingMap = Reflect.get(_target, "mockMap");
+      let behaviour: NewBehaviourParam = mockMap.get(argumentsList);
+
+      console.log({ behaviour, argumentsList });
+      console.log(mockMap.keys());
+
+      // Default behaviour
+      if (!behaviour) {
+        behaviour = Reflect.get(_target, "defaultBehaviour");
+        console.log("default behaviour", behaviour);
+      }
 
       switch (behaviour.behaviour) {
         case Behaviour.Return:
@@ -55,6 +64,7 @@ export function FunctionMock(functionName: string) {
         Reflect.set(target, "defaultBehaviour", newValue.defaultBehaviour);
         Reflect.set(target, "calls", []);
         Reflect.set(target, "functionName", newValue.functionName);
+        Reflect.set(target, "mockMap", newValue.mockMap);
         return true;
       }
 
@@ -64,6 +74,17 @@ export function FunctionMock(functionName: string) {
         case "calls":
         case "functionName": {
           Reflect.set(target, prop, newValue);
+          break;
+        }
+        case "newCustomBehaviour": {
+          const { funcName, args, newBehaviour } = newValue as {
+            funcName: string;
+            args: any[];
+            newBehaviour: NewBehaviourParam;
+          };
+
+          const mockMap: HashingMap = Reflect.get(target, "mockMap");
+          mockMap.set(args, newBehaviour);
           break;
         }
         default:
@@ -88,6 +109,7 @@ export function initializeProxy(proxy: any, functionName: string) {
     defaultBehaviour,
     functionName,
     calls: [],
+    mockMap: new HashingMap(),
   });
 }
 
@@ -152,6 +174,19 @@ export class FunctionMockUtils {
         self.changeDefaultBehaviour({
           behaviour: Behaviour.Call,
           callback,
+        });
+      },
+    };
+  }
+
+  public callController(...args: any[]) {
+    const self = this;
+    return {
+      thenReturn(value: any) {
+        Reflect.set(self.proxy, "newCustomBehaviour", {
+          behaviour: Behaviour.Return,
+          returnedValue: value,
+          args,
         });
       },
     };
