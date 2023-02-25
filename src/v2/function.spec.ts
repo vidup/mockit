@@ -4,6 +4,9 @@ function hellaw(...args: any[]) {
   return "hello world";
 }
 
+/**
+ * All mocked methods are instances of FunctionMock => we can test it once here.
+ */
 describe("v2 function", () => {
   it("should default to a returned undefined", () => {
     const mock = Mockit.mockFunction(hellaw);
