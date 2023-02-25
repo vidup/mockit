@@ -33,7 +33,7 @@ export class Mockit {
       },
       isCalledWith(...args: any[]) {
         const utils = new FunctionMockUtils(method);
-        return utils.callController(args);
+        return utils.callController(...args);
       },
     };
   }

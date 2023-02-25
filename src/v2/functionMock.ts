@@ -11,11 +11,6 @@ export const Behaviours = {
 
 export type BehaviourType = typeof Behaviours[keyof typeof Behaviours];
 
-type Call = {
-  args: any[];
-  behaviour: NewBehaviourParam;
-};
-
 export function FunctionMock(functionName: string) {
   const proxy = new Proxy(() => {}, {
     apply: function (_target, _thisArg, argumentsList) {
@@ -23,13 +18,9 @@ export function FunctionMock(functionName: string) {
       const mockMap: HashingMap = Reflect.get(_target, "mockMap");
       let behaviour: NewBehaviourParam = mockMap.get(argumentsList);
 
-      console.log({ behaviour, argumentsList });
-      console.log(mockMap.keys());
-
       // Default behaviour
       if (!behaviour) {
         behaviour = Reflect.get(_target, "defaultBehaviour");
-        console.log("default behaviour", behaviour);
       }
 
       switch (behaviour.behaviour) {
@@ -77,14 +68,13 @@ export function FunctionMock(functionName: string) {
           break;
         }
         case "newCustomBehaviour": {
-          const { funcName, args, newBehaviour } = newValue as {
-            funcName: string;
+          const { args, customBehaviour } = newValue as {
             args: any[];
-            newBehaviour: NewBehaviourParam;
+            customBehaviour: NewBehaviourParam;
           };
 
           const mockMap: HashingMap = Reflect.get(target, "mockMap");
-          mockMap.set(args, newBehaviour);
+          mockMap.set(args, customBehaviour);
           break;
         }
         default:
@@ -143,7 +133,7 @@ export class FunctionMockUtils {
       /**
        * @param error error to throw when the method is called
        */
-      thenThrow(error: Error) {
+      thenThrow(error: any) {
         self.changeDefaultBehaviour({
           behaviour: Behaviour.Throw,
           error,
@@ -161,7 +151,7 @@ export class FunctionMockUtils {
       /**
        * @param error error to reject when the method is called
        */
-      thenReject(error: Error) {
+      thenReject(error: any) {
         self.changeDefaultBehaviour({
           behaviour: Behaviour.Reject,
           rejectedValue: error,
@@ -184,8 +174,47 @@ export class FunctionMockUtils {
     return {
       thenReturn(value: any) {
         Reflect.set(self.proxy, "newCustomBehaviour", {
-          behaviour: Behaviour.Return,
-          returnedValue: value,
+          customBehaviour: {
+            behaviour: Behaviour.Return,
+            returnedValue: value,
+          },
+          args,
+        });
+      },
+      thenThrow(error: any) {
+        Reflect.set(self.proxy, "newCustomBehaviour", {
+          customBehaviour: {
+            behaviour: Behaviour.Throw,
+            error,
+          },
+          args,
+        });
+      },
+      thenCall(callback: (...args: any[]) => any) {
+        Reflect.set(self.proxy, "newCustomBehaviour", {
+          customBehaviour: {
+            behaviour: Behaviour.Call,
+            callback,
+          },
+          args,
+        });
+      },
+      thenResolve(value: any) {
+        Reflect.set(self.proxy, "newCustomBehaviour", {
+          customBehaviour: {
+            behaviour: Behaviour.Resolve,
+            resolvedValue: value,
+          },
+          args,
+        });
+      },
+
+      thenReject(error: any) {
+        Reflect.set(self.proxy, "newCustomBehaviour", {
+          customBehaviour: {
+            behaviour: Behaviour.Reject,
+            rejectedValue: error,
+          },
           args,
         });
       },
