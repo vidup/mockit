@@ -37,6 +37,10 @@ export class Mockit {
   static mock<T>(_original: Class<T>): T {
     return new Mock<T>(_original) as T;
   }
+
+  static mockFunction<T extends (...args: any[]) => any>(original: T): T {
+    return FunctionMock(original.name) as T;
+  }
 }
 
 class AbstractMock<T> {
