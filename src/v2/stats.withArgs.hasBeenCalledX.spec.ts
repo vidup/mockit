@@ -3,23 +3,25 @@ import { Mockit } from "./Mockit";
 function hello(...args: any[]) {}
 
 describe("V2 hasBeenCalledWith", () => {
-  it("should provide functions asserting if a method has been called with a specific set of arguments", () => {
+  it("should provide functions asserting if a method has been called at least once with a specific set of arguments", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
     Mockit.whenMethod(mock)
       .isCalledWith("hello")
       .thenCall(() => "world");
 
-    expect(spy.withArgs("hello").hasBeenCalled).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").atleastOnce).toBe(false);
     mock("hello");
-    expect(spy.withArgs("hello").hasBeenCalled).toBe(true);
+    expect(spy.hasBeenCalled.withArgs("hello").atleastOnce).toBe(true);
 
     mock("something else");
-    expect(spy.withArgs("hello").hasBeenCalled).toBe(true);
-    expect(spy.withArgs("something else").hasBeenCalled).toBe(true);
+    expect(spy.hasBeenCalled.withArgs("hello").atleastOnce).toBe(true);
+    expect(spy.hasBeenCalled.withArgs("something else").atleastOnce).toBe(true);
 
     mock({ hello: "world" });
-    expect(spy.withArgs({ hello: "world" }).hasBeenCalled).toBe(true);
+    expect(spy.hasBeenCalled.withArgs({ hello: "world" }).atleastOnce).toBe(
+      true
+    );
 
     mock({
       hello: "world",
@@ -47,22 +49,27 @@ describe("V2 hasBeenCalledWith", () => {
       .isCalledWith("hello")
       .thenCall(() => "world");
 
-    expect(spy.withArgs("hello").hasBeenCalledOnce).toBe(false);
-    expect(spy.withArgs("hello").hasBeenCalledTwice).toBe(false);
-    expect(spy.withArgs("hello").hasBeenCalledThrice).toBe(false);
-    mock("hello");
-    expect(spy.withArgs("hello").hasBeenCalledOnce).toBe(true);
-    expect(spy.withArgs("hello").hasBeenCalledTwice).toBe(false);
-    expect(spy.withArgs("hello").hasBeenCalledThrice).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").once).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").twice).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").thrice).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").atleastOnce).toBe(false);
 
     mock("hello");
-    expect(spy.withArgs("hello").hasBeenCalledOnce).toBe(false);
-    expect(spy.withArgs("hello").hasBeenCalledTwice).toBe(true);
-    expect(spy.withArgs("hello").hasBeenCalledThrice).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").once).toBe(true);
+    expect(spy.hasBeenCalled.withArgs("hello").twice).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").thrice).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").atleastOnce).toBe(true);
 
     mock("hello");
-    expect(spy.withArgs("hello").hasBeenCalledOnce).toBe(false);
-    expect(spy.withArgs("hello").hasBeenCalledTwice).toBe(false);
-    expect(spy.withArgs("hello").hasBeenCalledThrice).toBe(true);
+    expect(spy.hasBeenCalled.withArgs("hello").once).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").twice).toBe(true);
+    expect(spy.hasBeenCalled.withArgs("hello").thrice).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").atleastOnce).toBe(true);
+
+    mock("hello");
+    expect(spy.hasBeenCalled.withArgs("hello").once).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").twice).toBe(false);
+    expect(spy.hasBeenCalled.withArgs("hello").thrice).toBe(true);
+    expect(spy.hasBeenCalled.withArgs("hello").atleastOnce).toBe(true);
   });
 });

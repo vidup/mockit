@@ -294,10 +294,11 @@ export class FunctionMockUtils {
 
     return {
       calls,
+      callsLength: callsMap.getCalls().length,
 
-      get hasBeenCalled() {
-        return calls.length > 0;
-      },
+      // get hasBeenCalled() {
+      //   return calls.length > 0;
+      // },
 
       get hasBeenCalledOnce() {
         return calls.length === 1;
@@ -313,6 +314,45 @@ export class FunctionMockUtils {
 
       hasBeenCalledNTimes(howMuch: number) {
         return calls.length === howMuch;
+      },
+
+      get hasBeenCalled() {
+        return {
+          get atleastOnce() {
+            return calls.length > 0;
+          },
+          get once() {
+            return calls.length === 1;
+          },
+          get twice() {
+            return calls.length === 2;
+          },
+          get thrice() {
+            return calls.length === 3;
+          },
+          nTimes(howMuch: number) {
+            return calls.length === howMuch;
+          },
+          withArgs(...args: any[]) {
+            return {
+              get atleastOnce() {
+                return callsMap.hasBeenCalledWith(...args);
+              },
+              get once() {
+                return callsMap.hasBeenCalledNTimesWith(1, ...args);
+              },
+              get twice() {
+                return callsMap.hasBeenCalledNTimesWith(2, ...args);
+              },
+              get thrice() {
+                return callsMap.hasBeenCalledNTimesWith(3, ...args);
+              },
+              nTimes(howMuch: number) {
+                return callsMap.hasBeenCalledNTimesWith(howMuch, ...args);
+              },
+            };
+          },
+        };
       },
 
       withArgs(...args: any[]) {
