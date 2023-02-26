@@ -231,11 +231,33 @@ export class FunctionMockUtils {
 
   public spy() {
     const self = this;
+    const calls = Reflect.get(self.proxy, "calls") as {
+      args: any[];
+      behaviour: NewBehaviourParam;
+    }[];
+
     return {
-      calls: Reflect.get(self.proxy, "calls") as {
-        args: any[];
-        behaviour: NewBehaviourParam;
-      }[],
+      calls,
+
+      get hasBeenCalled() {
+        return calls.length > 0;
+      },
+
+      get hasBeenCalledOnce() {
+        return calls.length === 1;
+      },
+
+      get hasBeenCalledTwice() {
+        return calls.length === 2;
+      },
+
+      get hasBeenCalledThrice() {
+        return calls.length === 3;
+      },
+
+      hasBeenCalledNTimes(howMuch: number) {
+        return calls.length === howMuch;
+      },
     };
   }
 }

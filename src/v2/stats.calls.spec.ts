@@ -7,14 +7,14 @@ function hello(...args: any[]) {
 describe("v2 stats", () => {
   it("should return an empty array when no calls are made", () => {
     const mock = Mockit.mockFunction(hello);
-    const spy = Mockit.spyFunction(mock);
+    const spy = Mockit.spy(mock);
 
     expect(spy.calls).toEqual([]);
   });
 
   it("should return an array with one call when one call is made", () => {
     const mock = Mockit.mockFunction(hello);
-    const spy = Mockit.spyFunction(mock);
+    const spy = Mockit.spy(mock);
 
     mock("hello");
 
@@ -28,7 +28,7 @@ describe("v2 stats", () => {
 
   it("should cumulate calls", async () => {
     const mock = Mockit.mockFunction(hello);
-    const spy = Mockit.spyFunction(mock);
+    const spy = Mockit.spy(mock);
 
     mock("hello");
     mock("hello");

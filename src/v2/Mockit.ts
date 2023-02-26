@@ -49,7 +49,7 @@ export class Mockit {
     return FunctionMock(original.name) as T;
   }
 
-  static spyFunction<T extends (...args: any[]) => any>(original: T) {
+  static spy<T extends (...args: any[]) => any>(original: T) {
     const utils = new FunctionMockUtils(original);
     return utils.spy();
   }
