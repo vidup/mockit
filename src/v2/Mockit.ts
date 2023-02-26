@@ -55,6 +55,24 @@ export class Mockit {
     // This generic type is here to make it look like a real function
     return new FunctionSpy(mockedFunctionInstance);
   }
+
+  static any() {
+    return {
+      string: z.string(),
+      number: z.number(),
+      boolean: z.boolean(),
+      array: z.array(z.any()),
+      object: z.object({}),
+      function: z.function(),
+      uuid: z.string().uuid(),
+      date: z.date(),
+      email: z.string().email(),
+      url: z.string().url(),
+      map: z.map(z.any(), z.any()),
+      set: z.set(z.any()),
+      bigint: z.bigint(),
+    };
+  }
 }
 
 class AbstractMock<T> {

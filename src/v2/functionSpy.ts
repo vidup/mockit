@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { HashingMap } from "../HashingMap";
 import { NewBehaviourParam } from "../types/behaviour";
 
@@ -83,4 +84,8 @@ export class FunctionSpy {
       },
     };
   }
+}
+
+export function argsContainZodSchema(...args: any[]) {
+  return args.some((arg) => arg instanceof z.ZodSchema);
 }
