@@ -52,10 +52,39 @@ describe("argsContainZodSchema", () => {
       z.array(z.any()),
       z.tuple([z.any(), z.any()]),
       z.record(z.any()),
+      z.object({ x: z.any(), y: z.number() }),
     ];
 
     zodSchemas.forEach((arg) => {
       expect(argsContainZodSchema(arg)).toBe(true);
+    });
+  });
+
+  it("should do it with multiple arguments too", () => {
+    const argsCombinations = [
+      [1, "hello", z.string()],
+      [1, "hello", z.number()],
+      [1, "hello", z.boolean()],
+      [z.string(), z.number(), z.boolean()],
+      [z.string(), 1, z.boolean()],
+      ["hello", { x: 1 }, z.object({ x: z.number() })],
+    ];
+
+    argsCombinations.forEach((args) => {
+      expect(argsContainZodSchema(...args)).toBe(true);
+    });
+  });
+
+  it("should be able to find deep zod schemas in objects", () => {
+    const argsCombinations = [
+      [{ x: 1, y: z.number() }],
+      [{ x: 1, y: [z.number()] }],
+      [{ x: { y: { z: z.number() } } }],
+      [[[[[[[[z.number()]]]]]]]],
+    ];
+
+    argsCombinations.forEach((args) => {
+      expect(argsContainZodSchema(...args)).toBe(true);
     });
   });
 });

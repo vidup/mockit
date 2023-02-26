@@ -29,6 +29,10 @@ export class FunctionCalls {
     // So we need to flatten them to get the whole list as a single array
     return this.calls.values<Call[]>().flat();
   }
+
+  public getArgs() {
+    return this.calls.getOriginalKeys();
+  }
 }
 
 export class FunctionSpy {
@@ -64,6 +68,9 @@ export class FunctionSpy {
         return callsMap.getCalls().length === howMuch;
       },
       withArgs(...args: any[]) {
+        // const argscontainZodSchema = argsContainZodSchema(...args);
+        // const calledArgs = callsMap.getArgs();
+
         return {
           get atleastOnce() {
             return callsMap.hasBeenCalledWith(...args);
@@ -87,5 +94,34 @@ export class FunctionSpy {
 }
 
 export function argsContainZodSchema(...args: any[]) {
-  return args.some((arg) => arg instanceof z.ZodSchema);
+  const level0ArgscontainZodSchema = args.some(
+    (arg) => arg instanceof z.ZodSchema
+  );
+
+  const objectsArgs = args.filter((arg) => arg instanceof Object);
+
+  let objectsArgsContainZodSchema = false;
+  if (objectsArgs.length > 0) {
+    const objectArgsValues = objectsArgs
+      .map((arg) => Object.values(arg))
+      .flat();
+
+    // I need it recursive
+    objectsArgsContainZodSchema = argsContainZodSchema(...objectArgsValues);
+  }
+
+  const arraysArgs = args.filter((arg) => arg instanceof Array);
+  let arraysArgsContainZodSchema = false;
+  if (arraysArgs.length > 0) {
+    const arraysArgsValues = arraysArgs.flat();
+    arraysArgsContainZodSchema = argsContainZodSchema(...arraysArgsValues);
+  }
+
+  // lots of optimizations possible here, not really BLAZINGLY FAST right now...
+
+  return (
+    level0ArgscontainZodSchema ||
+    objectsArgsContainZodSchema ||
+    arraysArgsContainZodSchema
+  );
 }

@@ -1,6 +1,7 @@
 import { AbstractParser, Parser } from "../parser";
 
 export class HashingMap {
+  private originalArgs: any[] = [];
   constructor(
     private readonly map = new Map(),
     private readonly parser: AbstractParser = new Parser()
@@ -12,6 +13,7 @@ export class HashingMap {
   }
 
   set(args: any, value: any): this {
+    this.originalArgs.push(args);
     const hashedArgs = this.parser.hash(args);
     this.map.set(hashedArgs, value);
 
@@ -20,6 +22,10 @@ export class HashingMap {
 
   keys(): any[] {
     return Array.from(this.map.keys());
+  }
+
+  getOriginalKeys(): any[] {
+    return this.originalArgs;
   }
 
   values<T>(): T[] {
