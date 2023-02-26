@@ -24,8 +24,8 @@ export class FunctionCalls {
   }
 
   public getCalls(): Call[] {
-    // Remember, the values are arrays of call for each args combination
-    // So we need to flatten them
+    // Remember, the values are arrays of calls for each args combination
+    // So we need to flatten them to get the whole list as a single array
     return this.calls.values<Call[]>().flat();
   }
 }
