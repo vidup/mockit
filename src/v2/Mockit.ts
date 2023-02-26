@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { Behaviour } from "../types/behaviour";
 import { GetClassMethods } from "../types/GetClassMethods";
-import { FunctionMock, FunctionMockUtils, FunctionSpy } from "./functionMock";
+import { FunctionMock, FunctionMockUtils } from "./functionMock";
+import { FunctionSpy } from "./functionSpy";
 
 type AbstractClass<T> = abstract new (...args: any[]) => T;
 type Class<T> = new (...args: any[]) => T;
@@ -57,7 +58,6 @@ export class Mockit {
 }
 
 class AbstractMock<T> {
-  // private data = {};
   constructor(propertiesToMock: Array<keyof T>) {
     for (const property of propertiesToMock) {
       const fMock = FunctionMock(property as string);
