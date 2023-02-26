@@ -23,6 +23,14 @@ export function FunctionMock(functionName: string) {
         behaviour = Reflect.get(_target, "defaultBehaviour");
       }
 
+      // Adding the call to the list of calls, for the spy
+      const calls = Reflect.get(_target, "calls");
+      calls.push({
+        args: argumentsList,
+        behaviour,
+      });
+      Reflect.set(_target, "calls", calls);
+
       switch (behaviour.behaviour) {
         case Behaviour.Return:
           return behaviour.returnedValue;
@@ -218,6 +226,16 @@ export class FunctionMockUtils {
           args,
         });
       },
+    };
+  }
+
+  public spy() {
+    const self = this;
+    return {
+      calls: Reflect.get(self.proxy, "calls") as {
+        args: any[];
+        behaviour: NewBehaviourParam;
+      }[],
     };
   }
 }

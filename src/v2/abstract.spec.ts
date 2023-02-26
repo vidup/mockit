@@ -12,7 +12,6 @@ describe("v2", () => {
     const returningMock = Mockit.mockAbstract(Hellaw, ["hello"]);
     Mockit.whenMethod(returningMock.hello).isCalled.thenReturn("world");
 
-    const x = returningMock.hello("hello");
     expect(returningMock.hello("hello")).toBe("world");
 
     const throwingMock = Mockit.mockAbstract(Hellaw, ["hello"]);

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Behaviour } from "../types/behaviour";
 import { GetClassMethods } from "../types/GetClassMethods";
 import { FunctionMock, FunctionMockUtils } from "./functionMock";
 
@@ -6,6 +7,8 @@ type AbstractClass<T> = abstract new (...args: any[]) => T;
 type Class<T> = new (...args: any[]) => T;
 
 export class Mockit {
+  static Behaviours = Behaviour;
+
   /**
    * @param original abstract class to mock
    * @param propertiesToMock list of properties that
@@ -44,6 +47,11 @@ export class Mockit {
 
   static mockFunction<T extends (...args: any[]) => any>(original: T): T {
     return FunctionMock(original.name) as T;
+  }
+
+  static spyFunction<T extends (...args: any[]) => any>(original: T) {
+    const utils = new FunctionMockUtils(original);
+    return utils.spy();
   }
 }
 
