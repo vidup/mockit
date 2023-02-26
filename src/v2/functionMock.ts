@@ -16,6 +16,7 @@ export function FunctionMock(functionName: string) {
     apply: function (_target, _thisArg, argumentsList) {
       // Checking if there is a custom behaviour for this call
       const mockMap: HashingMap = Reflect.get(_target, "mockMap");
+
       const behaviourWithTheseArguments = mockMap.get(argumentsList) as {
         calls: any[];
         customBehaviour: NewBehaviourParam;
@@ -26,17 +27,6 @@ export function FunctionMock(functionName: string) {
       // Default behaviour
       if (!behaviour) {
         behaviour = Reflect.get(_target, "defaultBehaviour");
-      } else {
-        // Adding the call to the list of calls, for the spy
-        const callsWithTheseArguments =
-          behaviourWithTheseArguments.calls.concat({
-            args: argumentsList,
-            behaviour,
-          });
-        // TODO: this does not work when only using custom behaviour. Maybe store calls in a dedicated map?
-        behaviourWithTheseArguments.calls.push(argumentsList);
-        mockMap.set(argumentsList, behaviourWithTheseArguments);
-        Reflect.set(_target, "mockMap", mockMap);
       }
 
       // Adding the call to the list of calls, for the spy
@@ -45,6 +35,11 @@ export function FunctionMock(functionName: string) {
         args: argumentsList,
         behaviour,
       });
+
+      const callsMap: FunctionCalls = Reflect.get(_target, "callsMap");
+      callsMap.registerCall(argumentsList, behaviour);
+      Reflect.set(_target, "callsMap", callsMap);
+
       Reflect.set(_target, "calls", calls);
 
       switch (behaviour.behaviour) {
@@ -72,7 +67,9 @@ export function FunctionMock(functionName: string) {
         case "mockMap":
           const mockMap = Reflect.get(target, "mockMap") as HashingMap;
           return mockMap;
-
+        case "callsMap":
+          const callsMap = Reflect.get(target, "callsMap") as FunctionCalls;
+          return callsMap;
         default:
           throw new Error("Unauthorized property");
       }
@@ -84,6 +81,7 @@ export function FunctionMock(functionName: string) {
         Reflect.set(target, "calls", []);
         Reflect.set(target, "functionName", newValue.functionName);
         Reflect.set(target, "mockMap", newValue.mockMap);
+        Reflect.set(target, "callsMap", newValue.callsMap);
         return true;
       }
 
@@ -130,12 +128,40 @@ const defaultBehaviour: NewBehaviourParam = {
   returnedValue: undefined,
 };
 
+type Call = {
+  behaviour: NewBehaviourParam;
+};
+
+class FunctionCalls {
+  private calls: HashingMap = new HashingMap();
+  constructor() {}
+
+  public registerCall(args: any[], behaviour: NewBehaviourParam) {
+    const existingCalls = (this.calls.get(args) ?? []) as Call[];
+    this.calls.set(args, existingCalls.concat({ behaviour }));
+  }
+
+  public hasBeenCalledWith(...args: any[]) {
+    return this.calls.has(args);
+  }
+
+  public hasBeenCalledNTimesWith(n: number, ...args: any[]) {
+    const calls = this.calls.get(args) as Call[];
+    return calls.length === n;
+  }
+
+  public getCalls() {
+    return this.calls.values();
+  }
+}
+
 export function initializeProxy(proxy: any, functionName: string) {
   Reflect.set(proxy, "init", {
     defaultBehaviour,
     functionName,
     calls: [],
     mockMap: new HashingMap(),
+    callsMap: new FunctionCalls(),
   });
 }
 
@@ -264,6 +290,8 @@ export class FunctionMockUtils {
       behaviour: NewBehaviourParam;
     }[];
 
+    const callsMap = Reflect.get(self.proxy, "callsMap") as FunctionCalls;
+
     return {
       calls,
 
@@ -288,16 +316,23 @@ export class FunctionMockUtils {
       },
 
       hasBeenCalledWith(...args: any[]) {
-        const mockMap = Reflect.get(self.proxy, "mockMap") as HashingMap;
-        const customBehaviour = mockMap.get(args) as {
-          calls: any[];
-          customBehaviour: NewBehaviourParam;
+        return {
+          get ONCE() {
+            return callsMap.hasBeenCalledNTimesWith(1, ...args);
+          },
+          get TWICE() {
+            return callsMap.hasBeenCalledNTimesWith(2, ...args);
+          },
+          get THRICE() {
+            return callsMap.hasBeenCalledNTimesWith(3, ...args);
+          },
+          nTimes(howMuch: number) {
+            return callsMap.hasBeenCalledNTimesWith(howMuch, ...args);
+          },
+          get atLeastOnce() {
+            return callsMap.hasBeenCalledWith(...args);
+          },
         };
-
-        console.log(customBehaviour);
-
-        return customBehaviour?.calls?.length > 0;
-        // get mockmap which stores the calls for specific behaviours
       },
     };
   }
