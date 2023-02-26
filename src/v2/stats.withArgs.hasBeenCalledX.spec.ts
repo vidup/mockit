@@ -10,16 +10,16 @@ describe("V2 hasBeenCalledWith", () => {
       .isCalledWith("hello")
       .thenCall(() => "world");
 
-    expect(spy.hasBeenCalledWith("hello").atLeastOnce).toBe(false);
+    expect(spy.withArgs("hello").hasBeenCalled).toBe(false);
     mock("hello");
-    expect(spy.hasBeenCalledWith("hello").ONCE).toBe(true);
+    expect(spy.withArgs("hello").hasBeenCalled).toBe(true);
 
     mock("something else");
-    expect(spy.hasBeenCalledWith("hello").ONCE).toBe(true);
-    expect(spy.hasBeenCalledWith("something else").ONCE).toBe(true);
+    expect(spy.withArgs("hello").hasBeenCalled).toBe(true);
+    expect(spy.withArgs("something else").hasBeenCalled).toBe(true);
 
     mock({ hello: "world" });
-    expect(spy.hasBeenCalledWith({ hello: "world" }).ONCE).toBe(true);
+    expect(spy.withArgs({ hello: "world" }).hasBeenCalled).toBe(true);
 
     mock({
       hello: "world",
@@ -30,13 +30,13 @@ describe("V2 hasBeenCalledWith", () => {
     });
 
     expect(
-      spy.hasBeenCalledWith({
+      spy.withArgs({
         hello: "world",
         x: 2,
         y: new Map().set({ x: 2, y: 3 }, { secret: "bbq" }),
         w: new Set([1, 3, "Victor", { x: 2 }]),
         z: [1, 2, { x: 2 }, "Victor"],
-      }).ONCE
+      }).hasBeenCalled
     ).toBe(true);
   });
 
@@ -47,7 +47,22 @@ describe("V2 hasBeenCalledWith", () => {
       .isCalledWith("hello")
       .thenCall(() => "world");
 
-    expect(spy.hasBeenCalledWith("hello")).toBe(false);
+    expect(spy.withArgs("hello").hasBeenCalledOnce).toBe(false);
+    expect(spy.withArgs("hello").hasBeenCalledTwice).toBe(false);
+    expect(spy.withArgs("hello").hasBeenCalledThrice).toBe(false);
     mock("hello");
+    expect(spy.withArgs("hello").hasBeenCalledOnce).toBe(true);
+    expect(spy.withArgs("hello").hasBeenCalledTwice).toBe(false);
+    expect(spy.withArgs("hello").hasBeenCalledThrice).toBe(false);
+
+    mock("hello");
+    expect(spy.withArgs("hello").hasBeenCalledOnce).toBe(false);
+    expect(spy.withArgs("hello").hasBeenCalledTwice).toBe(true);
+    expect(spy.withArgs("hello").hasBeenCalledThrice).toBe(false);
+
+    mock("hello");
+    expect(spy.withArgs("hello").hasBeenCalledOnce).toBe(false);
+    expect(spy.withArgs("hello").hasBeenCalledTwice).toBe(false);
+    expect(spy.withArgs("hello").hasBeenCalledThrice).toBe(true);
   });
 });

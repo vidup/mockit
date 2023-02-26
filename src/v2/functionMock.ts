@@ -315,21 +315,21 @@ export class FunctionMockUtils {
         return calls.length === howMuch;
       },
 
-      hasBeenCalledWith(...args: any[]) {
+      withArgs(...args: any[]) {
         return {
-          get ONCE() {
+          get hasBeenCalledOnce() {
             return callsMap.hasBeenCalledNTimesWith(1, ...args);
           },
-          get TWICE() {
+          get hasBeenCalledTwice() {
             return callsMap.hasBeenCalledNTimesWith(2, ...args);
           },
-          get THRICE() {
+          get hasBeenCalledThrice() {
             return callsMap.hasBeenCalledNTimesWith(3, ...args);
           },
-          nTimes(howMuch: number) {
+          hasBeenCalledNTimes(howMuch: number) {
             return callsMap.hasBeenCalledNTimesWith(howMuch, ...args);
           },
-          get atLeastOnce() {
+          get hasBeenCalled() {
             return callsMap.hasBeenCalledWith(...args);
           },
         };
