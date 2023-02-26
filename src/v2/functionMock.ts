@@ -150,8 +150,10 @@ class FunctionCalls {
     return calls.length === n;
   }
 
-  public getCalls() {
-    return this.calls.values();
+  public getCalls(): Call[] {
+    // Remember, the values are arrays of call for each args combination
+    // So we need to flatten them
+    return this.calls.values<Call[]>().flat();
   }
 }
 
@@ -291,47 +293,26 @@ export class FunctionMockUtils {
     }[];
 
     const callsMap = Reflect.get(self.proxy, "callsMap") as FunctionCalls;
-
     return {
       calls,
       callsLength: callsMap.getCalls().length,
 
-      // get hasBeenCalled() {
-      //   return calls.length > 0;
-      // },
-
-      get hasBeenCalledOnce() {
-        return calls.length === 1;
-      },
-
-      get hasBeenCalledTwice() {
-        return calls.length === 2;
-      },
-
-      get hasBeenCalledThrice() {
-        return calls.length === 3;
-      },
-
-      hasBeenCalledNTimes(howMuch: number) {
-        return calls.length === howMuch;
-      },
-
       get hasBeenCalled() {
         return {
           get atleastOnce() {
-            return calls.length > 0;
+            return callsMap.getCalls().length > 0;
           },
           get once() {
-            return calls.length === 1;
+            return callsMap.getCalls().length === 1;
           },
           get twice() {
-            return calls.length === 2;
+            return callsMap.getCalls().length === 2;
           },
           get thrice() {
-            return calls.length === 3;
+            return callsMap.getCalls().length === 3;
           },
           nTimes(howMuch: number) {
-            return calls.length === howMuch;
+            return callsMap.getCalls().length === howMuch;
           },
           withArgs(...args: any[]) {
             return {
