@@ -32,17 +32,17 @@ describe("V2 hasBeenCalledWith", () => {
     });
 
     expect(
-      spy.withArgs({
+      spy.hasBeenCalled.withArgs({
         hello: "world",
         x: 2,
         y: new Map().set({ x: 2, y: 3 }, { secret: "bbq" }),
         w: new Set([1, 3, "Victor", { x: 2 }]),
         z: [1, 2, { x: 2 }, "Victor"],
-      }).hasBeenCalled
+      }).atleastOnce
     ).toBe(true);
   });
 
-  it.skip("should provide functions asserting how many times a method has been called with a specific set of arguments", () => {
+  it("should provide functions asserting how many times a method has been called with a specific set of arguments", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
     Mockit.whenMethod(mock)

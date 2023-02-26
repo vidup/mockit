@@ -132,7 +132,7 @@ type Call = {
   behaviour: NewBehaviourParam;
 };
 
-class FunctionCalls {
+export class FunctionCalls {
   private calls: HashingMap = new HashingMap();
   constructor() {}
 
@@ -146,8 +146,8 @@ class FunctionCalls {
   }
 
   public hasBeenCalledNTimesWith(n: number, ...args: any[]) {
-    const calls = this.calls.get(args) as Call[];
-    return calls.length === n;
+    const calls = this.calls.get<Call[] | undefined>(args);
+    return calls?.length === n;
   }
 
   public getCalls(): Call[] {
@@ -284,74 +284,56 @@ export class FunctionMockUtils {
       },
     };
   }
+}
 
-  public spy() {
-    const self = this;
-    const calls = Reflect.get(self.proxy, "calls") as {
+export class FunctionSpy {
+  constructor(private proxy: any) {}
+
+  private get callsMap() {
+    return Reflect.get(this.proxy, "callsMap") as FunctionCalls;
+  }
+
+  public get calls() {
+    return Reflect.get(this.proxy, "calls") as {
       args: any[];
       behaviour: NewBehaviourParam;
     }[];
+  }
 
-    const callsMap = Reflect.get(self.proxy, "callsMap") as FunctionCalls;
+  public get hasBeenCalled() {
+    const callsMap = this.callsMap;
     return {
-      calls,
-      callsLength: callsMap.getCalls().length,
-
-      get hasBeenCalled() {
-        return {
-          get atleastOnce() {
-            return callsMap.getCalls().length > 0;
-          },
-          get once() {
-            return callsMap.getCalls().length === 1;
-          },
-          get twice() {
-            return callsMap.getCalls().length === 2;
-          },
-          get thrice() {
-            return callsMap.getCalls().length === 3;
-          },
-          nTimes(howMuch: number) {
-            return callsMap.getCalls().length === howMuch;
-          },
-          withArgs(...args: any[]) {
-            return {
-              get atleastOnce() {
-                return callsMap.hasBeenCalledWith(...args);
-              },
-              get once() {
-                return callsMap.hasBeenCalledNTimesWith(1, ...args);
-              },
-              get twice() {
-                return callsMap.hasBeenCalledNTimesWith(2, ...args);
-              },
-              get thrice() {
-                return callsMap.hasBeenCalledNTimesWith(3, ...args);
-              },
-              nTimes(howMuch: number) {
-                return callsMap.hasBeenCalledNTimesWith(howMuch, ...args);
-              },
-            };
-          },
-        };
+      get atleastOnce() {
+        return callsMap.getCalls().length > 0;
       },
-
+      get once() {
+        return callsMap.getCalls().length === 1;
+      },
+      get twice() {
+        return callsMap.getCalls().length === 2;
+      },
+      get thrice() {
+        return callsMap.getCalls().length === 3;
+      },
+      nTimes(howMuch: number) {
+        return callsMap.getCalls().length === howMuch;
+      },
       withArgs(...args: any[]) {
         return {
-          get hasBeenCalledOnce() {
+          get atleastOnce() {
+            return callsMap.hasBeenCalledWith(...args);
+          },
+          get once() {
             return callsMap.hasBeenCalledNTimesWith(1, ...args);
           },
-          get hasBeenCalledTwice() {
+          get twice() {
             return callsMap.hasBeenCalledNTimesWith(2, ...args);
           },
-          get hasBeenCalledThrice() {
+          get thrice() {
             return callsMap.hasBeenCalledNTimesWith(3, ...args);
           },
-          hasBeenCalledNTimes(howMuch: number) {
+          nTimes(howMuch: number) {
             return callsMap.hasBeenCalledNTimesWith(howMuch, ...args);
-          },
-          get hasBeenCalled() {
-            return callsMap.hasBeenCalledWith(...args);
           },
         };
       },
