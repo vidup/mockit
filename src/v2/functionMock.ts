@@ -16,11 +16,27 @@ export function FunctionMock(functionName: string) {
     apply: function (_target, _thisArg, argumentsList) {
       // Checking if there is a custom behaviour for this call
       const mockMap: HashingMap = Reflect.get(_target, "mockMap");
-      let behaviour: NewBehaviourParam = mockMap.get(argumentsList);
+      const behaviourWithTheseArguments = mockMap.get(argumentsList) as {
+        calls: any[];
+        customBehaviour: NewBehaviourParam;
+      };
+
+      let behaviour = behaviourWithTheseArguments?.customBehaviour;
 
       // Default behaviour
       if (!behaviour) {
         behaviour = Reflect.get(_target, "defaultBehaviour");
+      } else {
+        // Adding the call to the list of calls, for the spy
+        const callsWithTheseArguments =
+          behaviourWithTheseArguments.calls.concat({
+            args: argumentsList,
+            behaviour,
+          });
+        // TODO: this does not work when only using custom behaviour. Maybe store calls in a dedicated map?
+        behaviourWithTheseArguments.calls.push(argumentsList);
+        mockMap.set(argumentsList, behaviourWithTheseArguments);
+        Reflect.set(_target, "mockMap", mockMap);
       }
 
       // Adding the call to the list of calls, for the spy
@@ -53,6 +69,10 @@ export function FunctionMock(functionName: string) {
         case "defaultBehaviour":
         case "functionName":
           return Reflect.get(target, prop);
+        case "mockMap":
+          const mockMap = Reflect.get(target, "mockMap") as HashingMap;
+          return mockMap;
+
         default:
           throw new Error("Unauthorized property");
       }
@@ -82,7 +102,15 @@ export function FunctionMock(functionName: string) {
           };
 
           const mockMap: HashingMap = Reflect.get(target, "mockMap");
-          mockMap.set(args, customBehaviour);
+          const existingCustomBehaviour = mockMap.get(args) as {
+            calls: any[];
+            customBehaviour: NewBehaviourParam;
+          };
+          mockMap.set(args, {
+            customBehaviour,
+            calls: existingCustomBehaviour?.calls ?? [],
+            // This is important to keep track of calls in case of multiple behaviours
+          });
           break;
         }
         default:
@@ -257,6 +285,19 @@ export class FunctionMockUtils {
 
       hasBeenCalledNTimes(howMuch: number) {
         return calls.length === howMuch;
+      },
+
+      hasBeenCalledWith(...args: any[]) {
+        const mockMap = Reflect.get(self.proxy, "mockMap") as HashingMap;
+        const customBehaviour = mockMap.get(args) as {
+          calls: any[];
+          customBehaviour: NewBehaviourParam;
+        };
+
+        console.log(customBehaviour);
+
+        return customBehaviour?.calls?.length > 0;
+        // get mockmap which stores the calls for specific behaviours
       },
     };
   }
