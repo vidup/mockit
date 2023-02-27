@@ -56,7 +56,7 @@ export class Mockit {
     return new FunctionSpy(mockedFunctionInstance);
   }
 
-  static any() {
+  static get any() {
     return {
       string: z.string(),
       number: z.number(),

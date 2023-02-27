@@ -1,6 +1,7 @@
-import { z } from "zod";
+import { z, ZodType } from "zod";
 import { HashingMap } from "../HashingMap";
 import { NewBehaviourParam } from "../types/behaviour";
+import { flattenObjectOrArrays } from "./flattenObject";
 
 export type Call = {
   behaviour: NewBehaviourParam;
@@ -98,30 +99,13 @@ export function argsContainZodSchema(...args: any[]) {
     (arg) => arg instanceof z.ZodSchema
   );
 
-  const objectsArgs = args.filter((arg) => arg instanceof Object);
-
-  let objectsArgsContainZodSchema = false;
-  if (objectsArgs.length > 0) {
-    const objectArgsValues = objectsArgs
-      .map((arg) => Object.values(arg))
-      .flat();
-
-    // I need it recursive
-    objectsArgsContainZodSchema = argsContainZodSchema(...objectArgsValues);
-  }
-
-  const arraysArgs = args.filter((arg) => arg instanceof Array);
-  let arraysArgsContainZodSchema = false;
-  if (arraysArgs.length > 0) {
-    const arraysArgsValues = arraysArgs.flat();
-    arraysArgsContainZodSchema = argsContainZodSchema(...arraysArgsValues);
-  }
-
-  // lots of optimizations possible here, not really BLAZINGLY FAST right now...
-
-  return (
-    level0ArgscontainZodSchema ||
-    objectsArgsContainZodSchema ||
-    arraysArgsContainZodSchema
+  const objectsArgs = args.filter(
+    (arg) => arg instanceof Object && !(arg instanceof ZodType)
   );
+  const flattenedObjects = objectsArgs.map(flattenObjectOrArrays);
+  const objectsContainZod = flattenedObjects.some((obj) => {
+    return Object.values(obj).some((value) => value instanceof z.ZodSchema);
+  });
+
+  return level0ArgscontainZodSchema || objectsContainZod;
 }
