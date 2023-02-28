@@ -52,5 +52,29 @@ describe("v2 spies with any arguments", () => {
       spy.hasBeenCalled.withArgs(Mockit.any.string, Mockit.any.number)
         .atleastOnce
     ).toBe(false);
+    mock("hello", 1);
+    expect(
+      spy.hasBeenCalled.withArgs(Mockit.any.string, Mockit.any.number)
+        .atleastOnce
+    ).toBe(true);
+
+    expect(
+      spy.hasBeenCalled.withArgs(
+        Mockit.any.string,
+        Mockit.any.number,
+        Mockit.any.object,
+        Mockit.any.array
+      ).atleastOnce
+    ).toBe(false);
+
+    mock("hello", 1, {}, []);
+    expect(
+      spy.hasBeenCalled.withArgs(
+        Mockit.any.string,
+        Mockit.any.number,
+        Mockit.any.object,
+        Mockit.any.array
+      ).atleastOnce
+    ).toBe(true);
   });
 });

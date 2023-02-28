@@ -75,28 +75,34 @@ export class FunctionSpy {
         return {
           get atleastOnce() {
             if (argscontainZodSchema) {
-              let matchesWithSchema = false;
-              for (const calledArgs of calledArgsList) {
-                if (matchesWithSchema) return true;
+              let allArgsMatch = args.map((arg) => false);
+              for (let i = 0; i < calledArgsList.length; i++) {
+                if (allArgsMatch.every((m) => m)) {
+                  return true;
+                } else {
+                  allArgsMatch = allArgsMatch.map((m) => false);
+                }
 
+                const calledArgs = calledArgsList[i];
                 for (let i = 0; i < args.length; i++) {
                   const arg = args[i];
                   /** ZOD ARGUMENT */
                   if (arg instanceof z.ZodType) {
                     if (arg.safeParse(calledArgs[i]).success) {
-                      matchesWithSchema = true;
+                      allArgsMatch[i] = true;
                     }
                     continue;
                   }
 
                   /** SIMPLE PRIMITIVE ARGUMENT */
                   if (
-                    arg instanceof String ||
-                    arg instanceof Number ||
-                    arg instanceof Boolean
+                    typeof arg === "string" ||
+                    typeof arg === "number" ||
+                    typeof arg === "boolean" ||
+                    typeof arg === "bigint"
                   ) {
                     if (arg === calledArgs[i]) {
-                      matchesWithSchema = true;
+                      allArgsMatch[i] = true;
                     }
                     continue;
                   }
@@ -119,25 +125,21 @@ export class FunctionSpy {
                       const calledValue = getDeepValue(key, calledArgs[i]);
                       if (value instanceof z.ZodType) {
                         if (value.safeParse(calledValue).success) {
-                          matchesWithSchema = true;
+                          allArgsMatch[i] = true;
                           continue;
                         }
                       }
 
                       if (value === calledValue) {
                         // Theorically it should be simple primitives only here
-                        matchesWithSchema = true;
+                        allArgsMatch[i] = true;
                       }
                     }
                   }
                 }
-
-                if (matchesWithSchema) {
-                  return true;
-                }
               }
 
-              return false;
+              return allArgsMatch.every((m) => m);
             }
             return callsMap.hasBeenCalledWith(...args);
           },
