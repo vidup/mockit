@@ -231,7 +231,7 @@ function getDeepValue(path: string, obj) {
   console.log(path);
   for (let i = 0; i < pathParts.length; i++) {
     if (current[pathParts[i]] === undefined) {
-      throw new Error(`Path ${path} does not exist`);
+      return undefined;
     }
     current = current[pathParts[i]];
   }

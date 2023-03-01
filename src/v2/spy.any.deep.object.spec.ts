@@ -44,6 +44,16 @@ describe("v2 spies with deep any arguments", () => {
       b: true,
       //   c: [1, 2, Mockit.any.email], // Not working with arrays somehow
       z: { w: { a: Mockit.any.function } },
+      list: [
+        1,
+        2,
+        3,
+        4,
+        {
+          x: 1,
+          y: { z: { w: { a: Mockit.any.set } } },
+        },
+      ],
     };
 
     const mock = Mockit.mockFunction(hello);
@@ -58,5 +68,24 @@ describe("v2 spies with deep any arguments", () => {
       z: { w: { a: "not a function" } },
     });
     expect(spy.hasBeenCalled.withArgs(object).atleastOnce).toBe(false);
+
+    mock({
+      x: 1,
+      y: { z: { w: { a: "hello" } } },
+      b: true,
+      z: { w: { a: () => {} } },
+      list: [
+        1,
+        2,
+        3,
+        4,
+        {
+          x: 1,
+          y: { z: { w: { a: new Set() } } },
+        },
+      ],
+    });
+
+    expect(spy.hasBeenCalled.withArgs(object).atleastOnce).toBe(true);
   });
 });
