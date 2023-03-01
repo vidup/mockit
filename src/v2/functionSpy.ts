@@ -111,7 +111,8 @@ export class FunctionSpy {
                     typeof arg === "string" ||
                     typeof arg === "number" ||
                     typeof arg === "boolean" ||
-                    typeof arg === "bigint"
+                    typeof arg === "bigint" ||
+                    arg == null
                   ) {
                     if (arg === calledArgs[SPY_ARG_INDEX]) {
                       allArgsMatch[SPY_ARG_INDEX] = true;
@@ -143,6 +144,11 @@ export class FunctionSpy {
                       ENTRY_INDEX++
                     ) {
                       const [key, value] = entries[ENTRY_INDEX];
+                      if (calledArgs[SPY_ARG_INDEX] == null) {
+                        // If the called arg is null, we can't check for keys so we consider
+                        // that it does not match, and we continue to the next entry
+                        continue;
+                      }
                       const calledValue = getDeepValue(
                         key,
                         calledArgs[SPY_ARG_INDEX]
@@ -164,24 +170,6 @@ export class FunctionSpy {
                     if (objetKeysMatch.every((m) => m)) {
                       allArgsMatch[SPY_ARG_INDEX] = true;
                     }
-                    // for (const [key, value] of entries) {
-                    //   const value = getDeepValue(key, arg);
-                    //   const calledValue = getDeepValue(
-                    //     key,
-                    //     calledArgs[SPY_ARG_INDEX]
-                    //   );
-                    //   if (value instanceof z.ZodType) {
-                    //     if (value.safeParse(calledValue).success) {
-                    //       allArgsMatch[SPY_ARG_INDEX] = true;
-                    //       continue;
-                    //     }
-                    //   }
-
-                    //   if (value === calledValue) {
-                    //     // Theorically it should be simple primitives only here
-                    //     allArgsMatch[SPY_ARG_INDEX] = true;
-                    //   }
-                    // }
                   }
                 }
               }
@@ -228,7 +216,6 @@ function getDeepValue(path: string, obj) {
   // path is of form x.y.z.0.a etc...
   const pathParts = path.split(".");
   let current = obj;
-  console.log(path);
   for (let i = 0; i < pathParts.length; i++) {
     if (current[pathParts[i]] === undefined) {
       return undefined;

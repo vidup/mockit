@@ -88,4 +88,29 @@ describe("v2 spies with deep any arguments", () => {
 
     expect(spy.hasBeenCalled.withArgs(object).atleastOnce).toBe(true);
   });
+
+  it("should allow multiple complex objects", () => {
+    const schemas = [
+      {
+        x: 1,
+        y: { z: { w: { a: Mockit.any.string } } },
+      },
+      {
+        y: Mockit.any.number,
+      },
+    ];
+
+    const mock = Mockit.mockFunction(hello);
+    const spy = Mockit.spy(mock);
+
+    expect(spy.hasBeenCalled.withArgs(...schemas).atleastOnce).toBe(false);
+    mock();
+    expect(spy.hasBeenCalled.withArgs(...schemas).atleastOnce).toBe(false);
+    mock({ x: 1, y: { z: { w: { a: "hello" } } } });
+    expect(spy.hasBeenCalled.withArgs(...schemas).atleastOnce).toBe(false);
+    mock({ y: 1 });
+    expect(spy.hasBeenCalled.withArgs(...schemas).atleastOnce).toBe(false);
+    mock({ x: 1, y: { z: { w: { a: "hello" } } } }, { y: 1 });
+    expect(spy.hasBeenCalled.withArgs(...schemas).atleastOnce).toBe(true);
+  });
 });
