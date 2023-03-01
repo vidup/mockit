@@ -150,3 +150,5 @@ type FunctionCall =
   | { type: Behaviour.Resolve; args: any[]; resolvedValue: any }
   | { type: Behaviour.Reject; args: any[]; rejectedValue: any }
   | { type: Behaviour.Call; args: any[]; callback: (...args: any[]) => any };
+
+export { Mockit as MockitV2 } from "./v2/Mockit";
