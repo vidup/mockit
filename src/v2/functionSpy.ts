@@ -68,28 +68,40 @@ export class FunctionSpy {
       nTimes(howMuch: number) {
         return callsMap.getCalls().length === howMuch;
       },
-      withArgs(...args: any[]) {
-        const argscontainZodSchema = argsContainZodSchema(...args);
+      withArgs(...expectedArgs: any[]) {
+        const argscontainZodSchema = argsContainZodSchema(...expectedArgs);
         const calledArgsList = callsMap.getArgs();
 
         return {
           get atleastOnce() {
             if (argscontainZodSchema) {
-              let allArgsMatch = args.map((arg) => false);
-              for (let i = 0; i < calledArgsList.length; i++) {
+              let allArgsMatch = expectedArgs.map((arg) => false);
+              for (
+                let CALLED_LIST_INDEX = 0;
+                CALLED_LIST_INDEX < calledArgsList.length;
+                CALLED_LIST_INDEX++
+              ) {
                 if (allArgsMatch.every((m) => m)) {
+                  // Function exit early since it's at least once.
                   return true;
                 } else {
+                  // Reset the array to false for the next iteration
                   allArgsMatch = allArgsMatch.map((m) => false);
                 }
 
-                const calledArgs = calledArgsList[i];
-                for (let i = 0; i < args.length; i++) {
-                  const arg = args[i];
+                // Get the args for the current analysed call
+                const calledArgs = calledArgsList[CALLED_LIST_INDEX];
+                for (
+                  let SPY_ARG_INDEX = 0;
+                  SPY_ARG_INDEX < expectedArgs.length;
+                  SPY_ARG_INDEX++
+                ) {
+                  // Here we check for each spied argument if it matches the called arg at the same index
+                  const arg = expectedArgs[SPY_ARG_INDEX];
                   /** ZOD ARGUMENT */
                   if (arg instanceof z.ZodType) {
-                    if (arg.safeParse(calledArgs[i]).success) {
-                      allArgsMatch[i] = true;
+                    if (arg.safeParse(calledArgs[SPY_ARG_INDEX]).success) {
+                      allArgsMatch[SPY_ARG_INDEX] = true;
                     }
                     continue;
                   }
@@ -101,8 +113,8 @@ export class FunctionSpy {
                     typeof arg === "boolean" ||
                     typeof arg === "bigint"
                   ) {
-                    if (arg === calledArgs[i]) {
-                      allArgsMatch[i] = true;
+                    if (arg === calledArgs[SPY_ARG_INDEX]) {
+                      allArgsMatch[SPY_ARG_INDEX] = true;
                     }
                     continue;
                   }
@@ -117,43 +129,78 @@ export class FunctionSpy {
                       throw new Error("Not implemented yet");
                     }
 
-                    const flattenedObjects = flattenObjectOrArrays(arg);
-                    for (const [key, value] of Object.entries(
-                      flattenedObjects
-                    )) {
-                      const value = getDeepValue(key, arg);
-                      const calledValue = getDeepValue(key, calledArgs[i]);
+                    const flattenedObject = flattenObjectOrArrays(arg);
+                    // This is a flattened version of an object or array
+                    // { x: { y: 1 } } => { "x.y": 1 };
+                    // [1, 2, 3] => { "0": 1, "1": 2, "2": 3 }
+                    // Now we can iterate over the keys and check if the calledArg matches for each key
+
+                    const entries = Object.entries(flattenedObject);
+                    const objetKeysMatch = entries.map((entry) => false);
+                    for (
+                      let ENTRY_INDEX = 0;
+                      ENTRY_INDEX < entries.length;
+                      ENTRY_INDEX++
+                    ) {
+                      const [key, value] = entries[ENTRY_INDEX];
+                      const calledValue = getDeepValue(
+                        key,
+                        calledArgs[SPY_ARG_INDEX]
+                      );
+
                       if (value instanceof z.ZodType) {
                         if (value.safeParse(calledValue).success) {
-                          allArgsMatch[i] = true;
+                          objetKeysMatch[ENTRY_INDEX] = true;
                           continue;
                         }
                       }
 
                       if (value === calledValue) {
                         // Theorically it should be simple primitives only here
-                        allArgsMatch[i] = true;
+                        objetKeysMatch[ENTRY_INDEX] = true;
                       }
                     }
+
+                    if (objetKeysMatch.every((m) => m)) {
+                      allArgsMatch[SPY_ARG_INDEX] = true;
+                    }
+                    // for (const [key, value] of entries) {
+                    //   const value = getDeepValue(key, arg);
+                    //   const calledValue = getDeepValue(
+                    //     key,
+                    //     calledArgs[SPY_ARG_INDEX]
+                    //   );
+                    //   if (value instanceof z.ZodType) {
+                    //     if (value.safeParse(calledValue).success) {
+                    //       allArgsMatch[SPY_ARG_INDEX] = true;
+                    //       continue;
+                    //     }
+                    //   }
+
+                    //   if (value === calledValue) {
+                    //     // Theorically it should be simple primitives only here
+                    //     allArgsMatch[SPY_ARG_INDEX] = true;
+                    //   }
+                    // }
                   }
                 }
               }
 
               return allArgsMatch.every((m) => m);
             }
-            return callsMap.hasBeenCalledWith(...args);
+            return callsMap.hasBeenCalledWith(...expectedArgs);
           },
           get once() {
-            return callsMap.hasBeenCalledNTimesWith(1, ...args);
+            return callsMap.hasBeenCalledNTimesWith(1, ...expectedArgs);
           },
           get twice() {
-            return callsMap.hasBeenCalledNTimesWith(2, ...args);
+            return callsMap.hasBeenCalledNTimesWith(2, ...expectedArgs);
           },
           get thrice() {
-            return callsMap.hasBeenCalledNTimesWith(3, ...args);
+            return callsMap.hasBeenCalledNTimesWith(3, ...expectedArgs);
           },
           nTimes(howMuch: number) {
-            return callsMap.hasBeenCalledNTimesWith(howMuch, ...args);
+            return callsMap.hasBeenCalledNTimesWith(howMuch, ...expectedArgs);
           },
         };
       },

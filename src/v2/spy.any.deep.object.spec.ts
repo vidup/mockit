@@ -52,7 +52,7 @@ describe("v2 spies with deep any arguments", () => {
     expect(spy.hasBeenCalled.withArgs(object).atleastOnce).toBe(false);
     mock({
       x: 1,
-      y: { z: { w: { a: "hello" } } },
+      y: { z: { w: { a: "hell" } } },
       b: true,
       //   c: [1, 2, "not an email"],
       z: { w: { a: "not a function" } },
