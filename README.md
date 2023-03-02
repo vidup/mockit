@@ -197,294 +197,133 @@ spy.calls[2].args; // ["please throw"]
 // TODO: add behaviour examples since they're returned too
 ```
 
-```ts
-import { Mockit } from "@vdcode/mockit";
+## Has the function been called?
 
-class MyClass {
-  public sum(a: number, b: number): number {
-    return a + b;
-  }
-
-  public multiply(a: number, b: number): number {
-    return a * b;
-  }
-
-  public async asyncSum(a: number, b: number): Promise<number> {
-    return a + b;
-  }
-}
-
-const myClassMock = Mockit.mock(MyClass);
-```
-
-### Default behaviour
-
-By default, the mock will return `undefined` for each call on the functions of your class.
-
-### Set default behaviour on instanciation
-
-You can set a different default behaviour when you instanciate a mock.
-Mocks can either:
-
-- Return (default behaviour)
-- Throw
-- Resolve
-- Reject
-- Call a callback
+You can check if the mocked function has been called called with a few helpers Mockit provides. Except for `nTimes`, all of these helpers are getters, so you can use them as boolean values. This prevents false positives when using them in weak asserting functions, depending on the library you use.
 
 ```ts
-const throwingMock = Mockit.mock(MyClass, {
-  defaultBehaviour: {
-    behaviour: Mockit.behaviours.Throw,
-    error: new Error("hiii"),
-  },
-});
+function hello(...args: any[]) {}
 
-const rejectingMock = Mockit.mock(MyClass, {
-  defaultBehaviour: {
-    behaviour: Mockit.behaviours.Reject,
-    rejectedValue: new Error("rejected"),
-  },
-});
+const mock = Mockit.mockFunction(hello);
+const spy = Mockit.spy(mock);
 
-const resolvingMock = Mockit.mock(MyClass, {
-  defaultBehaviour: {
-    behaviour: Mockit.behaviours.Resolve,
-    resolvedValue: "hii",
-  },
-});
+mock("hiii");
 
-const callBackMock = Mockit.mock(MyClass, {
-  defaultBehaviour: {
-    behaviour: Mockit.behaviours.Callback,
-    callback: () => {
-      console.log("hiii");
-    },
-  },
-});
+spy.hasBeenCalled.once; // true
+spy.hasBeenCalled.twice; // false
+spy.hasBeenCalled.atLeastOnce; // true
+spy.hasBeenCalled.thrice; // false
+spy.hasBeenCalled.nTimes(1); // true
+
+mock("hello");
+
+spy.hasBeenCalled.once; // false
+spy.hasBeenCalled.twice; // true
+spy.hasBeenCalled.atLeastOnce; // true
+spy.hasBeenCalled.thrice; // false
+spy.hasBeenCalled.nTimes(2); // true
+
+mock("please throw");
+
+spy.hasBeenCalled.once; // false
+spy.hasBeenCalled.twice; // false
+spy.hasBeenCalled.atLeastOnce; // true
+spy.hasBeenCalled.thrice; // true
+spy.hasBeenCalled.nTimes(3); // true
 ```
 
-### Change default behaviour dynamically
+## Has the function been called with specific arguments?
 
-You can also change the default behaviour of a mock dynamically.
+You can also check if the mocked function has been called with specific arguments. To do that, you just need to chain the `withArgs(...args)` helper, which takes the same arguments as the mocked function.
+From there, you can use the same helpers as above.
 
 ```ts
-// This mock will throw on all its functions
-const mock = Mockit.mock(Person, {
-  defaultBehaviour: {
-    behaviour: Mockit.Behaviours.Throw,
-    error: "error",
-  },
-});
+function hello(...args: any[]) {}
 
-try {
-  mock.walk();
-} catch (err) {
-  // will throw and come here
-}
+const mock = Mockit.mockFunction(hello);
+const spy = Mockit.spy(mock);
 
-// it will now return by default from here
-Mockit.changeDefaultBehaviour(mock, {
-  behaviour: Mockit.Behaviours.Return,
-  returnedValue: "returned",
-});
+spy.hasBeenCalled.withArgs("hiii").once; // false
+spy.hasBeenCalled.withArgs("hiii").twice; // false
+spy.hasBeenCalled.withArgs("hiii").atLeastOnce; // false
+spy.hasBeenCalled.withArgs("hiii").thrice; // false
+spy.hasBeenCalled.withArgs("hiii").nTimes(1); // false
 
-const result = mock.walk(); // "returned"
+mock("hiii");
+
+spy.hasBeenCalled.withArgs("hiii").once; // true
+spy.hasBeenCalled.withArgs("hiii").twice; // false
+spy.hasBeenCalled.withArgs("hiii").atLeastOnce; // true
+spy.hasBeenCalled.withArgs("hiii").thrice; // false
+spy.hasBeenCalled.withArgs("hiii").nTimes(1); // true
+
+// etc...
 ```
 
-### Function default behaviour
+## TODO: All possible arguments
 
-You can change the behaviour of a specific function of your mock, while maintaining a global default behaviour for the others function of a mock. This can be useful if the dependency you're injecting is used multiples times in your module and you need fine grained behaviour (like passing some initial check).
+TODO here: add a list of all the types of arguments that can be passed to the spy withArgs
 
-You have access to helpers for each behaviour:
+---
+
+# Zod integration with spies
+
+We believe that [Zod](https://github.com/colinhacks/zod) is a game changer when it comes to validating data (and more).
+Mockit integrates with Zod to provide you with a powerful way to check if your mocked functions have been called with specific arguments.
+
+This means you can not only check if a function has been called with a specific set of argument, but also:
+
+- with a specific type of argument
+- with arguments that match a specific zod schema.
+
+Here are a few examples:
 
 ```ts
-const mock = Mockit.mock(Person);
-Mockit.when(mock).calls("walk").thenReturn("hiii");
-Mockit.when(mock).calls("walk").thenResolve("hiii");
-Mockit.when(mock).calls("walk").thenReject(new Error("hellaw"));
-Mockit.when(mock).calls("walk").thenThrow(new Error("hellaw"));
-Mockit.when(mock)
-  .calls("walk")
-  .thenCallback(() => console.log("hiii"));
+function hello(...args: any[]) {}
+
+const mock = Mockit.mockFunction(hello);
+const spy = Mockit.spy(mock);
+
+// String
+spy.hasBeenCalled.withArgs(Mockit.any.string).once; // false
+mock("hiii");
+spy.hasBeenCalled.withArgs(Mockit.any.string).once; // true
+
+// Email
+spy.hasBeenCalled.withArgs(Mockit.any.string.email()).once; // false
+mock("gracehopper@gmail.com");
+spy.hasBeenCalled.withArgs(Mockit.any.string.email()).once; // true
+
+// Uuid
+spy.hasBeenCalled.withArgs(Mockit.any.string.uuid()).once; // false
+mock("a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6");
+spy.hasBeenCalled.withArgs(Mockit.any.string.uuid()).once; // true
+
+// Negative number
+spy.hasBeenCalled.withArgs(Mockit.any.number.negative()).once; // false
+mock(-1);
+spy.hasBeenCalled.withArgs(Mockit.any.number.negative()).once; // true
+
+// Positive number
+spy.hasBeenCalled.withArgs(Mockit.any.number.positive()).once; // false
+mock(1);
+spy.hasBeenCalled.withArgs(Mockit.any.number.positive()).once; // true
+
+// Number between 10 and 20
+spy.hasBeenCalled.withArgs(Mockit.any.number.min(10).max(20)).once; // false
+mock(15);
+spy.hasBeenCalled.withArgs(Mockit.any.number.min(10).max(20)).once; // true
+
+// Array of strings
+spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // false
+mock([1, 2, 3]);
+spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // false
+mock(["1", "2", "3"]);
+spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // true
 ```
 
-Note that in Typescript you get auto-completion of your original class methods.
-
-### Function custom behaviour with specific arguments
-
-**Mockit** also allows you to change the behaviour of a function based on the arguments passed to it. This is useful if you want to test more complex scenarios.
+These are just a few basic examples, but you can user any zod schema. For more information I highly recommend that you check out the [Zod documentation](https://zod.dev/).
 
 ```ts
-const mock = Mockit.mock(Person);
 
-Mockit.when(mock).calls("walk").withArgs(1, 2, 3).thenReturn("hiii");
-
-Mockit.when(mock).calls("walk").withArgs({ x: 1 }).thenThrow(new Error("Nop"));
-
-mock.walk(1, 2, 3); // "hiii"
-mock.walk({ x: 1 }); // throws an error
 ```
-
-You get access to the same helpers as those for the default behaviour.
-
-### Example
-
-```ts
-// naive useCase: should throw if token is invalid, or return user data
-function getUserData(
-  { userUuid: string, credentials: { token: string } },
-  userService: UserService
-): Promise<User> {
-  if (!userService.isTokenValid(token)) {
-    throw new Error("Invalid token");
-  }
-
-  return userService.getUser(userUuid);
-}
-
-// test
-describe("Protection", () => {
-  it("should protect against bad tokens", () => {
-    const userServiceMock = Mockit.mock(UserService, {
-      defaultBehaviour: {
-        behaviour: Mockit.Behaviours.Return,
-        returnedValue: false,
-      },
-    });
-    const userUuid = "userUuid";
-
-    expect(() =>
-      getUserData(
-        { userUuid, credentials: { token: "token" } },
-        userServiceMock
-      )
-    ).toThrowError("Invalid token");
-  });
-
-  it("should return user data", async () => {
-    const userServiceMock = Mockit.mock(UserService, {
-      defaultBehaviour: {
-        behaviour: Mockit.Behaviours.Return,
-        returnedValue: true,
-      },
-    });
-    const userUuid = "userUuid";
-    const user = { uuid: userUuid };
-
-    Mockit.when(userServiceMock)
-      .calls("getUser")
-      .withArgs(userUuid)
-      .thenResolve(user);
-
-    const result = await getUserData(
-      { userUuid, credentials: { token: "token" } },
-      userServiceMock
-    );
-
-    expect(result).toEqual(user);
-  });
-});
-```
-
-# Spies
-
-## Raw
-
-**Mockit** also allows you to spy on each of your mocks functions.
-This is useful if you want to test more complex scenarios as well as debug your tests.
-
-```ts
-const mock = Mockit.mock(Person);
-const spy = Mockit.spy(mock); // register the spy on the mock
-```
-
-Note that once a spy is registered to your mock, you can keep using it: it will update itself with each new call.
-
-There are two main ways to use Mockit's spies:
-
-### Using a `MethodAsserter` instane.
-
-You get access to a few helper functions and booleans:
-
-```ts
-const walkSpy = spy.method("walk"); // MethodAsserter instance
-
-// Booleans
-walkSpy.hasBeenCalled;
-walkSpy.hasBeenCalledWithOnce;
-walkSpy.hasBeenCalledWithTwice;
-walkSpy.hasBeenCalledWithThrice;
-
-// Basic helpers
-walkSpy.hasBeenCalledWith(...args: any[]);
-walkSpy.hasBeenCalledNTimesWith(args: any[], times: number);
-
-// Combined helpers
-walkSpy.hasBeenCalledOnceWith(args: any[]);
-walkSpy.hasBeenCalledTwiceWith(args: any[]);
-walkSpy.hasBeenCalledThriceWith(args: any[]);
-```
-
-These helper functions can receive a special argument: `Mockit.any`.
-This is very useful if you don't care about the exact value of an argument, but only that it has been called with it.
-A classic example of this is when a creation function returns an UUID, or a dynamic timestamp.
-
-```ts
-const mock = Mockit.mock(Person);
-const walkSpy = Mockit.spy(mock).method("walk");
-mock.walk(
-  new Date().valueOf(),
-  new Date().toISOString(),
-  new Date(),
-  Math.random(),
-  { x: 1 },
-  [1, 2, 3]
-);
-
-walkSpy.hasBeenCalledWith(
-  Mockit.any(Number),
-  Mockit.any(String),
-  Mockit.any(Object),
-  Mockit.any(Number),
-  Mockit.any(Object),
-  Mockit.any(Array)
-);
-```
-
-### Raw calls analysis
-
-You can access the history of the calls made to a function of your mock.
-You can either get the total calls or the calls with specific arguments.
-
-For now you cannot get the calls made with Mockit.any, but that's something I'm considering working on in the future.
-
-Example:
-
-```ts
-const mock = Mockit.mock(Person);
-// register the the mock to the spy
-const spy = Mockit.spy(myClassMock);
-
-// ... your test code
-
-// get the all the calls
-const calls = spy.callsTo("walk").inTotal();
-
-// get the calls with specific arguments
-const callsFor1And2 = spy.callsTo("walk").withArgs(1, 2);
-```
-
-These calls are objects of type Call.
-
-```ts
-export type Call = {
-  args: any[];
-  key: string;
-  date: string; // ISO string
-  mockedBehaviour: Function; // the mocked behaviour
-  previousCalls: Call[];
-};
-```
-
-You can use these calls for analysis, or to check that you mocked correctly with the `mockedBehaviour` key, which is effectively the mock that was executed at the time of the call.
