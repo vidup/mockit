@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { argsContainZodSchema } from "./functionSpy";
+import { argsContainZodSchema } from "./argsContainZodSchema";
 
 describe("argsContainZodSchema", () => {
   const notZodSchema = [

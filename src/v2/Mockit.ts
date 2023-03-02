@@ -1,11 +1,16 @@
 import { z } from "zod";
 import { Behaviour } from "../types/behaviour";
-import { GetClassMethods } from "../types/GetClassMethods";
-import { FunctionMock, FunctionMockUtils } from "./functionMock";
+
+import { AbstractClassMock } from "./classMocks/abstract";
+import { ConcreteClassMock } from "./classMocks/concrete";
+
+import { FunctionMock } from "./functionMock";
+import { FunctionMockUtils } from "./functionMock/utils";
+
 import { FunctionSpy } from "./functionSpy";
 
 type AbstractClass<T> = abstract new (...args: any[]) => T;
-type Class<T> = new (...args: any[]) => T;
+export type Class<T> = new (...args: any[]) => T;
 
 export class Mockit {
   static Behaviours = Behaviour;
@@ -22,7 +27,7 @@ export class Mockit {
     _original: AbstractClass<T>, // it's here to activate the generic type
     propertiesToMock: Array<keyof T>
   ): T {
-    return new AbstractMock<T>(propertiesToMock) as T;
+    return new AbstractClassMock<T>(propertiesToMock) as T;
   }
 
   static whenMethod<T>(method: any) {
@@ -43,7 +48,7 @@ export class Mockit {
   }
 
   static mock<T>(_original: Class<T>): T {
-    return new Mock<T>(_original) as T;
+    return new ConcreteClassMock<T>(_original) as T;
   }
 
   static mockFunction<T extends (...args: any[]) => any>(original: T): T {
@@ -52,7 +57,7 @@ export class Mockit {
 
   static spy<T extends (...args: any[]) => any>(mockedFunctionInstance: T) {
     // Here, you should provide a FunctionMock instance, not a real function
-    // This generic type is here to make it look like a real function
+    // This generic type is here to make it look like it accepts a real function
     return new FunctionSpy(mockedFunctionInstance);
   }
 
@@ -74,43 +79,3 @@ export class Mockit {
     };
   }
 }
-
-class AbstractMock<T> {
-  constructor(propertiesToMock: Array<keyof T>) {
-    for (const property of propertiesToMock) {
-      const fMock = FunctionMock(property as string);
-      this[property as string] = fMock;
-    }
-  }
-}
-
-const functionSchema = z.function();
-
-class Mock<T> {
-  constructor(original: Class<T>) {
-    const properties = Object.getOwnPropertyNames(
-      original.prototype
-    ) as GetClassMethods<T>[];
-
-    const instance = new original();
-    const methods = properties.filter(
-      (method) =>
-        method !== "constructor" &&
-        functionSchema.safeParse(instance[method]).success
-    );
-
-    for (const method of methods) {
-      const fMock = FunctionMock(method as string);
-      this[method as string] = fMock;
-    }
-  }
-}
-
-// Mockit.any => use zod
-// Save the arguments in the list of calls
-// Then, if asked for a list of calls or anything with any parameters,
-// Instead of using the classic hashing map, get the whole list of calls
-// Then apply the filter on the list of calls
-
-// The tough part will be to make it work at the same time as other arguments
-// that are not any but are specific values
