@@ -105,12 +105,3 @@ class Mock<T> {
     }
   }
 }
-
-// Mockit.any => use zod
-// Save the arguments in the list of calls
-// Then, if asked for a list of calls or anything with any parameters,
-// Instead of using the classic hashing map, get the whole list of calls
-// Then apply the filter on the list of calls
-
-// The tough part will be to make it work at the same time as other arguments
-// that are not any but are specific values

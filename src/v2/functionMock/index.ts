@@ -1,6 +1,10 @@
-import { HashingMap } from "../HashingMap";
-import { Behaviour, NewBehaviourParam } from "../types/behaviour";
-import { FunctionCalls } from "./functionSpy";
+import { HashingMap } from "../../HashingMap";
+import { Behaviour, NewBehaviourParam } from "../../types/behaviour";
+import { FunctionCalls } from "../functionSpy";
+
+import { applyCatch } from "./applyCatch";
+import { getCatch } from "./getCatch";
+import { setCatch } from "./setCatch";
 
 export const Behaviours = {
   Return: "Return",
@@ -12,112 +16,32 @@ export const Behaviours = {
 
 export type BehaviourType = typeof Behaviours[keyof typeof Behaviours];
 
+/**
+ * This is the function mock "class", it is taking the place of the function
+ * that we want to mock.
+ * It is a proxy, so it makes itself look like a function but in reality is
+ * a complex object that can catch calls, store and return data.
+ *
+ * It's a central piece of the library.
+ */
 export function FunctionMock(functionName: string) {
   const proxy = new Proxy(() => {}, {
-    apply: function (_target, _thisArg, argumentsList) {
-      // Checking if there is a custom behaviour for this call
-      const mockMap: HashingMap = Reflect.get(_target, "mockMap");
+    /**
+     * This will be triggered when the function mock is called.
+     */
+    apply: applyCatch,
 
-      const behaviourWithTheseArguments = mockMap.get(argumentsList) as {
-        calls: any[];
-        customBehaviour: NewBehaviourParam;
-      };
+    /**
+     * This is internal, and allow us to get information stored in the mock
+     */
+    get: getCatch,
 
-      let behaviour = behaviourWithTheseArguments?.customBehaviour;
-
-      // Default behaviour
-      if (!behaviour) {
-        behaviour = Reflect.get(_target, "defaultBehaviour");
-      }
-
-      // Adding the call to the list of calls, for the spy
-      const calls = Reflect.get(_target, "calls");
-      calls.push({
-        args: argumentsList,
-        behaviour,
-      });
-
-      const callsMap: FunctionCalls = Reflect.get(_target, "callsMap");
-      callsMap.registerCall(argumentsList, behaviour);
-      Reflect.set(_target, "callsMap", callsMap);
-
-      Reflect.set(_target, "calls", calls);
-
-      switch (behaviour.behaviour) {
-        case Behaviour.Return:
-          return behaviour.returnedValue;
-        case Behaviour.Throw:
-          throw behaviour.error;
-        case Behaviour.Call:
-          return behaviour.callback(...argumentsList);
-        case Behaviour.Resolve:
-          return Promise.resolve(behaviour.resolvedValue);
-        case Behaviour.Reject:
-          return Promise.reject(behaviour.rejectedValue);
-        default:
-          throw new Error("Mock logic not implemented yet");
-      }
-    },
-
-    get: function (target, prop, _receiver) {
-      switch (prop) {
-        case "calls":
-        case "defaultBehaviour":
-        case "functionName":
-          return Reflect.get(target, prop);
-        case "mockMap":
-          const mockMap = Reflect.get(target, "mockMap") as HashingMap;
-          return mockMap;
-        case "callsMap":
-          const callsMap = Reflect.get(target, "callsMap") as FunctionCalls;
-          return callsMap;
-        default:
-          throw new Error("Unauthorized property");
-      }
-    },
-
-    set: function (target, prop, newValue, receiver) {
-      if (prop === "init") {
-        Reflect.set(target, "defaultBehaviour", newValue.defaultBehaviour);
-        Reflect.set(target, "calls", []);
-        Reflect.set(target, "functionName", newValue.functionName);
-        Reflect.set(target, "mockMap", newValue.mockMap);
-        Reflect.set(target, "callsMap", newValue.callsMap);
-        return true;
-      }
-
-      // this will list authorized properties
-      switch (prop) {
-        case "defaultBehaviour":
-        case "calls":
-        case "functionName": {
-          Reflect.set(target, prop, newValue);
-          break;
-        }
-        case "newCustomBehaviour": {
-          const { args, customBehaviour } = newValue as {
-            args: any[];
-            customBehaviour: NewBehaviourParam;
-          };
-
-          const mockMap: HashingMap = Reflect.get(target, "mockMap");
-          const existingCustomBehaviour = mockMap.get(args) as {
-            calls: any[];
-            customBehaviour: NewBehaviourParam;
-          };
-          mockMap.set(args, {
-            customBehaviour,
-            calls: existingCustomBehaviour?.calls ?? [],
-            // This is important to keep track of calls in case of multiple behaviours
-          });
-          break;
-        }
-        default:
-          throw new Error("Unauthorized property");
-      }
-
-      return;
-    },
+    /**
+     * This is internal, and allow us to set information in the mock,
+     * like the default behaviour, or a custom behaviour,
+     * or calls data for the spying feature.
+     */
+    set: setCatch,
   });
 
   new FunctionMockUtils(proxy).initialize(functionName);
