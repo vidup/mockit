@@ -9,7 +9,7 @@ describe("v2 hasBeenCalled", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(spy.hasBeenCalled.atleastOnce).toBe(false);
+    expect(spy.hasBeenCalled.atLeastOnce).toBe(false);
     expect(spy.hasBeenCalled.once).toBe(false);
     expect(spy.hasBeenCalled.twice).toBe(false);
     expect(spy.hasBeenCalled.thrice).toBe(false);
@@ -17,7 +17,7 @@ describe("v2 hasBeenCalled", () => {
     expect(spy.hasBeenCalled.nTimes(4)).toBe(false);
 
     mock();
-    expect(spy.hasBeenCalled.atleastOnce).toBe(true);
+    expect(spy.hasBeenCalled.atLeastOnce).toBe(true);
     expect(spy.hasBeenCalled.once).toBe(true);
     expect(spy.hasBeenCalled.twice).toBe(false);
     expect(spy.hasBeenCalled.thrice).toBe(false);
@@ -25,7 +25,7 @@ describe("v2 hasBeenCalled", () => {
     expect(spy.hasBeenCalled.nTimes(4)).toBe(false);
 
     mock();
-    expect(spy.hasBeenCalled.atleastOnce).toBe(true);
+    expect(spy.hasBeenCalled.atLeastOnce).toBe(true);
     expect(spy.hasBeenCalled.once).toBe(false);
     expect(spy.hasBeenCalled.twice).toBe(true);
     expect(spy.hasBeenCalled.thrice).toBe(false);
@@ -33,7 +33,7 @@ describe("v2 hasBeenCalled", () => {
     expect(spy.hasBeenCalled.nTimes(4)).toBe(false);
 
     mock();
-    expect(spy.hasBeenCalled.atleastOnce).toBe(true);
+    expect(spy.hasBeenCalled.atLeastOnce).toBe(true);
     expect(spy.hasBeenCalled.once).toBe(false);
     expect(spy.hasBeenCalled.twice).toBe(false);
     expect(spy.hasBeenCalled.thrice).toBe(true);
@@ -41,7 +41,7 @@ describe("v2 hasBeenCalled", () => {
     expect(spy.hasBeenCalled.nTimes(4)).toBe(false);
 
     mock();
-    expect(spy.hasBeenCalled.atleastOnce).toBe(true);
+    expect(spy.hasBeenCalled.atLeastOnce).toBe(true);
     expect(spy.hasBeenCalled.once).toBe(false);
     expect(spy.hasBeenCalled.twice).toBe(false);
     expect(spy.hasBeenCalled.thrice).toBe(false);

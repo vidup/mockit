@@ -8,16 +8,16 @@ describe("v2 spy.any.nTimes", () => {
     const spy = Mockit.spy(mock);
 
     expect(
-      spy.hasBeenCalled.withArgs({ x: Mockit.any.string }).atleastOnce
+      spy.hasBeenCalled.withArgs({ x: Mockit.any.string }).atLeastOnce
     ).toBe(false);
     mock({ x: "hello" });
     expect(
-      spy.hasBeenCalled.withArgs({ x: Mockit.any.string }).atleastOnce
+      spy.hasBeenCalled.withArgs({ x: Mockit.any.string }).atLeastOnce
     ).toBe(true);
     mock({ x: "hello" });
     mock({ x: "1" });
     expect(
-      spy.hasBeenCalled.withArgs({ x: Mockit.any.string }).atleastOnce
+      spy.hasBeenCalled.withArgs({ x: Mockit.any.string }).atLeastOnce
     ).toBe(true);
   });
 

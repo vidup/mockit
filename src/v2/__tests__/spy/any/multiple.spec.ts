@@ -9,15 +9,15 @@ describe("v2 spies with any arguments", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(spy.hasBeenCalled.withArgs(Mockit.any.string, 1).atleastOnce).toBe(
+    expect(spy.hasBeenCalled.withArgs(Mockit.any.string, 1).atLeastOnce).toBe(
       false
     );
     mock(1, 1);
-    expect(spy.hasBeenCalled.withArgs(Mockit.any.string, 1).atleastOnce).toBe(
+    expect(spy.hasBeenCalled.withArgs(Mockit.any.string, 1).atLeastOnce).toBe(
       false
     );
     mock("hello", 1);
-    expect(spy.hasBeenCalled.withArgs(Mockit.any.string, 1).atleastOnce).toBe(
+    expect(spy.hasBeenCalled.withArgs(Mockit.any.string, 1).atLeastOnce).toBe(
       true
     );
   });
@@ -26,15 +26,15 @@ describe("v2 spies with any arguments", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(spy.hasBeenCalled.withArgs(1, Mockit.any.string).atleastOnce).toBe(
+    expect(spy.hasBeenCalled.withArgs(1, Mockit.any.string).atLeastOnce).toBe(
       false
     );
     mock(1, 1);
-    expect(spy.hasBeenCalled.withArgs(1, Mockit.any.string).atleastOnce).toBe(
+    expect(spy.hasBeenCalled.withArgs(1, Mockit.any.string).atLeastOnce).toBe(
       false
     );
     mock(1, "hello");
-    expect(spy.hasBeenCalled.withArgs(1, Mockit.any.string).atleastOnce).toBe(
+    expect(spy.hasBeenCalled.withArgs(1, Mockit.any.string).atLeastOnce).toBe(
       true
     );
   });
@@ -45,17 +45,17 @@ describe("v2 spies with any arguments", () => {
 
     expect(
       spy.hasBeenCalled.withArgs(Mockit.any.string, Mockit.any.number)
-        .atleastOnce
+        .atLeastOnce
     ).toBe(false);
     mock(1, 1);
     expect(
       spy.hasBeenCalled.withArgs(Mockit.any.string, Mockit.any.number)
-        .atleastOnce
+        .atLeastOnce
     ).toBe(false);
     mock("hello", 1);
     expect(
       spy.hasBeenCalled.withArgs(Mockit.any.string, Mockit.any.number)
-        .atleastOnce
+        .atLeastOnce
     ).toBe(true);
 
     expect(
@@ -64,7 +64,7 @@ describe("v2 spies with any arguments", () => {
         Mockit.any.number,
         Mockit.any.object,
         Mockit.any.array
-      ).atleastOnce
+      ).atLeastOnce
     ).toBe(false);
 
     mock("hello", 1, {}, []);
@@ -74,7 +74,7 @@ describe("v2 spies with any arguments", () => {
         Mockit.any.number,
         Mockit.any.object,
         Mockit.any.array
-      ).atleastOnce
+      ).atLeastOnce
     ).toBe(true);
   });
 });

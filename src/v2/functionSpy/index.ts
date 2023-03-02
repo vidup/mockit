@@ -54,7 +54,7 @@ export class FunctionSpy {
   public get hasBeenCalled() {
     const callsMap = this.callsMap;
     return {
-      get atleastOnce() {
+      get atLeastOnce() {
         return callsMap.getCalls().length > 0;
       },
       get once() {
@@ -74,7 +74,7 @@ export class FunctionSpy {
         const calledArgsList = callsMap.getArgs();
 
         return {
-          get atleastOnce() {
+          get atLeastOnce() {
             if (argscontainZodSchema) {
               return (
                 countMatchingCalls({
