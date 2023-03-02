@@ -12,16 +12,16 @@ describe("v2 with zod custom matchers", () => {
     const spy = Mockit.spy(mock);
 
     expect(
-      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atleastOnce
+      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atLeastOnce
     ).toBe(false);
     mock(4);
     mock(11);
     expect(
-      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atleastOnce
+      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atLeastOnce
     ).toBe(false);
     mock(5);
     expect(
-      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atleastOnce
+      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atLeastOnce
     ).toBe(true);
   });
 
@@ -30,15 +30,15 @@ describe("v2 with zod custom matchers", () => {
     const spy = Mockit.spy(mock);
 
     expect(
-      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atleastOnce
+      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atLeastOnce
     ).toBe(false);
     mock(11);
     expect(
-      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atleastOnce
+      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atLeastOnce
     ).toBe(false);
     mock(10);
     expect(
-      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atleastOnce
+      spy.hasBeenCalled.withArgs(Mockit.any.number.min(5).max(10)).atLeastOnce
     ).toBe(true);
   });
 });
