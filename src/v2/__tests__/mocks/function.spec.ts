@@ -15,14 +15,14 @@ describe("v2 function", () => {
 
   it("should allow to change the default behaviour", async () => {
     const mock = Mockit.mockFunction(hellaw);
-    Mockit.whenMethod(mock).isCalled.thenReturn("hello");
+    Mockit.when(mock).isCalled.thenReturn("hello");
     expect(mock()).toBe("hello");
 
-    Mockit.whenMethod(mock).isCalled.thenThrow(new Error("error"));
+    Mockit.when(mock).isCalled.thenThrow(new Error("error"));
     expect(() => mock()).toThrowError("error");
 
     let counter = 0;
-    Mockit.whenMethod(mock).isCalled.thenCall(() => {
+    Mockit.when(mock).isCalled.thenCall(() => {
       counter++;
     });
 
@@ -32,10 +32,10 @@ describe("v2 function", () => {
     mock();
     expect(counter).toBe(3);
 
-    Mockit.whenMethod(mock).isCalled.thenResolve("hello-resolved");
+    Mockit.when(mock).isCalled.thenResolve("hello-resolved");
     expect(mock()).resolves.toBe("hello-resolved");
 
-    Mockit.whenMethod(mock).isCalled.thenReject(new Error("hello-rejected"));
+    Mockit.when(mock).isCalled.thenReject(new Error("hello-rejected"));
     expect(mock()).rejects.toThrowError("hello-rejected");
   });
 });

@@ -14,10 +14,10 @@ describe("v2 function custom behaviour", () => {
 
   test("mockit should be able to specify arguments related behaviours", () => {
     const mock = Mockit.mockFunction(hello);
-    Mockit.whenMethod(mock).isCalledWith("hello").thenReturn("hello");
-    Mockit.whenMethod(mock).isCalledWith("world").thenReturn("world");
-    Mockit.whenMethod(mock).isCalledWith().thenReturn("undefinedinput");
-    Mockit.whenMethod(mock).isCalled.thenReturn("default");
+    Mockit.when(mock).isCalledWith("hello").thenReturn("hello");
+    Mockit.when(mock).isCalledWith("world").thenReturn("world");
+    Mockit.when(mock).isCalledWith().thenReturn("undefinedinput");
+    Mockit.when(mock).isCalled.thenReturn("default");
 
     expect(mock("hello")).toBe("hello");
     expect(mock("world")).toBe("world");
@@ -25,10 +25,10 @@ describe("v2 function custom behaviour", () => {
     expect(mock({ az: 2, y: 3 })).toBe("default");
 
     const throwingMock = Mockit.mockFunction(hello);
-    Mockit.whenMethod(throwingMock).isCalledWith("hello").thenThrow("hello");
-    Mockit.whenMethod(throwingMock).isCalledWith("world").thenThrow("world");
-    Mockit.whenMethod(throwingMock).isCalledWith().thenThrow("undefinedinput");
-    Mockit.whenMethod(throwingMock).isCalled.thenThrow("default");
+    Mockit.when(throwingMock).isCalledWith("hello").thenThrow("hello");
+    Mockit.when(throwingMock).isCalledWith("world").thenThrow("world");
+    Mockit.when(throwingMock).isCalledWith().thenThrow("undefinedinput");
+    Mockit.when(throwingMock).isCalled.thenThrow("default");
 
     expect(() => throwingMock("hello")).toThrow("hello");
     expect(() => throwingMock("world")).toThrow("world");
@@ -37,18 +37,18 @@ describe("v2 function custom behaviour", () => {
 
     const counter = { value: 0 };
     const callingMock = Mockit.mockFunction(hello);
-    Mockit.whenMethod(callingMock)
+    Mockit.when(callingMock)
       .isCalledWith("hello")
       .thenCall(() => {
         counter.value++;
       });
-    Mockit.whenMethod(callingMock)
+    Mockit.when(callingMock)
       .isCalledWith("world")
       .thenCall(() => {
         counter.value--;
       });
 
-    Mockit.whenMethod(callingMock).isCalled.thenCall(() => {
+    Mockit.when(callingMock).isCalled.thenCall(() => {
       counter.value = 9999;
     });
 
@@ -67,12 +67,10 @@ describe("v2 function custom behaviour", () => {
     expect(counter.value).toBe(9999);
 
     const resolvingMock = Mockit.mockFunction(hello);
-    Mockit.whenMethod(resolvingMock).isCalledWith("hello").thenResolve("hello");
-    Mockit.whenMethod(resolvingMock).isCalledWith("world").thenResolve("world");
-    Mockit.whenMethod(resolvingMock)
-      .isCalledWith()
-      .thenResolve("undefinedinput");
-    Mockit.whenMethod(resolvingMock).isCalled.thenResolve("default");
+    Mockit.when(resolvingMock).isCalledWith("hello").thenResolve("hello");
+    Mockit.when(resolvingMock).isCalledWith("world").thenResolve("world");
+    Mockit.when(resolvingMock).isCalledWith().thenResolve("undefinedinput");
+    Mockit.when(resolvingMock).isCalled.thenResolve("default");
 
     expect(resolvingMock("hello")).resolves.toBe("hello");
     expect(resolvingMock("world")).resolves.toBe("world");
@@ -80,12 +78,10 @@ describe("v2 function custom behaviour", () => {
     expect(resolvingMock({ az: 2, y: 3 })).resolves.toBe("default");
 
     const rejectingMock = Mockit.mockFunction(hello);
-    Mockit.whenMethod(rejectingMock).isCalledWith("hello").thenReject("hello");
-    Mockit.whenMethod(rejectingMock).isCalledWith("world").thenReject("world");
-    Mockit.whenMethod(rejectingMock)
-      .isCalledWith()
-      .thenReject("undefinedinput");
-    Mockit.whenMethod(rejectingMock).isCalled.thenReject("default");
+    Mockit.when(rejectingMock).isCalledWith("hello").thenReject("hello");
+    Mockit.when(rejectingMock).isCalledWith("world").thenReject("world");
+    Mockit.when(rejectingMock).isCalledWith().thenReject("undefinedinput");
+    Mockit.when(rejectingMock).isCalled.thenReject("default");
 
     expect(rejectingMock("hello")).rejects.toBe("hello");
     expect(rejectingMock("world")).rejects.toBe("world");
@@ -96,15 +92,15 @@ describe("v2 function custom behaviour", () => {
   it("should be able to specific different behaviours for the same function", () => {
     const mock = Mockit.mockFunction(hello);
     let counter = 0;
-    Mockit.whenMethod(mock).isCalledWith("hello").thenReturn("hello");
-    Mockit.whenMethod(mock).isCalledWith("world").thenThrow("world");
-    Mockit.whenMethod(mock)
+    Mockit.when(mock).isCalledWith("hello").thenReturn("hello");
+    Mockit.when(mock).isCalledWith("world").thenThrow("world");
+    Mockit.when(mock)
       .isCalledWith()
       .thenCall(() => {
         counter++;
       });
-    Mockit.whenMethod(mock).isCalled.thenResolve("default");
-    Mockit.whenMethod(mock).isCalledWith("NOOO").thenReject("NOOO");
+    Mockit.when(mock).isCalled.thenResolve("default");
+    Mockit.when(mock).isCalledWith("NOOO").thenReject("NOOO");
 
     expect(mock("hello")).toBe("hello");
     expect(() => mock("world")).toThrow("world");

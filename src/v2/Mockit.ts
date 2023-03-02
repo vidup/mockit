@@ -30,7 +30,7 @@ export class Mockit {
     return new AbstractClassMock<T>(propertiesToMock) as T;
   }
 
-  static whenMethod<T>(method: any) {
+  static when<T>(method: any) {
     return {
       /**
        * This function sets up the behaviour of the mocked method.
