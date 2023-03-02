@@ -6,7 +6,7 @@ describe("V2 hasBeenCalledWith", () => {
   it("should provide functions asserting if a method has been called at least once with a specific set of arguments", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
-    Mockit.whenMethod(mock)
+    Mockit.when(mock)
       .isCalledWith("hello")
       .thenCall(() => "world");
 
@@ -45,7 +45,7 @@ describe("V2 hasBeenCalledWith", () => {
   it("should provide functions asserting how many times a method has been called with a specific set of arguments", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
-    Mockit.whenMethod(mock)
+    Mockit.when(mock)
       .isCalledWith("hello")
       .thenCall(() => "world");
 

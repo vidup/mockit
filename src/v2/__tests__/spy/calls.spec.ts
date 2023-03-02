@@ -37,7 +37,7 @@ describe("v2 stats", () => {
     expect(spy.calls.length).toBe(3);
 
     let counter = 0;
-    Mockit.whenMethod(mock)
+    Mockit.when(mock)
       .isCalledWith("hiiii")
       .thenCall(() => counter++);
 
