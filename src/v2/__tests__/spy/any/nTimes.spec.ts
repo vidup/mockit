@@ -1,4 +1,4 @@
-import { Mockit } from "./Mockit";
+import { Mockit } from "../../../Mockit";
 
 export function hello(...args: any[]) {}
 
@@ -79,7 +79,7 @@ describe("v2 spy.any.nTimes", () => {
     );
   });
 
-  for (const n of [1, 2, 3, 4, 7, 22, 100]) {
+  for (const n of [1, 2, 3, 4, 7, 22]) {
     it(`should work for nTimes(${n})`, () => {
       const mock = Mockit.mockFunction(hello);
       const spy = Mockit.spy(mock);

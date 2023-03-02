@@ -1,6 +1,4 @@
-import { Behaviour, NewBehaviourParam } from "../types/behaviour";
-
-import { Mockit } from "./Mockit";
+import { Mockit } from "../../Mockit";
 
 abstract class Hellaw {
   abstract hello(input: string): string;
