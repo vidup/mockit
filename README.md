@@ -1,14 +1,13 @@
-DISCLAIMER: This readme is for the V1 version which is not published yet.
-
-This is a fun little experiment I'm doing to build a lightweight Mokito inspired mocking library.
-
 [![Wallaby.js](https://img.shields.io/badge/wallaby.js-powered-blue.svg?style=flat&logo=github)](https://wallabyjs.com/oss/)
 
-It gives you access to helpers to mock and spy functions, classes and abstract classes (even their abstract methods !).
+DISCLAIMER: This readme is for the V1 beta version.
 
+This is a fun little experiment I'm doing to build a lightweight Mokito inspired mocking library.
+It gives you access to helpers to mock and spy functions, classes and abstract classes (even their abstract methods !).
 This is a work in progress and is subject to change completely and breakingly. Feel free to contribute though.
 
 # Philosophy
+(skip this for code examples below)
 
 The idea behind this library is to provide a simple way to mock and spy injected dependencies in your code.
 I'm a big fan of dependency injection as a way to write testable code. In Typescript it's as easy as passing them as function parameters.
