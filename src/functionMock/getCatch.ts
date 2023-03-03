@@ -1,4 +1,4 @@
-import { HashingMap } from "../../HashingMap";
+import { HashingMap } from "../HashingMap";
 import { FunctionCalls } from "../functionSpy";
 
 export function getCatch(target, prop, _receiver) {

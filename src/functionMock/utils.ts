@@ -1,4 +1,4 @@
-import { Behaviour, NewBehaviourParam } from "../../types/behaviour";
+import { Behaviour, NewBehaviourParam } from "../types/behaviour";
 import { initializeProxy, changeDefaultBehaviour } from "./index";
 
 export class FunctionMockUtils {

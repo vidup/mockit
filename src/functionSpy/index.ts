@@ -1,8 +1,8 @@
-import { HashingMap } from "../../HashingMap";
-import { NewBehaviourParam } from "../../types/behaviour";
+import { HashingMap } from "../HashingMap";
+import { NewBehaviourParam } from "../types/behaviour";
 
-import { countMatchingCalls } from "./utils/countMatchingCalls";
-import { argsContainZodSchema } from "./utils/argsContainZodSchema";
+import { countMatchingCalls } from "../utils/countMatchingCalls";
+import { argsContainZodSchema } from "../utils/argsContainZodSchema";
 
 export type Call = {
   behaviour: NewBehaviourParam;

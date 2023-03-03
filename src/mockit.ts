@@ -1,154 +1,81 @@
-import { Mock } from "./mock";
+import { z } from "zod";
+import { Behaviour } from "./types/behaviour";
 
-import { Behaviour, NewBehaviourParam } from "./types/behaviour";
-import { AnyClass } from "./types/AnyClass";
+import { AbstractClassMock } from "./classMocks/abstract";
+import { ConcreteClassMock } from "./classMocks/concrete";
 
-import { Spy } from "./mock/Spy";
-import { Any } from "./Any";
+import { FunctionMock } from "./functionMock";
+import { FunctionMockUtils } from "./functionMock/utils";
 
-import { InjectorWrapper } from "./mock/InjectorWrapper";
+import { FunctionSpy } from "./functionSpy";
 
-type MockOptions = {
-  defaultBehaviour?: NewBehaviourParam;
-};
+type AbstractClass<T> = abstract new (...args: any[]) => T;
+export type Class<T> = new (...args: any[]) => T;
 
 export class Mockit {
-  static mock<T>(original: AnyClass<T>, options?: MockOptions): T {
-    const mock = new Mock<T>(original);
-    mock.setupBehaviour(
-      options?.defaultBehaviour ?? {
-        behaviour: Behaviour.Return,
-        returnedValue: undefined,
-      }
-    );
+  static Behaviours = Behaviour;
 
-    return mock as T;
-  }
-
-  static mockFunction<T extends (...args: any[]) => any>(
-    _original: T,
-    options?: MockOptions
+  /**
+   * @param original abstract class to mock
+   * @param propertiesToMock list of properties that
+   * will be mocked. If not provided, all properties
+   * will be undefined.
+   * It's required because we cannot dynamically access abstract properties.
+   * (they're not compiled in the JS code)
+   */
+  static mockAbstract<T>(
+    _original: AbstractClass<T>, // it's here to activate the generic type
+    propertiesToMock: Array<keyof T>
   ): T {
-    let fake = () => {};
-
-    return new Proxy(fake, {
-      get: (target, prop) => {
-        if (prop === "calls") {
-          return Reflect.get(target, "calls");
-        }
-      },
-      apply: function (target, _thisArg, argumentsList) {
-        if (options?.defaultBehaviour?.behaviour === Behaviour.Throw) {
-          Reflect.set(target, "calls", [
-            ...((Reflect.get(target, "calls") as any[]) ?? []),
-            {
-              args: argumentsList,
-              error: options.defaultBehaviour.error,
-              type: Behaviour.Throw,
-            },
-          ]);
-          throw options.defaultBehaviour.error;
-        }
-
-        if (options?.defaultBehaviour?.behaviour === Behaviour.Return) {
-          Reflect.set(target, "calls", [
-            ...((Reflect.get(target, "calls") as any[]) ?? []),
-            {
-              args: argumentsList,
-              returnedValue: options.defaultBehaviour.returnedValue,
-              type: Behaviour.Return,
-            },
-          ]);
-
-          return options.defaultBehaviour.returnedValue;
-        }
-
-        if (options?.defaultBehaviour?.behaviour === Behaviour.Reject) {
-          Reflect.set(target, "calls", [
-            ...((Reflect.get(target, "calls") as any[]) ?? []),
-            {
-              args: argumentsList,
-              rejectedValue: options.defaultBehaviour.rejectedValue,
-              type: Behaviour.Reject,
-            },
-          ]);
-
-          return Promise.reject(options.defaultBehaviour.rejectedValue);
-        }
-
-        if (options?.defaultBehaviour?.behaviour === Behaviour.Resolve) {
-          Reflect.set(target, "calls", [
-            ...((Reflect.get(target, "calls") as any[]) ?? []),
-            {
-              args: argumentsList,
-              resolvedValue: options.defaultBehaviour.resolvedValue,
-              type: Behaviour.Resolve,
-            },
-          ]);
-          return Promise.resolve(options.defaultBehaviour.resolvedValue);
-        }
-
-        if (options?.defaultBehaviour?.behaviour === Behaviour.Call) {
-          Reflect.set(target, "calls", [
-            ...((Reflect.get(target, "calls") as any[]) ?? []),
-            {
-              args: argumentsList,
-              callback: options.defaultBehaviour.callback,
-              type: Behaviour.Call,
-            },
-          ]);
-          return options.defaultBehaviour.callback(...argumentsList);
-        }
-
-        Reflect.set(target, "calls", [
-          ...((Reflect.get(target, "calls") as any[]) ?? []),
-          {
-            args: argumentsList,
-            returnedValue: undefined,
-            type: Behaviour.Return,
-          },
-        ]);
-
-        return undefined;
-      },
-    }) as T;
+    return new AbstractClassMock<T>(propertiesToMock) as T;
   }
 
-  static spyFunction<T extends (...args: any[]) => any>(mock: T) {
+  static when<T>(method: any) {
     return {
-      get calls() {
-        return (Reflect.get(mock, "calls") ?? []) as FunctionCall[];
+      /**
+       * This function sets up the behaviour of the mocked method.
+       * If the mocked method is called with parameters that are not setup for custom behaviour, this will be the default behaviour
+       */
+      get isCalled() {
+        const utils = new FunctionMockUtils(method);
+        return utils.defaultBehaviourController();
       },
-      clearCalls() {
-        Reflect.set(mock, "calls", []);
+      isCalledWith(...args: any[]) {
+        const utils = new FunctionMockUtils(method);
+        return utils.callController(...args);
       },
     };
   }
 
-  static changeDefaultBehaviour<T>(mock: T, newBehaviour: NewBehaviourParam) {
-    (mock as Mock<T>).setupBehaviour(newBehaviour);
+  static mock<T>(_original: Class<T>): T {
+    return new ConcreteClassMock<T>(_original) as T;
   }
 
-  static spy<T>(mock: T) {
-    return new Spy<T>(mock as Mock<T>);
+  static mockFunction<T extends (...args: any[]) => any>(original: T): T {
+    return FunctionMock(original.name) as T;
   }
 
-  static when<T>(mock: T) {
-    return new InjectorWrapper<T>(mock as Mock<T>);
+  static spy<T extends (...args: any[]) => any>(mockedFunctionInstance: T) {
+    // Here, you should provide a FunctionMock instance, not a real function
+    // This generic type is here to make it look like it accepts a real function
+    return new FunctionSpy(mockedFunctionInstance);
   }
 
-  static any(val: String | Object | Number | Boolean) {
-    return new Any(val);
+  static get any() {
+    return {
+      string: z.string(),
+      number: z.number(),
+      boolean: z.boolean(),
+      array: z.array(z.any()),
+      object: z.object({}),
+      function: z.function(),
+      uuid: z.string().uuid(),
+      date: z.date(),
+      email: z.string().email(),
+      url: z.string().url(),
+      map: z.map(z.any(), z.any()),
+      set: z.set(z.any()),
+      bigint: z.bigint(),
+    };
   }
-
-  static Behaviours = Behaviour;
 }
-
-type FunctionCall =
-  | { type: Behaviour.Return; args: any[]; returnedValue: any }
-  | { type: Behaviour.Throw; args: any[]; error: Error }
-  | { type: Behaviour.Resolve; args: any[]; resolvedValue: any }
-  | { type: Behaviour.Reject; args: any[]; rejectedValue: any }
-  | { type: Behaviour.Call; args: any[]; callback: (...args: any[]) => any };
-
-export { Mockit as MockitV2 } from "./v2/Mockit";

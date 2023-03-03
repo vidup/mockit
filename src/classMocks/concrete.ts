@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { GetClassMethods } from "../../types/GetClassMethods";
+import { GetClassMethods } from "../types/GetClassMethods";
 import { FunctionMock } from "../functionMock";
 import { Class } from "../Mockit";
 

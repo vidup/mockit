@@ -1,5 +1,5 @@
-import { HashingMap } from "../../HashingMap";
-import { Behaviour, NewBehaviourParam } from "../../types/behaviour";
+import { HashingMap } from "../HashingMap";
+import { Behaviour, NewBehaviourParam } from "../types/behaviour";
 import { FunctionCalls } from "../functionSpy";
 
 import { applyCatch } from "./applyCatch";
