@@ -315,3 +315,23 @@ spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // true
 These are just a few basic examples, but you can user any zod schema. For more information I highly recommend that you check out the [Zod documentation](https://zod.dev/).
 
 The API might change (I believe it should just accept a plan zod schema instead of exposing Mockit.z).
+
+# Next up
+The main feature I want to implement is to be able to setup a behaviour based on a Zod schema. Kindof the equivalent of what Mockit allows with spies.
+```ts
+// IDEA ONLY: THIS IS NOT AVAILABLE
+function hello(...args: any[]) {}
+
+const mock = Mockit.mock(hello);
+Mockit.when(mock).isCalled.withArgs(z.schema({
+  name: z.string(),
+  email: z.email(),
+  age: z.number().min(18)
+})).thenReturn("major");
+
+Mockit.when(mock).isCalled.withArgs(z.schema({
+  name: z.string(),
+  email: z.email(),
+  age: z.number().max(18)
+}).thenReturn("minor");
+```
