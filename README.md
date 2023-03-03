@@ -119,7 +119,7 @@ mock("hiii"); // logs ["hiii"]
 
 You can also set a specific behaviour for a specific set of arguments. This is useful when you want to test a function that has different behaviours depending on the arguments it receives.
 
-To do that, you can chain the `isCalled.withArgs(...args)` helper, which takes the same arguments as the mocked function, and then set the behaviour you want.
+To do that, you can use the `isCalledWith(...args)` helper, which takes the same arguments as the mocked function, and then set the behaviour you want.
 
 At that point the API is the same as the default behaviour.
 
@@ -127,11 +127,9 @@ At that point the API is the same as the default behaviour.
 function hello(...args: any[]) {}
 const mock = Mockit.mockFunction(hello);
 
-Mockit.when(mock).isCalled.withArgs("hiii").thenReturn("hiii");
-Mockit.when(mock).isCalled.withArgs("hello").thenReturn("hello");
-Mockit.When(mock)
-  .isCalled.withArgs("please throw")
-  .thenThrow(new Error("hiii"));
+Mockit.when(mock).isCalledWith("hiii").thenReturn("hiii");
+Mockit.when(mock).isCalledWith("hello").thenReturn("hello");
+Mockit.When(mock).isCalledWith("please throw").thenThrow(new Error("hiii"));
 
 mock("hiii"); // "hiii"
 mock("hello"); // "hello"
@@ -317,19 +315,21 @@ These are just a few basic examples, but you can user any zod schema. For more i
 The API might change (I believe it should just accept a plan zod schema instead of exposing Mockit.z).
 
 # Next up
+
 The main feature I want to implement is to be able to setup a behaviour based on a Zod schema. Kindof the equivalent of what Mockit allows with spies.
+
 ```ts
 // IDEA ONLY: THIS IS NOT AVAILABLE
 function hello(...args: any[]) {}
 
 const mock = Mockit.mock(hello);
-Mockit.when(mock).isCalled.withArgs(z.schema({
+Mockit.when(mock).isCalledWith(z.schema({
   name: z.string(),
   email: z.email(),
   age: z.number().min(18)
 })).thenReturn("major");
 
-Mockit.when(mock).isCalled.withArgs(z.schema({
+Mockit.when(mock).isCalledWith(z.schema({
   name: z.string(),
   email: z.email(),
   age: z.number().max(18)
