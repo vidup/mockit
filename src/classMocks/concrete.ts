@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { GetClassMethods } from "../types/GetClassMethods";
 import { FunctionMock } from "../functionMock";
-import { Class } from "../Mockit";
+import { Class } from "../mockit";
 
 const functionSchema = z.function();
 

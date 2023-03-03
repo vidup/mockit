@@ -1,4 +1,4 @@
-import { Mockit } from "../../Mockit";
+import { Mockit } from "../../mockit";
 
 abstract class Hellaw {
   abstract hello(input: string): string;

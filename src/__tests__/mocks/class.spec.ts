@@ -1,4 +1,4 @@
-import { Mockit } from "../../Mockit";
+import { Mockit } from "../../mockit";
 
 class Hellaw {
   public hello(): string {

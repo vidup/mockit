@@ -11,7 +11,5 @@
     "declarationDir": "dist/dts",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
-  },
-  // ignore test files
-  "exclude": ["**/*.test.ts", "**/*.spec.ts"]
+  }
 }

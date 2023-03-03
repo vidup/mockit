@@ -1,4 +1,4 @@
-import { Mockit } from "../../Mockit";
+import { Mockit } from "../../mockit";
 
 function hello(...args: any[]) {
   return "world";

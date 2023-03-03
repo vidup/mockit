@@ -1,1 +1,1 @@
-export { Mockit } from "./Mockit";
+export { Mockit } from "./mockit";
