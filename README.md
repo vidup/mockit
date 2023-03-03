@@ -4,9 +4,6 @@ This is a fun little experiment I'm doing to build a lightweight Mokito inspired
 
 [![Wallaby.js](https://img.shields.io/badge/wallaby.js-powered-blue.svg?style=flat&logo=github)](https://wallabyjs.com/oss/)
 
-For now it's functional and allows you to mock classes methods, altering their behaviour with default and args specific mocks.
-It also allows you to spy on these methods and analyze their calls.
-
 It gives you access to helpers to mock and spy functions, classes and abstract classes (even their abstract methods !).
 
 This is a work in progress and is subject to change completely and breakingly. Feel free to contribute though.
@@ -16,11 +13,11 @@ This is a work in progress and is subject to change completely and breakingly. F
 The idea behind this library is to provide a simple way to mock and spy injected dependencies in your code.
 I'm a big fan of dependency injection as a way to write testable code. In Typescript it's as easy as passing them as function parameters.
 
-However, I found that mocking dependencies in Typescript is a bit of a pain: you're often forced to build fake implementations of your dependencies, which can be a bit tedious, especially as they grow more complex.
+However, I found that mocking dependencies in Typescript is a bit of a pain: you're often forced to build fake implementations of your dependencies, which can be a bit tedious, especially as they grow more complex. It's fragile. Changing the original signature (like adding another method to a class) forces you to correct your mocks one by one, or worse, use `@ts-ignore` and `@ts-expect-error` everywhere).
 
 Sadly, I found the mocking ecosystem either too heavy (like the great `ts-mockito` package, sadly not that much maintained anymore) or too framework specific ( `jest` utilities like `mockImplementationOnce`, `mockReturnValueOnce`, `fn()`, `spyOn()`, etc.);
 
-I wanted something that was semantic, easy to use, and independent of any test runner framework too. Changing all my tests when switching from `jest` to `vitest` or `ava` is _not_ something I'm a fan of.
+I needed something that was semantic, easy to use, and independent of any test runner framework too. Changing all my tests when switching from `jest` to `vitest` or `ava` is _not_ something I'm a fan of.
 
 DISCLAIMER: I'm trying to keep this library as lightweight as possible. I'm not trying to port Mokito: the `ts-mockito` library already did that way better than I could ever do. If you what you're after is a Mokito port, I suggest you use that library instead.
 
