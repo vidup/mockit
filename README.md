@@ -586,5 +586,5 @@ Mockit.when(mock).isCalledWith(z.schema({
 }).thenReturn("minor");
 ```
 
-- [] Add a `reset(mock)` function
-- [] Add a `dryVerify(mock)` or `analyze(mock)` function that returns an object with the suppositions that have been met and the ones that have not been met, instead of throwing an error.
+- Add a `reset(mock)` function
+- Add a `dryVerify(mock)` or `analyze(mock)` function that returns an object with the suppositions that have been met and the ones that have not been met, instead of throwing an error.
