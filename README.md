@@ -476,9 +476,9 @@ function hello(...args: any[]) {}
 
 test("it should be called three times, 'hello' twice and 'hiii' once", () => {
   const mock = mockFunction(hello);
-  suppose(mock).willBeCalledWith("hiii").once;
-  suppose(mock).willBeCalledWith("hello").twice;
-  suppose(mock).willBeCalled.thrice;
+  suppose(mock).willBeCalledWith("hiii").once();
+  suppose(mock).willBeCalledWith("hello").twice();
+  suppose(mock).willBeCalled.thrice();
 
   mock("hiii");
 
@@ -493,7 +493,7 @@ test("it should be called three times, 'hello' twice and 'hiii' once", () => {
 ## Usage with Zod
 
 You can use any Zod schema to create suppositions.
-This allows you to check if the mocked function has been called with specific types of arguments, or even with arguments that match a specific schema.
+This allows you to check if the mocked function has been called with specific kind of arguments, or even with arguments that match a more specific and limitative schema (like a positive integer, for example).
 You can also check that a mock has not been called.
 
 ```ts
@@ -533,7 +533,7 @@ function createAccount(
 it("should only call minor registration if user is minor", () => {
   const adultRegistrationMock = mockFunction(registerAdultAccount);
   const minorRegistrationMock = mockFunction(registerMinorAccount);
-  suppose(minorRegistrationMock).willBeCalledWith(minorSchema).once;
+  suppose(minorRegistrationMock).willBeCalledWith(minorSchema).once();
   suppose(adultRegistrationMock).willNotBeCalled();
 
   createAccount(
@@ -549,7 +549,7 @@ it("should only call adult registration if user is adult", () => {
   const adultRegistrationMock = mockFunction(registerAdultAccount);
   const minorRegistrationMock = mockFunction(registerMinorAccount);
   suppose(minorRegistrationMock).willNotBeCalled();
-  suppose(adultRegistrationMock).willBeCalledWith(adultSchema).once;
+  suppose(adultRegistrationMock).willBeCalledWith(adultSchema).once();
 
   createAccount(
     { uuid: "123", name: "John", email: "adult@gmail.com", age: 18 },
@@ -565,7 +565,7 @@ it("should only call adult registration if user is adult", () => {
 
 # Next up
 
-A great feature I want to implement is to be able to setup a behaviour based on a Zod schema. Kindof the equivalent of what Mockit allows with spies and suppositions.
+- [] A great feature I want to implement is to be able to setup a behaviour based on a Zod schema. Kindof the equivalent of what Mockit allows with spies and suppositions.
 
 ```ts
 // IDEA ONLY: THIS IS NOT AVAILABLE
@@ -584,3 +584,6 @@ Mockit.when(mock).isCalledWith(z.schema({
   age: z.number().max(18)
 }).thenReturn("minor");
 ```
+
+- [] Add a `reset(mock)` function
+- [] Add a `dryVerify(mock)` or `analyze(mock)` function that returns an object with the suppositions that have been met and the ones that have not been met, instead of throwing an error.
