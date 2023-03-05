@@ -30,6 +30,7 @@ Feel free to contribute :)
 - [Suppose and verify](#suppose-and-verify)
   - [Basic usage](#basic-usage)
   - [Usage with Zod](#usage-with-zod)
+- [Why not mock objects?](#why-not-mock-objects)
 
 # Why
 
@@ -562,7 +563,9 @@ it("should only call adult registration if user is adult", () => {
 });
 ```
 
----
+# Why not mock objects ?
+
+Mocking objects is a great way to test your code, but it's already been done by other libraries. My favorite is [@anatine/zod-mock](https://www.npmjs.com/package/@anatine/zod-mock) which I highly recommend you use.
 
 # Next up
 
