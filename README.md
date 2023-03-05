@@ -20,8 +20,8 @@ Feel free to contribute :)
   - [Mocking classes](#mocking-classes)
   - [Mocking abstract classes](#mocking-abstract-classes)
   - [Mocking interfaces](#mocking-interfaces)
-- [Set default behaviour](#set-default-behaviour)
-- [Set behaviour for specific arguments](#set-behaviour-for-specific-arguments)
+  - [Set default behaviour](#set-default-behaviour)
+  - [Set behaviour for specific arguments](#set-behaviour-for-specific-arguments)
 - [Spies](#spies)
   - [Calls](#calls)
   - [Has the function been called?](#has-the-function-been-called)
@@ -199,12 +199,13 @@ This is a **really** convenient feature when you need to test a function that de
 
 ## Mocking interfaces
 
-Sadly, you cannot use interfaces as parameters in TypeScript (contrary to abstract classes), so you have to pass the type of the interface manually as a generic parameter. This is not a big deal though, and it's still a lot better than having to write a dummy class that implements the interface you want to mock.
+Mockit provides a `mockInterface` function that allows you to mock types and interfaces. Sadly, you cannot use interfaces as parameters in TypeScript (contrary to abstract classes), so you have to pass the type of the interface manually as a generic parameter. This is not a big deal though, and it's still a lot better than having to write a dummy class that implements the interface you want to mock.
 
 ```ts
 import { mockInterface, when } from "../../mockit";
 
 interface House {
+  // it could be a type instead of an interface
   getRoomsCount(): number;
   getWindowsCount(): number;
   getDoorsCount(): number;
@@ -225,7 +226,7 @@ describe("mockInterface", () => {
 });
 ```
 
-# Set default behaviour
+## Set default behaviour
 
 Mockit's mocks default behaviour is to return `undefined`.
 You can change this behaviour leveraging the `Mockit.when` helper. This helper takes any mocked function as a parameter, and can then be used with either:
@@ -266,7 +267,7 @@ Mockit.when(mock).isCalled.thenCall((...args) => {
 mock("hiii"); // logs ["hiii"]
 ```
 
-# Set behaviour for specific arguments
+## Set behaviour for specific arguments
 
 You can also set a specific behaviour for a specific set of arguments. This is useful when you want to test a function that has different behaviours depending on the arguments it receives.
 
