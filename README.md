@@ -336,14 +336,14 @@ Mockit.when(mock).isCalledWith(z.schema({
 }).thenReturn("minor");
 ```
 
-I also want to implement a `verify` API directly with the mock, so that you can do something like:
+- [x] I also want to implement a `verify` API directly with the mock, so that you can do something like: (IT WORKS \o/)
 
 ```ts
 // IDEA ONLY: THIS IS NOT AVAILABLE
 function hello(...args: any[]) {}
 
 const mock = Mockit.mock(hello);
-mockExpect(mock).isCalledWith(
+suppose(mock).willBeCalledWith(
   z.schema({
     name: z.string(),
     email: z.email(),
