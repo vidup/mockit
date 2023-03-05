@@ -12,6 +12,48 @@ import { FunctionSpy } from "./functionSpy";
 type AbstractClass<T> = abstract new (...args: any[]) => T;
 export type Class<T> = new (...args: any[]) => T;
 
+export function mockAbstract<T>(
+  _original: AbstractClass<T>, // it's here to activate the generic type
+  propertiesToMock: Array<keyof T>
+): T {
+  return new AbstractClassMock<T>(propertiesToMock) as T;
+}
+
+export function mock<T>(_original: Class<T>): T {
+  return new ConcreteClassMock<T>(_original) as T;
+}
+
+export function mockFunction<T extends (...args: any[]) => any>(
+  original: T
+): T {
+  return FunctionMock(original.name) as T;
+}
+
+export function when<T>(method: any) {
+  return {
+    /**
+     * This function sets up the behaviour of the mocked method.
+     * If the mocked method is called with parameters that are not setup for custom behaviour, this will be the default behaviour
+     */
+    get isCalled() {
+      const utils = new FunctionMockUtils(method);
+      return utils.defaultBehaviourController();
+    },
+    isCalledWith(...args: any[]) {
+      const utils = new FunctionMockUtils(method);
+      return utils.callController(...args);
+    },
+  };
+}
+
+export function spy<T extends (...args: any[]) => any>(
+  mockedFunctionInstance: T
+) {
+  // Here, you should provide a FunctionMock instance, not a real function
+  // This generic type is here to make it look like it accepts a real function
+  return new FunctionSpy(mockedFunctionInstance);
+}
+
 export class Mockit {
   static Behaviours = Behaviour;
 
@@ -27,41 +69,29 @@ export class Mockit {
     _original: AbstractClass<T>, // it's here to activate the generic type
     propertiesToMock: Array<keyof T>
   ): T {
-    return new AbstractClassMock<T>(propertiesToMock) as T;
+    return mockAbstract(_original, propertiesToMock);
   }
 
   static when<T>(method: any) {
-    return {
-      /**
-       * This function sets up the behaviour of the mocked method.
-       * If the mocked method is called with parameters that are not setup for custom behaviour, this will be the default behaviour
-       */
-      get isCalled() {
-        const utils = new FunctionMockUtils(method);
-        return utils.defaultBehaviourController();
-      },
-      isCalledWith(...args: any[]) {
-        const utils = new FunctionMockUtils(method);
-        return utils.callController(...args);
-      },
-    };
+    return when(method);
   }
 
   static mock<T>(_original: Class<T>): T {
-    return new ConcreteClassMock<T>(_original) as T;
+    return mock(_original);
   }
 
   static mockFunction<T extends (...args: any[]) => any>(original: T): T {
-    return FunctionMock(original.name) as T;
+    return mockFunction(original);
   }
 
   static spy<T extends (...args: any[]) => any>(mockedFunctionInstance: T) {
     // Here, you should provide a FunctionMock instance, not a real function
     // This generic type is here to make it look like it accepts a real function
-    return new FunctionSpy(mockedFunctionInstance);
+    return spy(mockedFunctionInstance);
   }
 
   static get any() {
+    // this is just a port to zod, you can pass zod schemas directly
     return {
       string: z.string(),
       number: z.number(),

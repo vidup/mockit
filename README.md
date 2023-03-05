@@ -316,7 +316,7 @@ The API might change (I believe it should just accept a plan zod schema instead 
 
 # Next up
 
-The main feature I want to implement is to be able to setup a behaviour based on a Zod schema. Kindof the equivalent of what Mockit allows with spies.
+A great feature I want to implement is to be able to setup a behaviour based on a Zod schema. Kindof the equivalent of what Mockit allows with spies.
 
 ```ts
 // IDEA ONLY: THIS IS NOT AVAILABLE
@@ -334,4 +334,22 @@ Mockit.when(mock).isCalledWith(z.schema({
   email: z.email(),
   age: z.number().max(18)
 }).thenReturn("minor");
+```
+
+I also want to implement a `verify` API directly with the mock, so that you can do something like:
+
+```ts
+// IDEA ONLY: THIS IS NOT AVAILABLE
+function hello(...args: any[]) {}
+
+const mock = Mockit.mock(hello);
+mockExpect(mock).isCalledWith(
+  z.schema({
+    name: z.string(),
+    email: z.email(),
+    age: z.number().min(18),
+  })
+).once;
+
+verify(mock); // this would throw and provide a nice error message
 ```

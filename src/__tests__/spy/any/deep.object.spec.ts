@@ -2,7 +2,7 @@ import { Mockit } from "../../../mockit";
 
 function hello(...args: any[]) {}
 
-describe("v2 spies with deep any arguments", () => {
+describe("Spy: with deep objects and arrays", () => {
   it("work for an any argument in the first level of an object", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);

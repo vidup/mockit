@@ -7,7 +7,7 @@ function hellaw(...args: any[]) {
 /**
  * All mocked methods are instances of FunctionMock => we can test it once here.
  */
-describe("v2 function", () => {
+describe("function mock", () => {
   it("should default to a returned undefined", () => {
     const mock = Mockit.mockFunction(hellaw);
     expect(mock()).toBeUndefined();

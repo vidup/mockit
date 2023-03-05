@@ -4,7 +4,7 @@ function hello() {
   return "world";
 }
 
-describe("v2 hasBeenCalled", () => {
+describe("spy hasBeenCalled.XXX", () => {
   it("should provide boolean for asserting how many times a method has been called", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);

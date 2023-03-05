@@ -24,7 +24,7 @@ export type BehaviourType = typeof Behaviours[keyof typeof Behaviours];
  * It is a proxy, so it makes itself look like a function but in reality is
  * a complex object that can catch calls, store and return data.
  *
- * It's a central piece of the library.
+ * It's a central piece of the library, because it is used in all mocks (function, class, abstract)
  */
 export function FunctionMock(functionName: string) {
   const proxy = new Proxy(() => {}, {
@@ -55,6 +55,14 @@ const defaultBehaviour: NewBehaviourParam = {
   returnedValue: undefined,
 };
 
+/**
+ * This function is used to initialize the proxy.
+ * It is called directly in the FunctionMock function that creates the proxy.
+ * Its role is to setup any data structure that will later be used to measure how
+ * the function mock has been called, as well as how to behave depending on the
+ * parameters passed to it.
+ * @param proxy the proxy to initialize
+ */
 export function initializeProxy(proxy: any, functionName: string) {
   Reflect.set(proxy, "init", {
     defaultBehaviour,
@@ -65,6 +73,8 @@ export function initializeProxy(proxy: any, functionName: string) {
   });
 }
 
+// TODO: expose this in some way to allow users to change the default behaviour
+// Not priority, you can just use a new mock for most use cases.
 export function changeDefaultBehaviour(
   proxy: any,
   newBehaviour: NewBehaviourParam

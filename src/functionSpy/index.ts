@@ -4,39 +4,6 @@ import { NewBehaviourParam } from "../types/behaviour";
 import { countMatchingCalls } from "../utils/countMatchingCalls";
 import { argsContainZodSchema } from "../utils/argsContainZodSchema";
 
-export type Call = {
-  behaviour: NewBehaviourParam;
-};
-
-export class FunctionCalls {
-  private calls: HashingMap = new HashingMap();
-  constructor() {}
-
-  public registerCall(args: any[], behaviour: NewBehaviourParam) {
-    const existingCalls = (this.calls.get(args) ?? []) as Call[];
-    this.calls.set(args, existingCalls.concat({ behaviour }));
-  }
-
-  public hasBeenCalledWith(...args: any[]) {
-    return this.calls.has(args);
-  }
-
-  public hasBeenCalledNTimesWith(n: number, ...args: any[]) {
-    const calls = this.calls.get<Call[] | undefined>(args);
-    return calls?.length === n;
-  }
-
-  public getCalls(): Call[] {
-    // Remember, the values are arrays of calls for each args combination
-    // So we need to flatten them to get the whole list as a single array
-    return this.calls.values<Call[]>().flat();
-  }
-
-  public getArgs() {
-    return this.calls.getOriginalKeys();
-  }
-}
-
 export class FunctionSpy {
   constructor(private proxy: any) {}
 
@@ -137,5 +104,38 @@ export class FunctionSpy {
         };
       },
     };
+  }
+}
+
+export type Call = {
+  behaviour: NewBehaviourParam;
+};
+
+export class FunctionCalls {
+  private calls: HashingMap = new HashingMap();
+  constructor() {}
+
+  public registerCall(args: any[], behaviour: NewBehaviourParam) {
+    const existingCalls = (this.calls.get(args) ?? []) as Call[];
+    this.calls.set(args, existingCalls.concat({ behaviour }));
+  }
+
+  public hasBeenCalledWith(...args: any[]) {
+    return this.calls.has(args);
+  }
+
+  public hasBeenCalledNTimesWith(n: number, ...args: any[]) {
+    const calls = this.calls.get<Call[] | undefined>(args);
+    return calls?.length === n;
+  }
+
+  public getCalls(): Call[] {
+    // Remember, the values are arrays of calls for each args combination
+    // So we need to flatten them to get the whole list as a single array
+    return this.calls.values<Call[]>().flat();
+  }
+
+  public getArgs() {
+    return this.calls.getOriginalKeys();
   }
 }
