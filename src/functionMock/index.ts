@@ -24,7 +24,7 @@ export type BehaviourType = typeof Behaviours[keyof typeof Behaviours];
  * It is a proxy, so it makes itself look like a function but in reality is
  * a complex object that can catch calls, store and return data.
  *
- * It's a central piece of the library.
+ * It's a central piece of the library, because it is used in all mocks (function, class, abstract)
  */
 export function FunctionMock(functionName: string) {
   const proxy = new Proxy(() => {}, {
