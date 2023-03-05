@@ -1,18 +1,21 @@
 import { z } from "zod";
-import { Behaviour } from "./types/behaviour";
 
-import { AbstractClassMock } from "./classMocks/abstract";
-import { ConcreteClassMock } from "./classMocks/concrete";
+import {
+  Behaviour,
+  FunctionMock,
+  FunctionMockUtils,
+  FunctionSpy,
+} from "./internal";
 
-import { FunctionMock } from "./functionMock";
-import { FunctionMockUtils } from "./functionMock/utils";
+import {
+  AbstractClassMock,
+  ConcreteClassMock,
+  type AbstractClass,
+  type Class,
+} from "./classMocks";
 
-import { FunctionSpy } from "./functionSpy";
 import { suppose } from "./suppose";
 import { verify } from "./suppose/verify";
-
-type AbstractClass<T> = abstract new (...args: any[]) => T;
-export type Class<T> = new (...args: any[]) => T;
 
 export function mockAbstract<T>(
   _original: AbstractClass<T>, // it's here to activate the generic type
@@ -49,6 +52,7 @@ export function when<T>(method: any) {
 }
 
 export { suppose, verify };
+export { Behaviour };
 
 export function spy<T extends (...args: any[]) => any>(
   mockedFunctionInstance: T

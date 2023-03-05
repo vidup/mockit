@@ -1,6 +1,7 @@
-import { HashingMap } from "../HashingMap";
+import { HashingMap } from "../../utils/HashingMap";
+import { SuppositionRegistry } from "../../suppose";
+
 import { FunctionCalls } from "../functionSpy";
-import { SuppositionRegistry } from "../suppose";
 
 export function getCatch(target, prop, _receiver) {
   switch (prop) {

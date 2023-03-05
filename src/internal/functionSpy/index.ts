@@ -1,8 +1,8 @@
-import { HashingMap } from "../HashingMap";
-import { NewBehaviourParam } from "../types/behaviour";
+import { HashingMap } from "../../utils/HashingMap";
+import { countMatchingCalls } from "../../utils/countMatchingCalls";
+import { argsContainZodSchema } from "../../utils/argsContainZodSchema";
 
-import { countMatchingCalls } from "../utils/countMatchingCalls";
-import { argsContainZodSchema } from "../utils/argsContainZodSchema";
+import { NewBehaviourParam } from "../functionMock/behaviour";
 
 export class FunctionSpy {
   constructor(private proxy: any) {}

@@ -1,4 +1,4 @@
-import { FunctionMock } from "../functionMock";
+import { FunctionMock } from "../internal/functionMock";
 
 export class AbstractClassMock<T> {
   constructor(propertiesToMock: Array<keyof T>) {
