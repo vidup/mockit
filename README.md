@@ -563,7 +563,7 @@ it("should only call adult registration if user is adult", () => {
 });
 ```
 
-# Why not mock objects ?
+# Why not mock objects?
 
 Mocking objects is a great way to test your code, but it's already been done by other libraries. My favorite is [@anatine/zod-mock](https://www.npmjs.com/package/@anatine/zod-mock) which I highly recommend you use.
 
