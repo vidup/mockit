@@ -10,6 +10,7 @@ import {
 import {
   AbstractClassMock,
   ConcreteClassMock,
+  InterfaceClassMock,
   type AbstractClass,
   type Class,
 } from "./classMocks";
@@ -32,6 +33,11 @@ export function mockFunction<T extends (...args: any[]) => any>(
   original: T
 ): T {
   return FunctionMock(original.name) as T;
+}
+
+export function mockInterface<T>(...functionsToMock: Array<keyof T>): T {
+  const mock = new InterfaceClassMock(functionsToMock as string[]);
+  return mock as T;
 }
 
 export function when<T>(method: any) {
@@ -86,6 +92,10 @@ export class Mockit {
 
   static mock<T>(_original: Class<T>): T {
     return mock(_original);
+  }
+
+  static mockInterface<T>(...functionsToMock: Array<keyof T>): T {
+    return mockInterface(...functionsToMock);
   }
 
   static mockFunction<T extends (...args: any[]) => any>(original: T): T {

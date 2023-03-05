@@ -1,6 +1,6 @@
 {
   "name": "@vdcode/mockit",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0",
   "description": "mocking library experiment",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

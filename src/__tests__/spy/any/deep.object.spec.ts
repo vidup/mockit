@@ -7,34 +7,28 @@ describe("Spy: with deep objects and arrays", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(
-      spy.hasBeenCalled.withArgs({ a: Mockit.any.string }).atLeastOnce
-    ).toBe(false);
+    expect(spy.wasCalledWith({ a: Mockit.any.string }).atLeastOnce).toBe(false);
     mock({ a: 1 });
-    expect(
-      spy.hasBeenCalled.withArgs({ a: Mockit.any.string }).atLeastOnce
-    ).toBe(false);
+    expect(spy.wasCalledWith({ a: Mockit.any.string }).atLeastOnce).toBe(false);
     mock({ a: "hello" });
-    expect(
-      spy.hasBeenCalled.withArgs({ a: Mockit.any.string }).atLeastOnce
-    ).toBe(true);
+    expect(spy.wasCalledWith({ a: Mockit.any.string }).atLeastOnce).toBe(true);
   });
 
   it("should work for level 2 argument", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(
-      spy.hasBeenCalled.withArgs({ a: { b: Mockit.any.string } }).atLeastOnce
-    ).toBe(false);
+    expect(spy.wasCalledWith({ a: { b: Mockit.any.string } }).atLeastOnce).toBe(
+      false
+    );
     mock({ a: { b: 1 } });
-    expect(
-      spy.hasBeenCalled.withArgs({ a: { b: Mockit.any.string } }).atLeastOnce
-    ).toBe(false);
+    expect(spy.wasCalledWith({ a: { b: Mockit.any.string } }).atLeastOnce).toBe(
+      false
+    );
     mock({ a: { b: "hello" } });
-    expect(
-      spy.hasBeenCalled.withArgs({ a: { b: Mockit.any.string } }).atLeastOnce
-    ).toBe(true);
+    expect(spy.wasCalledWith({ a: { b: Mockit.any.string } }).atLeastOnce).toBe(
+      true
+    );
   });
 
   it("should work for a complex object", () => {
@@ -59,7 +53,7 @@ describe("Spy: with deep objects and arrays", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(spy.hasBeenCalled.withArgs(object).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(object).atLeastOnce).toBe(false);
     mock({
       x: 1,
       y: { z: { w: { a: "hell" } } },
@@ -67,7 +61,7 @@ describe("Spy: with deep objects and arrays", () => {
       //   c: [1, 2, "not an email"],
       z: { w: { a: "not a function" } },
     });
-    expect(spy.hasBeenCalled.withArgs(object).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(object).atLeastOnce).toBe(false);
 
     mock({
       x: 1,
@@ -86,7 +80,7 @@ describe("Spy: with deep objects and arrays", () => {
       ],
     });
 
-    expect(spy.hasBeenCalled.withArgs(object).atLeastOnce).toBe(true);
+    expect(spy.wasCalledWith(object).atLeastOnce).toBe(true);
   });
 
   it("should allow multiple complex objects", () => {
@@ -103,14 +97,14 @@ describe("Spy: with deep objects and arrays", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(spy.hasBeenCalled.withArgs(...schemas).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(...schemas).atLeastOnce).toBe(false);
     mock();
-    expect(spy.hasBeenCalled.withArgs(...schemas).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(...schemas).atLeastOnce).toBe(false);
     mock({ x: 1, y: { z: { w: { a: "hello" } } } });
-    expect(spy.hasBeenCalled.withArgs(...schemas).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(...schemas).atLeastOnce).toBe(false);
     mock({ y: 1 });
-    expect(spy.hasBeenCalled.withArgs(...schemas).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(...schemas).atLeastOnce).toBe(false);
     mock({ x: 1, y: { z: { w: { a: "hello" } } } }, { y: 1 });
-    expect(spy.hasBeenCalled.withArgs(...schemas).atLeastOnce).toBe(true);
+    expect(spy.wasCalledWith(...schemas).atLeastOnce).toBe(true);
   });
 });

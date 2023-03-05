@@ -35,25 +35,25 @@ export function suppose(mock: any) {
       });
     },
     willBeCalled: {
-      get atLeastOnce() {
+      atLeastOnce() {
         return suppositionsMap.addSupposition({
           args: undefined,
           count: "atLeastOnce",
         });
       },
-      get once() {
+      once() {
         return suppositionsMap.addSupposition({
           args: undefined,
           count: 1,
         });
       },
-      get twice() {
+      twice() {
         return suppositionsMap.addSupposition({
           args: undefined,
           count: 2,
         });
       },
-      get thrice() {
+      thrice() {
         return suppositionsMap.addSupposition({
           args: undefined,
           count: 3,
@@ -68,25 +68,25 @@ export function suppose(mock: any) {
     },
     willBeCalledWith(...args: any[]) {
       return {
-        get atLeastOnce() {
+        atLeastOnce() {
           return suppositionsMap.addSupposition({
             args,
             count: "atLeastOnce",
           });
         },
-        get once() {
+        once() {
           return suppositionsMap.addSupposition({
             args,
             count: 1,
           });
         },
-        get twice() {
+        twice() {
           return suppositionsMap.addSupposition({
             args,
             count: 2,
           });
         },
-        get thrice() {
+        thrice() {
           return suppositionsMap.addSupposition({
             args,
             count: 3,
