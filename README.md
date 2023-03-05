@@ -290,9 +290,9 @@ mock("please throw"); // throws Error("hiii")
 
 # Spies
 
-Mockit also provides a `spy` helper which you can use on any of its mocked functions. This helper will give you access to all the calls made on the mocked function, as well as syntactic sugar to check how many times the function has been called, with which arguments, etc.
+Mockit provides a `spy` helper which you can use on any of its mocked functions. This helper will give you access to all the calls made on the mocked function, as well as syntactic sugar to check how many times the function has been called, with which arguments, etc.
 
-It also integrates with the amazing Zod library via the `Mockit.any` port, effectively giving you the whole power of Zod's validation system to check if the mocked function has been called with extremely specific arguments.
+It also integrates with the amazing Zod library, effectively giving you the whole power of Zod's validation system to check if the mocked function has been called with extremely specific arguments.
 
 ## Calls
 
@@ -419,46 +419,44 @@ const mock = Mockit.mockFunction(hello);
 const spy = Mockit.spy(mock);
 
 // String
-spy.hasBeenCalled.withArgs(Mockit.any.string).once; // false
+spy.hasBeenCalled.withArgs(z.string()).once; // false
 mock("hiii");
-spy.hasBeenCalled.withArgs(Mockit.any.string).once; // true
+spy.hasBeenCalled.withArgs(z.string()).once; // true
 
 // Email
-spy.hasBeenCalled.withArgs(Mockit.any.string.email()).once; // false
+spy.hasBeenCalled.withArgs(z.string().email()).once; // false
 mock("gracehopper@gmail.com");
-spy.hasBeenCalled.withArgs(Mockit.any.string.email()).once; // true
+spy.hasBeenCalled.withArgs(z.string().email()).once; // true
 
 // Uuid
-spy.hasBeenCalled.withArgs(Mockit.any.string.uuid()).once; // false
+spy.hasBeenCalled.withArgs(z.string().uuid()).once; // false
 mock("a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6");
-spy.hasBeenCalled.withArgs(Mockit.any.string.uuid()).once; // true
+spy.hasBeenCalled.withArgs(z.string().uuid()).once; // true
 
 // Negative number
-spy.hasBeenCalled.withArgs(Mockit.any.number.negative()).once; // false
+spy.hasBeenCalled.withArgs(z.number().negative()).once; // false
 mock(-1);
-spy.hasBeenCalled.withArgs(Mockit.any.number.negative()).once; // true
+spy.hasBeenCalled.withArgs(z.number().negative()).once; // true
 
 // Positive number
-spy.hasBeenCalled.withArgs(Mockit.any.number.positive()).once; // false
+spy.hasBeenCalled.withArgs(z.number().positive()).once; // false
 mock(1);
-spy.hasBeenCalled.withArgs(Mockit.any.number.positive()).once; // true
+spy.hasBeenCalled.withArgs(z.number().positive()).once; // true
 
 // Number between 10 and 20
-spy.hasBeenCalled.withArgs(Mockit.any.number.min(10).max(20)).once; // false
+spy.hasBeenCalled.withArgs(z.number().min(10).max(20)).once; // false
 mock(15);
-spy.hasBeenCalled.withArgs(Mockit.any.number.min(10).max(20)).once; // true
+spy.hasBeenCalled.withArgs(z.number().min(10).max(20)).once; // true
 
 // Array of strings
-spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // false
+spy.hasBeenCalled.withArgs(z.array(z.string())).once; // false
 mock([1, 2, 3]);
-spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // false
+spy.hasBeenCalled.withArgs(z.array(z.string())).once; // false
 mock(["1", "2", "3"]);
-spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // true
+spy.hasBeenCalled.withArgs(z.array(z.string())).once; // true
 ```
 
 These are just a few basic examples, but you can user any zod schema. For more information I highly recommend that you check out the [Zod documentation](https://zod.dev/).
-
-The API might change (I believe it should just accept a plan zod schema instead of exposing Mockit.z).
 
 # Suppose and Verify
 
