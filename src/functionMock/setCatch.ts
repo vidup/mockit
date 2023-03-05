@@ -8,6 +8,7 @@ export function setCatch(target, prop, newValue, receiver) {
     Reflect.set(target, "functionName", newValue.functionName);
     Reflect.set(target, "mockMap", newValue.mockMap);
     Reflect.set(target, "callsMap", newValue.callsMap);
+    Reflect.set(target, "suppositionsMap", newValue.suppositionsMap);
     return true;
   }
 

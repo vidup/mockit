@@ -8,6 +8,8 @@ import { FunctionMock } from "./functionMock";
 import { FunctionMockUtils } from "./functionMock/utils";
 
 import { FunctionSpy } from "./functionSpy";
+import { suppose } from "./suppose";
+import { verify } from "./suppose/verify";
 
 type AbstractClass<T> = abstract new (...args: any[]) => T;
 export type Class<T> = new (...args: any[]) => T;
@@ -45,6 +47,8 @@ export function when<T>(method: any) {
     },
   };
 }
+
+export { suppose, verify };
 
 export function spy<T extends (...args: any[]) => any>(
   mockedFunctionInstance: T
@@ -89,6 +93,9 @@ export class Mockit {
     // This generic type is here to make it look like it accepts a real function
     return spy(mockedFunctionInstance);
   }
+
+  static suppose = suppose;
+  static verify = verify;
 
   static get any() {
     // this is just a port to zod, you can pass zod schemas directly
