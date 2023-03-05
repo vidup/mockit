@@ -7,6 +7,7 @@ import { getCatch } from "./getCatch";
 import { setCatch } from "./setCatch";
 
 import { FunctionMockUtils } from "./utils";
+import { SuppositionRegistry } from "../suppose";
 
 export const Behaviours = {
   Return: "Return",
@@ -70,6 +71,7 @@ export function initializeProxy(proxy: any, functionName: string) {
     calls: [],
     mockMap: new HashingMap(),
     callsMap: new FunctionCalls(),
+    suppositionsMap: new SuppositionRegistry(),
   });
 }
 

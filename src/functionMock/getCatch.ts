@@ -1,5 +1,6 @@
 import { HashingMap } from "../HashingMap";
 import { FunctionCalls } from "../functionSpy";
+import { SuppositionRegistry } from "../suppose";
 
 export function getCatch(target, prop, _receiver) {
   switch (prop) {
@@ -13,6 +14,12 @@ export function getCatch(target, prop, _receiver) {
     case "callsMap":
       const callsMap = Reflect.get(target, "callsMap") as FunctionCalls;
       return callsMap;
+    case "suppositionsMap":
+      const suppositionsMap = Reflect.get(
+        target,
+        "suppositionsMap"
+      ) as SuppositionRegistry;
+      return suppositionsMap;
     default:
       throw new Error("Unauthorized property");
   }
