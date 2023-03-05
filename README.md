@@ -1,18 +1,106 @@
 [![Wallaby.js](https://img.shields.io/badge/wallaby.js-powered-blue.svg?style=flat&logo=github)](https://wallabyjs.com/oss/)
 
-DISCLAIMER: This readme is for the V1 beta version.
+Mockit solves the problem of [mocking the behaviour](https://martinfowler.com/articles/mocksArentStubs.html) of injected dependencies in Typescript.
 
-Mockit is a little experiment to help build mocked versions of functions, classes and abstract classes in TypeScript. It's inspired by Java's Mockito, although quite different in usage.
+It gives you access to a simple API to mock functions, classes and even abstract classes, so that any type of dependency can be mocked with minimum effort and maximum flexibility.
 
-The idea behind this library is to provide a simple way to mock and spy injected dependencies in your code.
-I'm a big fan of dependency injection as a way to write testable code. In Typescript it's as easy as passing them as function parameters.
+You can then setup the behaviour of your mocks, make suppositions on how they will be called and verify that they were called as expected.
 
-However, I found that mocking dependencies in Typescript is a bit of a pain: you're often forced to build fake implementations of your dependencies, which can be a bit tedious, especially as they grow more complex. It's fragile when change occurs. Changing the original signature (like adding another method to a class) forces you to correct your mocks one by one, or worse, use `@ts-ignore` and `@ts-expect-error` everywhere).
-I needed something that was semantic, easy to use, and independent of any test runner framework too. Changing all my tests when switching from `jest` to `vitest` or `ava` is _not_ something I'm a fan of.
+Finally, you can leverage the power of the [Zod](https://github.com/colinhacks/zod) library's schemas to make make assertions on the nature of the objects passed to your mocks.
 
-It leverages the zod library to allow you to check how your spied mocks are being called, with lots of flexibility.
+Feel free to contribute :)
 
-This is a work in progress and is subject to change completely and breakingly. Feel free to contribute though.
+## Mocking should be easy
+
+Until now, I found that mocking dependencies in Typescript is a bit of a pain: you're often forced to build complete fake implementations of your dependencies, which can be a bit tedious, especially as they grow more complex.
+
+**It is fragile when change occurs**. Extending the signature of a module (like adding another method to a class) should not force you to correct your mocks one by one. Or worse, to use `@ts-ignore` and `@ts-expect-error` everywhere.
+
+With Mockit, it's as easy as a function call.
+
+```ts
+import { mockFunction } from "@vdcode/mockit";
+
+class Hi {
+  public sayHi() {
+    return "hi";
+  }
+}
+const hiMock = mock(Hi);
+
+function hello() {
+  return "hello";
+}
+const helloMock = mockFunction(hello);
+
+abstract class Hola {
+  public abstract sayHello(): string;
+  public abstract sayHi(): string;
+  public abstract sayHola(): string;
+}
+const holaMock = mockAbstract(Hello, ["sayHola"]); // Mockit will help you by hinting you with the names of the abstract methods of your class, using generics to catch the type of the class you pass as the first parameter.
+```
+
+For TypeScript compiler, hiMock is an instance of Hi, and helloMock is a function with the same signature as hello.
+Except they can now be spied on, and their behaviour can be changed at will.
+
+## Mocking should be semantic
+
+Reading test code often happens when you broke it, and chances are high that you're not the one who wrote it: Mockit's API is designed to be as semantic as possible, so that you can easily understand what the test is about.
+
+```ts
+import { mockFunction, when } from "@vdcode/mockit";
+
+function log(anything: string): void {
+  // ...
+}
+function broadCast(anything: string): void {
+  // ...
+}
+
+function sendMessage(
+  message: string,
+  {
+    logger,
+    broadcaster,
+  }: {
+    logger: (x: string) => void;
+    broadcaster: (x: string) => void;
+  }
+): void {
+  try {
+    logger(`Sending message "${message}"`);
+    broadcaster(message);
+    logger(`Message "${message}" sent`);
+  } catch (err) {
+    logger(`Error while sending message "${message}"`);
+  }
+}
+
+// test file
+it("should log the error message if broadcast failed", () => {
+  const logMock = mockFunction(log);
+  const broadcastMock = mockFunction(broadCast);
+
+  when(broadCastMock).isCalled.thenThrow();
+
+  suppose(logMock).willBeCalledWith("Sending message hello");
+  suppose(logMock).willBeCalledWith("Error while sending message hello");
+
+  sendMessage("hello", { logger: logMock, broadcaster: broadcastMock });
+
+  verify(logMock);
+});
+```
+
+## Mocking should not lock you in
+
+Changing all my mocks when switching from `jest` to `vitest`, `mocha`, `ava`, `cypress` or `playwright` is _not_ something I'm a fan of. You can use Mockit with any test runner, effectively making your test code agnostic of the test runner you use, as far as mocking is concerned.
+
+## TypeScript testing is hard
+
+Testing with TypeScript is harder than with JavaScript: you have to deal with types, and that can sometimes be slowing you down. Mockit is designed from scratch to be used with TypeScript, and tricks the compiler to make it believe that your mocks are the real thing (under the hood, Mockit uses Proxies objects).
+It embraces one of TypeScript's best libraries, Zod, to help you make assertions on the nature of the objects passed to your mocks.
 
 # Mocks
 
