@@ -1,4 +1,4 @@
-export type SuppositionCount = "atLeastOnce" | number;
+export type SuppositionCount = "atLeastOnce" | "NEVER" | number;
 export type Supposition = {
   args: any[] | undefined;
   count: SuppositionCount;
@@ -22,6 +22,18 @@ export function suppose(mock: any) {
     "suppositionsMap"
   ) as SuppositionRegistry;
   return {
+    willNotBeCalled() {
+      return suppositionsMap.addSupposition({
+        args: undefined,
+        count: "NEVER",
+      });
+    },
+    willNotBeCalledWith(...args: any[]) {
+      return suppositionsMap.addSupposition({
+        args,
+        count: "NEVER",
+      });
+    },
     willBeCalled: {
       get atLeastOnce() {
         return suppositionsMap.addSupposition({

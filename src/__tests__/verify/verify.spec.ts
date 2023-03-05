@@ -100,4 +100,27 @@ describe("suppose then verify", () => {
 
     verify(mock);
   });
+
+  it("should allow to check if something has not been called", () => {
+    const mock = mockFunction(hello);
+    suppose(mock).willNotBeCalled();
+
+    verify(mock);
+
+    mock();
+    expect(() => verify(mock)).toThrow();
+  });
+
+  it("should allow to check if something has not been called with specific arguments", () => {
+    const mock = mockFunction(hello);
+    suppose(mock).willNotBeCalledWith("hello");
+
+    verify(mock);
+
+    mock(2);
+    verify(mock);
+
+    mock("hello");
+    expect(() => verify(mock)).toThrow();
+  });
 });
