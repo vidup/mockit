@@ -5,7 +5,7 @@ abstract class Hellaw {
   abstract world(): string;
 }
 
-describe("v2", () => {
+describe("abstract class mock", () => {
   it("should setup default behaviour for abstract method", async () => {
     const returningMock = mockAbstract(Hellaw, ["hello"]);
     when(returningMock.hello).isCalled.thenReturn("world");

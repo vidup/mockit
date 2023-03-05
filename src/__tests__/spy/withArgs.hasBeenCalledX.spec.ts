@@ -2,7 +2,7 @@ import { Mockit } from "../../mockit";
 
 function hello(...args: any[]) {}
 
-describe("V2 hasBeenCalledWith", () => {
+describe("spy hasBeenCalledWith.withArgs(...).XXX", () => {
   it("should provide functions asserting if a method has been called at least once with a specific set of arguments", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);

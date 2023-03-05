@@ -4,7 +4,7 @@ function hello(...args: any[]) {
   return "world";
 }
 
-describe("v2 stats", () => {
+describe("spy stats: calls list", () => {
   it("should return an empty array when no calls are made", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);

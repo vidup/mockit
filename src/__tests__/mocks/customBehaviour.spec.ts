@@ -7,7 +7,7 @@ function hello(...args: any[]) {
 /**
  * All mocked methods are instances of FunctionMock => we can test it once here.
  */
-describe("v2 function custom behaviour", () => {
+describe("function custom behaviour", () => {
   it("should initially work as intended", () => {
     expect(hello()).toBe("hello world");
   });

@@ -17,7 +17,7 @@ class Hellaw {
   };
 }
 
-describe("v2 class", () => {
+describe("class mock", () => {
   it("the mock should contain all the public functions of the original class", async () => {
     const mock = Mockit.mock(Hellaw);
     expect(mock.hello).toBeDefined();
