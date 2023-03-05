@@ -10,6 +10,31 @@ Finally, you can leverage the power of the [Zod](https://github.com/colinhacks/z
 
 Feel free to contribute :)
 
+- [Why](#why)
+  - [Mocking should be easy](#mocking-should-be-easy)
+  - [Mocking should be semantic](#mocking-should-be-semantic)
+  - [Mocking should not lock you in](#mocking-should-not-lock-you-in)
+  - [Mocking should be able to use types](#mocking-should-be-able-to-use-types)
+- [Mocks](#mocks)
+  - [Mocking functions](#mocking-functions)
+  - [Mocking classes](#mocking-classes)
+  - [Mocking abstract classes](#mocking-abstract-classes)
+  - [Mocking interfaces](#mocking-interfaces)
+- [Set default behaviour](#set-default-behaviour)
+- [Set behaviour for specific arguments](#set-behaviour-for-specific-arguments)
+- [Spies](#spies)
+  - [Calls](#calls)
+  - [Has the function been called?](#has-the-function-been-called)
+  - [Has the function been called with specific arguments?](#has-the-function-been-called-with-specific-arguments)
+  - [Integration with Zod](#integration-with-zod)
+- [Suppose and verify](#suppose-and-verify)
+  - [Basic usage](#basic-usage)
+  - [Usage with Zod](#usage-with-zod)
+
+# Why
+
+Skip this part if you want to jump straight to the [API](#mocks).
+
 ## Mocking should be easy
 
 Until now, I found that mocking dependencies in Typescript is a bit of a pain: you're often forced to build complete fake implementations of your dependencies, which can be a bit tedious, especially as they grow more complex.
@@ -97,10 +122,12 @@ it("should log the error message if broadcast failed", () => {
 
 Changing all my mocks when switching from `jest` to `vitest`, `mocha`, `ava`, `cypress` or `playwright` is _not_ something I'm a fan of. You can use Mockit with any test runner, effectively making your test code agnostic of the test runner you use, as far as mocking is concerned.
 
-## TypeScript testing is hard
+## Mocking should be able to use types
 
-Testing with TypeScript is harder than with JavaScript: you have to deal with types, and that can sometimes be slowing you down. Mockit is designed from scratch to be used with TypeScript, and tricks the compiler to make it believe that your mocks are the real thing (under the hood, Mockit uses Proxies objects).
-It embraces one of TypeScript's best libraries, Zod, to help you make assertions on the nature of the objects passed to your mocks.
+Depending on interfaces is a very good practices in any language: this allows you to easily swap implementations, and thus makes your code more flexible and testable. It can be quite tricky in TypeScript though, because types are not usable at runtime.
+Mockit [provides a `mockAbstract` function that helps you with that](#mocking-abstract-classes).
+
+We also provide a `mockInterface` function that does the same thing, [but for interfaces](#mocking-interfaces).
 
 # Mocks
 
@@ -140,25 +167,58 @@ const mock = Mockit.mock(Hello);
 
 ## Mocking abstract classes
 
-This is where things get interesting. You can mock abstract classes with the `mockAbstract` helper. It will return a `AbstractClassMock` instance, which is a dummy class. By default, this instance has no methods, because we cannot access abstract methods dynamically from JavaScript code (remember, **abstract methods are types**).
+This is where things get interesting. You can mock abstract classes with the `mockAbstract` helper. By default, this instance has no methods, because we cannot access abstract methods dynamically from JavaScript code (remember, **abstract methods are types**).
 
-To solve this issue, `mockAbstract` requires a second parameter, which is an array of strings, containing the names of the abstract methods you want to mock. Mockit will help you by hinting you with the names of the abstract methods of your class, using generics. You don't need to specify the generic type manually, it will be inferred from the class you pass as the first parameter.
-
-This is a **really** convenient feature when you need to test a function that depends on types, but you don't want to implement the whole interface in your test: use abstract classes instead of types or interfaces and you'll be able to mock them using Mockit.
+To make it work, `mockAbstract` requires two parameters: the first one is the abstract class you want to mock, and the second one is an array of strings, containing the names of the abstract methods of the class you want to mock. This allows Mockit to generate a dummy class that implements the interface you want to mock, and to generate a mock for each of the abstract methods you passed as parameter.
 
 ```ts
-import { Mockit } from "@vdcode/mockit";
+import { mockAbstract } from "@vdcode/mockit";
+
 abstract class Hello {
   public abstract sayHello(): string;
+  public abstract sayHi(): string;
+  public abstract sayHola(): string;
 }
 
-function useCase(params, deps: { hello: Hello }) {
-  return deps.hello.sayHello();
+const helloMock = mockAbstract(Hello, ["sayHola"]); // the mocked instance will mock sayHola.
+
+helloMock.sayHola(); // returns undefined by default.
+helloMock.sayHello(); // will throw: it's not mocked.
+```
+
+This is done by leveraging the power of TypeScript's generics, and the `keyof` operator, which allows us to:
+
+- catch the type of the first parameter
+- get the names of the abstract methods of the class we passed as parameter
+- provide a type to the second parameter of the function, helping you write your code faster and avoid spelling mistakes.
+
+This is a **really** convenient feature when you need to test a function that depends on an abstract class instead of of concrete implementation.
+
+## Mocking interfaces
+
+Sadly, you cannot use interfaces as parameters in TypeScript (contrary to abstract classes), so you have to pass the type of the interface manually as a generic parameter. This is not a big deal though, and it's still a lot better than having to write a dummy class that implements the interface you want to mock.
+
+```ts
+import { mockInterface, when } from "../../mockit";
+
+interface House {
+  getRoomsCount(): number;
+  getWindowsCount(): number;
+  getDoorsCount(): number;
 }
 
-test("should compile", () => {
-  const mock = Mockit.mockAbstract(Hello, ["sayHello"]);
-  const result = useCase({}, { hello: mock });
+describe("mockInterface", () => {
+  it("should mock an interface", () => {
+    const house = mockInterface<House>("getRoomsCount", "getDoorsCount");
+    when(house.getRoomsCount).isCalled.thenReturn(3);
+
+    expect(house.getRoomsCount()).toBe(3);
+
+    // This will throw an error because the method is not mocked
+    expect(() => house.getWindowsCount()).toThrowError(
+      "house.getWindowsCount is not a function"
+    );
+  });
 });
 ```
 
@@ -336,6 +396,66 @@ spy.hasBeenCalled.withArgs("hiii").nTimes(1); // true
 // etc...
 ```
 
+## Integration with Zod
+
+We believe that [Zod](https://github.com/colinhacks/zod) is a game changer when it comes to validating data (and more).
+Mockit integrates with Zod to provide you with a powerful way to check if your mocked functions have been called with specific arguments.
+
+This means you can not only check if a function has been called with a specific set of argument, but also:
+
+- with a specific type of argument
+- with arguments that match a specific zod schema.
+
+Here are a few examples:
+
+```ts
+function hello(...args: any[]) {}
+
+const mock = Mockit.mockFunction(hello);
+const spy = Mockit.spy(mock);
+
+// String
+spy.hasBeenCalled.withArgs(Mockit.any.string).once; // false
+mock("hiii");
+spy.hasBeenCalled.withArgs(Mockit.any.string).once; // true
+
+// Email
+spy.hasBeenCalled.withArgs(Mockit.any.string.email()).once; // false
+mock("gracehopper@gmail.com");
+spy.hasBeenCalled.withArgs(Mockit.any.string.email()).once; // true
+
+// Uuid
+spy.hasBeenCalled.withArgs(Mockit.any.string.uuid()).once; // false
+mock("a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6");
+spy.hasBeenCalled.withArgs(Mockit.any.string.uuid()).once; // true
+
+// Negative number
+spy.hasBeenCalled.withArgs(Mockit.any.number.negative()).once; // false
+mock(-1);
+spy.hasBeenCalled.withArgs(Mockit.any.number.negative()).once; // true
+
+// Positive number
+spy.hasBeenCalled.withArgs(Mockit.any.number.positive()).once; // false
+mock(1);
+spy.hasBeenCalled.withArgs(Mockit.any.number.positive()).once; // true
+
+// Number between 10 and 20
+spy.hasBeenCalled.withArgs(Mockit.any.number.min(10).max(20)).once; // false
+mock(15);
+spy.hasBeenCalled.withArgs(Mockit.any.number.min(10).max(20)).once; // true
+
+// Array of strings
+spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // false
+mock([1, 2, 3]);
+spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // false
+mock(["1", "2", "3"]);
+spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // true
+```
+
+These are just a few basic examples, but you can user any zod schema. For more information I highly recommend that you check out the [Zod documentation](https://zod.dev/).
+
+The API might change (I believe it should just accept a plan zod schema instead of exposing Mockit.z).
+
 # Suppose and Verify
 
 Mockit exposes two helpers that allow you to write tests in a more natural way:
@@ -441,69 +561,9 @@ it("should only call adult registration if user is adult", () => {
 
 ---
 
-# Zod integration with spies
-
-We believe that [Zod](https://github.com/colinhacks/zod) is a game changer when it comes to validating data (and more).
-Mockit integrates with Zod to provide you with a powerful way to check if your mocked functions have been called with specific arguments.
-
-This means you can not only check if a function has been called with a specific set of argument, but also:
-
-- with a specific type of argument
-- with arguments that match a specific zod schema.
-
-Here are a few examples:
-
-```ts
-function hello(...args: any[]) {}
-
-const mock = Mockit.mockFunction(hello);
-const spy = Mockit.spy(mock);
-
-// String
-spy.hasBeenCalled.withArgs(Mockit.any.string).once; // false
-mock("hiii");
-spy.hasBeenCalled.withArgs(Mockit.any.string).once; // true
-
-// Email
-spy.hasBeenCalled.withArgs(Mockit.any.string.email()).once; // false
-mock("gracehopper@gmail.com");
-spy.hasBeenCalled.withArgs(Mockit.any.string.email()).once; // true
-
-// Uuid
-spy.hasBeenCalled.withArgs(Mockit.any.string.uuid()).once; // false
-mock("a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6");
-spy.hasBeenCalled.withArgs(Mockit.any.string.uuid()).once; // true
-
-// Negative number
-spy.hasBeenCalled.withArgs(Mockit.any.number.negative()).once; // false
-mock(-1);
-spy.hasBeenCalled.withArgs(Mockit.any.number.negative()).once; // true
-
-// Positive number
-spy.hasBeenCalled.withArgs(Mockit.any.number.positive()).once; // false
-mock(1);
-spy.hasBeenCalled.withArgs(Mockit.any.number.positive()).once; // true
-
-// Number between 10 and 20
-spy.hasBeenCalled.withArgs(Mockit.any.number.min(10).max(20)).once; // false
-mock(15);
-spy.hasBeenCalled.withArgs(Mockit.any.number.min(10).max(20)).once; // true
-
-// Array of strings
-spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // false
-mock([1, 2, 3]);
-spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // false
-mock(["1", "2", "3"]);
-spy.hasBeenCalled.withArgs(Mockit.any.array(Mockit.any.string)).once; // true
-```
-
-These are just a few basic examples, but you can user any zod schema. For more information I highly recommend that you check out the [Zod documentation](https://zod.dev/).
-
-The API might change (I believe it should just accept a plan zod schema instead of exposing Mockit.z).
-
 # Next up
 
-A great feature I want to implement is to be able to setup a behaviour based on a Zod schema. Kindof the equivalent of what Mockit allows with spies.
+A great feature I want to implement is to be able to setup a behaviour based on a Zod schema. Kindof the equivalent of what Mockit allows with spies and suppositions.
 
 ```ts
 // IDEA ONLY: THIS IS NOT AVAILABLE
@@ -521,22 +581,4 @@ Mockit.when(mock).isCalledWith(z.schema({
   email: z.email(),
   age: z.number().max(18)
 }).thenReturn("minor");
-```
-
-- [x] I also want to implement a `verify` API directly with the mock, so that you can do something like: (IT WORKS \o/)
-
-```ts
-// IDEA ONLY: THIS IS NOT AVAILABLE
-function hello(...args: any[]) {}
-
-const mock = Mockit.mock(hello);
-suppose(mock).willBeCalledWith(
-  z.schema({
-    name: z.string(),
-    email: z.email(),
-    age: z.number().min(18),
-  })
-).once;
-
-verify(mock); // this would throw and provide a nice error message
 ```
