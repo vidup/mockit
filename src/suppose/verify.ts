@@ -46,8 +46,6 @@ export function verify(mock: any) {
       .nTimes(supposition.count);
   });
 
-  console.log(analysis, suppositions.getSuppositions(), spy.calls);
-
   if (analysis.some((a) => a === false)) {
     throw new Error("Verification failed");
   }
