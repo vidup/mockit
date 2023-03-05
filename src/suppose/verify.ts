@@ -15,7 +15,7 @@ export function verify(mock: any) {
 
   // This means it should never be called PERIOD, not matter which suppositions you added.
   if (defaultNever != null) {
-    if (spy.hasBeenCalled.atLeastOnce) {
+    if (spy.wasCalled.atLeastOnce) {
       throw new Error("Verification failed");
     }
   }
@@ -23,27 +23,25 @@ export function verify(mock: any) {
   const analysis = suppositions.getSuppositions().map((supposition) => {
     if (supposition.count === "NEVER") {
       if (supposition.args == null) {
-        return !spy.hasBeenCalled.atLeastOnce;
+        return !spy.wasCalled.atLeastOnce;
       }
 
-      return !spy.hasBeenCalled.withArgs(...supposition.args).atLeastOnce;
+      return !spy.wasCalledWith(...supposition.args).atLeastOnce;
     }
 
     if (supposition.count === "atLeastOnce") {
       if (supposition.args == null) {
-        return spy.hasBeenCalled.atLeastOnce;
+        return spy.wasCalled.atLeastOnce;
       }
 
-      return spy.hasBeenCalled.withArgs(...supposition.args).atLeastOnce;
+      return spy.wasCalledWith(...supposition.args).atLeastOnce;
     }
 
     if (supposition.args == null) {
-      return spy.hasBeenCalled.nTimes(supposition.count);
+      return spy.wasCalled.nTimes(supposition.count);
     }
 
-    return spy.hasBeenCalled
-      .withArgs(...supposition.args)
-      .nTimes(supposition.count);
+    return spy.wasCalledWith(...supposition.args).nTimes(supposition.count);
   });
 
   if (analysis.some((a) => a === false)) {

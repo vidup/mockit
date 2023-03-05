@@ -234,6 +234,7 @@ You can change this behaviour leveraging the `Mockit.when` helper. This helper t
 - A function mock
 - Any class mock's method
 - Any abstract class mock's method
+- Any interface mock's method
 
 You can currently set the following behaviours:
 
@@ -349,27 +350,27 @@ const spy = Mockit.spy(mock);
 
 mock("hiii");
 
-spy.hasBeenCalled.once; // true
-spy.hasBeenCalled.twice; // false
-spy.hasBeenCalled.atLeastOnce; // true
-spy.hasBeenCalled.thrice; // false
-spy.hasBeenCalled.nTimes(1); // true
+spy.wasCalled.once; // true
+spy.wasCalled.twice; // false
+spy.wasCalled.atLeastOnce; // true
+spy.wasCalled.thrice; // false
+spy.wasCalled.nTimes(1); // true
 
 mock("hello");
 
-spy.hasBeenCalled.once; // false
-spy.hasBeenCalled.twice; // true
-spy.hasBeenCalled.atLeastOnce; // true
-spy.hasBeenCalled.thrice; // false
-spy.hasBeenCalled.nTimes(2); // true
+spy.wasCalled.once; // false
+spy.wasCalled.twice; // true
+spy.wasCalled.atLeastOnce; // true
+spy.wasCalled.thrice; // false
+spy.wasCalled.nTimes(2); // true
 
 mock("please throw");
 
-spy.hasBeenCalled.once; // false
-spy.hasBeenCalled.twice; // false
-spy.hasBeenCalled.atLeastOnce; // true
-spy.hasBeenCalled.thrice; // true
-spy.hasBeenCalled.nTimes(3); // true
+spy.wasCalled.once; // false
+spy.wasCalled.twice; // false
+spy.wasCalled.atLeastOnce; // true
+spy.wasCalled.thrice; // true
+spy.wasCalled.nTimes(3); // true
 ```
 
 ## Has the function been called with specific arguments?
@@ -383,19 +384,19 @@ function hello(...args: any[]) {}
 const mock = Mockit.mockFunction(hello);
 const spy = Mockit.spy(mock);
 
-spy.hasBeenCalled.withArgs("hiii").once; // false
-spy.hasBeenCalled.withArgs("hiii").twice; // false
-spy.hasBeenCalled.withArgs("hiii").atLeastOnce; // false
-spy.hasBeenCalled.withArgs("hiii").thrice; // false
-spy.hasBeenCalled.withArgs("hiii").nTimes(1); // false
+spy.wasCalledWith("hiii").once; // false
+spy.wasCalledWith("hiii").twice; // false
+spy.wasCalledWith("hiii").atLeastOnce; // false
+spy.wasCalledWith("hiii").thrice; // false
+spy.wasCalledWith("hiii").nTimes(1); // false
 
 mock("hiii");
 
-spy.hasBeenCalled.withArgs("hiii").once; // true
-spy.hasBeenCalled.withArgs("hiii").twice; // false
-spy.hasBeenCalled.withArgs("hiii").atLeastOnce; // true
-spy.hasBeenCalled.withArgs("hiii").thrice; // false
-spy.hasBeenCalled.withArgs("hiii").nTimes(1); // true
+spy.wasCalledWith("hiii").once; // true
+spy.wasCalledWith("hiii").twice; // false
+spy.wasCalledWith("hiii").atLeastOnce; // true
+spy.wasCalledWith("hiii").thrice; // false
+spy.wasCalledWith("hiii").nTimes(1); // true
 
 // etc...
 ```
@@ -419,41 +420,41 @@ const mock = Mockit.mockFunction(hello);
 const spy = Mockit.spy(mock);
 
 // String
-spy.hasBeenCalled.withArgs(z.string()).once; // false
+spy.wasCalledWith(z.string()).once; // false
 mock("hiii");
-spy.hasBeenCalled.withArgs(z.string()).once; // true
+spy.wasCalledWith(z.string()).once; // true
 
 // Email
-spy.hasBeenCalled.withArgs(z.string().email()).once; // false
+spy.wasCalledWith(z.string().email()).once; // false
 mock("gracehopper@gmail.com");
-spy.hasBeenCalled.withArgs(z.string().email()).once; // true
+spy.wasCalledWith(z.string().email()).once; // true
 
 // Uuid
-spy.hasBeenCalled.withArgs(z.string().uuid()).once; // false
+spy.wasCalledWith(z.string().uuid()).once; // false
 mock("a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6");
-spy.hasBeenCalled.withArgs(z.string().uuid()).once; // true
+spy.wasCalledWith(z.string().uuid()).once; // true
 
 // Negative number
-spy.hasBeenCalled.withArgs(z.number().negative()).once; // false
+spy.wasCalledWith(z.number().negative()).once; // false
 mock(-1);
-spy.hasBeenCalled.withArgs(z.number().negative()).once; // true
+spy.wasCalledWith(z.number().negative()).once; // true
 
 // Positive number
-spy.hasBeenCalled.withArgs(z.number().positive()).once; // false
+spy.wasCalledWith(z.number().positive()).once; // false
 mock(1);
-spy.hasBeenCalled.withArgs(z.number().positive()).once; // true
+spy.wasCalledWith(z.number().positive()).once; // true
 
 // Number between 10 and 20
-spy.hasBeenCalled.withArgs(z.number().min(10).max(20)).once; // false
+spy.wasCalledWith(z.number().min(10).max(20)).once; // false
 mock(15);
-spy.hasBeenCalled.withArgs(z.number().min(10).max(20)).once; // true
+spy.wasCalledWith(z.number().min(10).max(20)).once; // true
 
 // Array of strings
-spy.hasBeenCalled.withArgs(z.array(z.string())).once; // false
+spy.wasCalledWith(z.array(z.string())).once; // false
 mock([1, 2, 3]);
-spy.hasBeenCalled.withArgs(z.array(z.string())).once; // false
+spy.wasCalledWith(z.array(z.string())).once; // false
 mock(["1", "2", "3"]);
-spy.hasBeenCalled.withArgs(z.array(z.string())).once; // true
+spy.wasCalledWith(z.array(z.string())).once; // true
 ```
 
 These are just a few basic examples, but you can user any zod schema. For more information I highly recommend that you check out the [Zod documentation](https://zod.dev/).

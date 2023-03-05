@@ -18,7 +18,7 @@ export class FunctionSpy {
     }[];
   }
 
-  public get hasBeenCalled() {
+  public get wasCalled() {
     const callsMap = this.callsMap;
     return {
       get atLeastOnce() {
@@ -36,72 +36,74 @@ export class FunctionSpy {
       nTimes(howMuch: number) {
         return callsMap.getCalls().length === howMuch;
       },
-      withArgs(...expectedArgs: any[]) {
-        const argscontainZodSchema = argsContainZodSchema(...expectedArgs);
-        const calledArgsList = callsMap.getArgs();
+    };
+  }
 
-        return {
-          get atLeastOnce() {
-            if (argscontainZodSchema) {
-              return (
-                countMatchingCalls({
-                  STOP_ONCE_MATCHES_TIMES: 1, // hehe :D
-                  expectedArgs,
-                  calledArgsList,
-                }) > 0
-              );
-            }
-            return callsMap.hasBeenCalledWith(...expectedArgs);
-          },
-          get once() {
-            if (argscontainZodSchema) {
-              return (
-                countMatchingCalls({
-                  expectedArgs,
-                  calledArgsList,
-                }) === 1
-              );
-            }
+  public wasCalledWith(...expectedArgs: any[]) {
+    const callsMap = this.callsMap;
+    const argscontainZodSchema = argsContainZodSchema(...expectedArgs);
+    const calledArgsList = callsMap.getArgs();
 
-            return callsMap.hasBeenCalledNTimesWith(1, ...expectedArgs);
-          },
-          get twice() {
-            if (argscontainZodSchema) {
-              return (
-                countMatchingCalls({
-                  expectedArgs,
-                  calledArgsList,
-                }) === 2
-              );
-            }
+    return {
+      get atLeastOnce() {
+        if (argscontainZodSchema) {
+          return (
+            countMatchingCalls({
+              STOP_ONCE_MATCHES_TIMES: 1, // hehe :D
+              expectedArgs,
+              calledArgsList,
+            }) > 0
+          );
+        }
+        return callsMap.wasCalledWith(...expectedArgs);
+      },
+      get once() {
+        if (argscontainZodSchema) {
+          return (
+            countMatchingCalls({
+              expectedArgs,
+              calledArgsList,
+            }) === 1
+          );
+        }
 
-            return callsMap.hasBeenCalledNTimesWith(2, ...expectedArgs);
-          },
-          get thrice() {
-            if (argscontainZodSchema) {
-              return (
-                countMatchingCalls({
-                  expectedArgs,
-                  calledArgsList,
-                }) === 3
-              );
-            }
+        return callsMap.wasCalledNTimesWith(1, ...expectedArgs);
+      },
+      get twice() {
+        if (argscontainZodSchema) {
+          return (
+            countMatchingCalls({
+              expectedArgs,
+              calledArgsList,
+            }) === 2
+          );
+        }
 
-            return callsMap.hasBeenCalledNTimesWith(3, ...expectedArgs);
-          },
-          nTimes(howMuch: number) {
-            if (argscontainZodSchema) {
-              return (
-                countMatchingCalls({
-                  expectedArgs,
-                  calledArgsList,
-                }) === howMuch
-              );
-            }
+        return callsMap.wasCalledNTimesWith(2, ...expectedArgs);
+      },
+      get thrice() {
+        if (argscontainZodSchema) {
+          return (
+            countMatchingCalls({
+              expectedArgs,
+              calledArgsList,
+            }) === 3
+          );
+        }
 
-            return callsMap.hasBeenCalledNTimesWith(howMuch, ...expectedArgs);
-          },
-        };
+        return callsMap.wasCalledNTimesWith(3, ...expectedArgs);
+      },
+      nTimes(howMuch: number) {
+        if (argscontainZodSchema) {
+          return (
+            countMatchingCalls({
+              expectedArgs,
+              calledArgsList,
+            }) === howMuch
+          );
+        }
+
+        return callsMap.wasCalledNTimesWith(howMuch, ...expectedArgs);
       },
     };
   }
@@ -120,11 +122,11 @@ export class FunctionCalls {
     this.calls.set(args, existingCalls.concat({ behaviour }));
   }
 
-  public hasBeenCalledWith(...args: any[]) {
+  public wasCalledWith(...args: any[]) {
     return this.calls.has(args);
   }
 
-  public hasBeenCalledNTimesWith(n: number, ...args: any[]) {
+  public wasCalledNTimesWith(n: number, ...args: any[]) {
     const calls = this.calls.get<Call[] | undefined>(args);
     return calls?.length === n;
   }

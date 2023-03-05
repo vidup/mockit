@@ -12,34 +12,30 @@ describe("Spy: precise call matchers", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(
-      spy.hasBeenCalled.withArgs(z.number().min(5).max(10)).atLeastOnce
-    ).toBe(false);
+    expect(spy.wasCalledWith(z.number().min(5).max(10)).atLeastOnce).toBe(
+      false
+    );
     mock(4);
     mock(11);
-    expect(
-      spy.hasBeenCalled.withArgs(z.number().min(5).max(10)).atLeastOnce
-    ).toBe(false);
+    expect(spy.wasCalledWith(z.number().min(5).max(10)).atLeastOnce).toBe(
+      false
+    );
     mock(5);
-    expect(
-      spy.hasBeenCalled.withArgs(z.number().min(5).max(10)).atLeastOnce
-    ).toBe(true);
+    expect(spy.wasCalledWith(z.number().min(5).max(10)).atLeastOnce).toBe(true);
   });
 
   it("should allow matching with numbers max", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(
-      spy.hasBeenCalled.withArgs(z.number().min(5).max(10)).atLeastOnce
-    ).toBe(false);
+    expect(spy.wasCalledWith(z.number().min(5).max(10)).atLeastOnce).toBe(
+      false
+    );
     mock(11);
-    expect(
-      spy.hasBeenCalled.withArgs(z.number().min(5).max(10)).atLeastOnce
-    ).toBe(false);
+    expect(spy.wasCalledWith(z.number().min(5).max(10)).atLeastOnce).toBe(
+      false
+    );
     mock(10);
-    expect(
-      spy.hasBeenCalled.withArgs(z.number().min(5).max(10)).atLeastOnce
-    ).toBe(true);
+    expect(spy.wasCalledWith(z.number().min(5).max(10)).atLeastOnce).toBe(true);
   });
 });

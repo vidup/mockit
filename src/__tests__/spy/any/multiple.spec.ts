@@ -10,57 +10,43 @@ describe("Spies with zod arguments", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(spy.hasBeenCalled.withArgs(z.string(), 1).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(z.string(), 1).atLeastOnce).toBe(false);
     mock(1, 1);
-    expect(spy.hasBeenCalled.withArgs(z.string(), 1).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(z.string(), 1).atLeastOnce).toBe(false);
     mock("hello", 1);
-    expect(spy.hasBeenCalled.withArgs(z.string(), 1).atLeastOnce).toBe(true);
+    expect(spy.wasCalledWith(z.string(), 1).atLeastOnce).toBe(true);
   });
 
   it("should work in reverse", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(spy.hasBeenCalled.withArgs(1, z.string()).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(1, z.string()).atLeastOnce).toBe(false);
     mock(1, 1);
-    expect(spy.hasBeenCalled.withArgs(1, z.string()).atLeastOnce).toBe(false);
+    expect(spy.wasCalledWith(1, z.string()).atLeastOnce).toBe(false);
     mock(1, "hello");
-    expect(spy.hasBeenCalled.withArgs(1, z.string()).atLeastOnce).toBe(true);
+    expect(spy.wasCalledWith(1, z.string()).atLeastOnce).toBe(true);
   });
 
   it("should work for two any arguments", () => {
     const mock = Mockit.mockFunction(hello);
     const spy = Mockit.spy(mock);
 
-    expect(spy.hasBeenCalled.withArgs(z.string(), z.number()).atLeastOnce).toBe(
-      false
-    );
+    expect(spy.wasCalledWith(z.string(), z.number()).atLeastOnce).toBe(false);
     mock(1, 1);
-    expect(spy.hasBeenCalled.withArgs(z.string(), z.number()).atLeastOnce).toBe(
-      false
-    );
+    expect(spy.wasCalledWith(z.string(), z.number()).atLeastOnce).toBe(false);
     mock("hello", 1);
-    expect(spy.hasBeenCalled.withArgs(z.string(), z.number()).atLeastOnce).toBe(
-      true
-    );
+    expect(spy.wasCalledWith(z.string(), z.number()).atLeastOnce).toBe(true);
 
     expect(
-      spy.hasBeenCalled.withArgs(
-        z.string(),
-        z.number(),
-        z.object({}),
-        z.array(z.any())
-      ).atLeastOnce
+      spy.wasCalledWith(z.string(), z.number(), z.object({}), z.array(z.any()))
+        .atLeastOnce
     ).toBe(false);
 
     mock("hello", 1, {}, []);
     expect(
-      spy.hasBeenCalled.withArgs(
-        z.string(),
-        z.number(),
-        z.object({}),
-        z.array(z.any())
-      ).atLeastOnce
+      spy.wasCalledWith(z.string(), z.number(), z.object({}), z.array(z.any()))
+        .atLeastOnce
     ).toBe(true);
   });
 });
