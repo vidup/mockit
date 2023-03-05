@@ -8,7 +8,27 @@ export function verify(mock: any) {
   ) as SuppositionRegistry;
 
   const spy = new FunctionSpy(mock);
+
+  const defaultNever = suppositions
+    .getSuppositions()
+    .find((s) => s.count === "NEVER" && s.args == null);
+
+  // This means it should never be called PERIOD, not matter which suppositions you added.
+  if (defaultNever != null) {
+    if (spy.hasBeenCalled.atLeastOnce) {
+      throw new Error("Verification failed");
+    }
+  }
+
   const analysis = suppositions.getSuppositions().map((supposition) => {
+    if (supposition.count === "NEVER") {
+      if (supposition.args == null) {
+        return !spy.hasBeenCalled.atLeastOnce;
+      }
+
+      return !spy.hasBeenCalled.withArgs(...supposition.args).atLeastOnce;
+    }
+
     if (supposition.count === "atLeastOnce") {
       if (supposition.args == null) {
         return spy.hasBeenCalled.atLeastOnce;

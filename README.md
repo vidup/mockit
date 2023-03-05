@@ -248,9 +248,108 @@ spy.hasBeenCalled.withArgs("hiii").nTimes(1); // true
 // etc...
 ```
 
-## TODO: All possible arguments
+# Suppose and Verify
 
-TODO here: add a list of all the types of arguments that can be passed to the spy withArgs
+Mockit exposes two helpers that allow you to write tests in a more natural way:
+
+- `suppose` allows you to set expectations on a mocked function
+- `verify` allows you to check if the expectations you set have been met, all at once, with one function call.
+
+## Basic usage
+
+You can create suppositions with any arguments you want.
+Once all your suppositions have been created, you can call `verify` to check if they have been met.
+
+```ts
+import { mockFunction, suppose, verify } from "mockit";
+function hello(...args: any[]) {}
+
+test("it should be called three times, 'hello' twice and 'hiii' once", () => {
+  const mock = mockFunction(hello);
+  suppose(mock).willBeCalledWith("hiii").once;
+  suppose(mock).willBeCalledWith("hello").twice;
+  suppose(mock).willBeCalled.thrice;
+
+  mock("hiii");
+
+  expect(() => verify(mock)).toThrow(); // only one supposition is met
+  mock("hello");
+  expect(() => verify(mock)).toThrow(); // the second supposition requires another call with "hello"
+  mock("hello");
+  verify(mock); // all suppositions are met
+});
+```
+
+## Usage with Zod
+
+You can use any Zod schema to create suppositions.
+This allows you to check if the mocked function has been called with specific types of arguments, or even with arguments that match a specific schema.
+You can also check that a mock has not been called.
+
+```ts
+import { mockFunction, suppose, verify } from "mockit";
+import { z } from "zod";
+
+function registerAdultAccount(...args: any[]) {}
+function registerMinorAccount(...args: any[]) {}
+const adultSchema = z.object({
+  uuid: z.string().uuid(),
+  name: z.string(),
+  email: z.string().email(),
+  age: z.number().int().positive().min(18),
+});
+
+const minorSchema = z.object({
+  uuid: z.string().uuid(),
+  name: z.string(),
+  email: z.string().email(),
+  age: z.number().int().positive().max(17),
+});
+
+function createAccount(
+  user: z.infer<typeof adultSchema | typeof minorSchema>,
+  registry: {
+    createAdult: typeof registerAdultAccount;
+    createMinor: typeof registerMinorAccount;
+  }
+) {
+  if (user.age < 18) {
+    return registry.createAdult(user);
+  }
+
+  return registry.createMinor(user);
+}
+
+it("should only call minor registration if user is minor", () => {
+  const adultRegistrationMock = mockFunction(registerAdultAccount);
+  const minorRegistrationMock = mockFunction(registerMinorAccount);
+  suppose(minorRegistrationMock).willBeCalledWith(minorSchema).once;
+  suppose(adultRegistrationMock).willNotBeCalled();
+
+  createAccount(
+    { uuid: "123", name: "John", email: "hii@gmail.com", age: 17 },
+    { createAdult: adultRegistrationMock, createMinor: minorRegistrationMock }
+  );
+
+  verify(minorRegistrationMock);
+  verify(adultRegistrationMock);
+});
+
+it("should only call adult registration if user is adult", () => {
+  const adultRegistrationMock = mockFunction(registerAdultAccount);
+  const minorRegistrationMock = mockFunction(registerMinorAccount);
+  suppose(minorRegistrationMock).willNotBeCalled();
+  suppose(adultRegistrationMock).willBeCalledWith(adultSchema).once;
+
+  createAccount(
+    { uuid: "123", name: "John", email: "adult@gmail.com", age: 18 },
+    { createAdult: adultRegistrationMock, createMinor: minorRegistrationMock }
+  );
+
+  verify(adultRegistrationMock);
+  verify(minorRegistrationMock);
+});
+```
 
 ---
 
