@@ -131,11 +131,14 @@ We also provide a `mockInterface` function that does the same thing, [but for in
 
 # Mocks
 
-You can mock three things with Mockit:
+With Mockit you can mock:
 
 - Functions
 - Classes
 - Abstract classes
+- Interfaces
+
+The API varies a bit depending on the type of the thing you want to mock, because of a big TypeScript's limitation: we cannot use types as values.
 
 ## Mocking functions
 
