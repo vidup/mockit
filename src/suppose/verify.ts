@@ -1,4 +1,4 @@
-import { FunctionSpy } from "../functionSpy";
+import { FunctionSpy } from "../internal/functionSpy";
 import { SuppositionRegistry } from ".";
 
 export function verify(mock: any) {

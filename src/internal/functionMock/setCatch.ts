@@ -1,5 +1,5 @@
-import { HashingMap } from "../HashingMap";
-import { NewBehaviourParam } from "../types/behaviour";
+import { HashingMap } from "../../utils/HashingMap";
+import { NewBehaviourParam } from "./behaviour";
 
 export function setCatch(target, prop, newValue, receiver) {
   if (prop === "init") {

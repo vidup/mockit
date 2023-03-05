@@ -1,4 +1,4 @@
-import { AbstractParser, Parser } from "../parser";
+import { AbstractParser, Parser } from "./parser";
 
 export class HashingMap {
   private originalArgs: any[] = [];

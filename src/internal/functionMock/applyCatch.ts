@@ -1,5 +1,6 @@
-import { HashingMap } from "../HashingMap";
-import { Behaviour, NewBehaviourParam } from "../types/behaviour";
+import { HashingMap } from "../../utils/HashingMap";
+import { Behaviour, NewBehaviourParam } from "./behaviour";
+
 import { FunctionCalls } from "../functionSpy";
 
 export function applyCatch(_target, _thisArg, argumentsList) {

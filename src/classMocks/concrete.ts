@@ -1,8 +1,9 @@
 import { z } from "zod";
 
-import { GetClassMethods } from "../types/GetClassMethods";
-import { FunctionMock } from "../functionMock";
-import { Class } from "../mockit";
+import { FunctionMock } from "../internal/functionMock";
+
+import { type Class } from "./types";
+import { type GetClassMethods } from "./GetClassMethods";
 
 const functionSchema = z.function();
 

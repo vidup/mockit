@@ -1,13 +1,13 @@
-import { HashingMap } from "../HashingMap";
-import { Behaviour, NewBehaviourParam } from "../types/behaviour";
+import { HashingMap } from "../../utils/HashingMap";
 import { FunctionCalls } from "../functionSpy";
+import { SuppositionRegistry } from "../../suppose";
+import { Behaviour, NewBehaviourParam } from "./behaviour";
 
 import { applyCatch } from "./applyCatch";
 import { getCatch } from "./getCatch";
 import { setCatch } from "./setCatch";
 
 import { FunctionMockUtils } from "./utils";
-import { SuppositionRegistry } from "../suppose";
 
 export const Behaviours = {
   Return: "Return",
