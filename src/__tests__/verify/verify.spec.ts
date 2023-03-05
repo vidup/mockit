@@ -66,4 +66,38 @@ describe("suppose then verify", () => {
     mock("hello");
     verify(mock);
   });
+
+  it("should accept multiple complex arguments on multiple suppositions", () => {
+    const mock = mockFunction(hello);
+    suppose(mock).willBeCalledWith(z.number(), z.string()).once;
+    suppose(mock).willBeCalledWith(z.string(), z.number()).once;
+    suppose(mock).willBeCalledWith(
+      z.object({
+        hello: z.string(),
+        world: z.number(),
+        todayIs: z.date(),
+      })
+    ).twice;
+
+    mock(2, "hello");
+    expect(() => verify(mock)).toThrow(); // only one supposition is valid
+
+    mock("hello", 2);
+    expect(() => verify(mock)).toThrow(); // only two supposition are valid
+
+    mock({
+      hello: "hello",
+      world: 2,
+      todayIs: new Date(),
+    });
+    expect(() => verify(mock)).toThrow(); // the last supposition is not complete: it needs another call
+
+    mock({
+      hello: "hello",
+      world: 2,
+      todayIs: new Date(),
+    });
+
+    verify(mock);
+  });
 });
