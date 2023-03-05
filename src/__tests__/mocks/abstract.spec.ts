@@ -1,4 +1,4 @@
-import { Mockit } from "../../mockit";
+import { mockAbstract, when } from "../../mockit";
 
 abstract class Hellaw {
   abstract hello(input: string): string;
@@ -7,19 +7,19 @@ abstract class Hellaw {
 
 describe("v2", () => {
   it("should setup default behaviour for abstract method", async () => {
-    const returningMock = Mockit.mockAbstract(Hellaw, ["hello"]);
-    Mockit.when(returningMock.hello).isCalled.thenReturn("world");
+    const returningMock = mockAbstract(Hellaw, ["hello"]);
+    when(returningMock.hello).isCalled.thenReturn("world");
 
     expect(returningMock.hello("hello")).toBe("world");
 
-    const throwingMock = Mockit.mockAbstract(Hellaw, ["hello"]);
-    Mockit.when(throwingMock.hello).isCalled.thenThrow(new Error("error"));
+    const throwingMock = mockAbstract(Hellaw, ["hello"]);
+    when(throwingMock.hello).isCalled.thenThrow(new Error("error"));
 
     expect(() => throwingMock.hello("hello")).toThrowError("error");
 
     let counter = 0;
-    const callingMock = Mockit.mockAbstract(Hellaw, ["hello"]);
-    Mockit.when(callingMock.hello).isCalled.thenCall(() => {
+    const callingMock = mockAbstract(Hellaw, ["hello"]);
+    when(callingMock.hello).isCalled.thenCall(() => {
       counter++;
     });
 
@@ -29,16 +29,14 @@ describe("v2", () => {
     callingMock.hello("hello");
     expect(counter).toBe(3);
 
-    const resolvingMock = Mockit.mockAbstract(Hellaw, ["hello"]);
-    Mockit.when(resolvingMock.hello).isCalled.thenResolve("world-resolved");
+    const resolvingMock = mockAbstract(Hellaw, ["hello"]);
+    when(resolvingMock.hello).isCalled.thenResolve("world-resolved");
 
     const resolved = await resolvingMock.hello("hello");
     expect(resolved).toBe("world-resolved");
 
-    const rejectingMock = Mockit.mockAbstract(Hellaw, ["hello"]);
-    Mockit.when(rejectingMock.hello).isCalled.thenReject(
-      new Error("error-rejected")
-    );
+    const rejectingMock = mockAbstract(Hellaw, ["hello"]);
+    when(rejectingMock.hello).isCalled.thenReject(new Error("error-rejected"));
 
     await expect(rejectingMock.hello("hello")).rejects.toThrowError(
       "error-rejected"
