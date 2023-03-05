@@ -7,7 +7,7 @@ interface House {
 
 describe("mockInterface", () => {
   it("should mock an interface", () => {
-    const house = mockInterface<House>(["getRoomsCount"]);
+    const house = mockInterface<House>("getRoomsCount", "getWindowsCount");
     when(house.getRoomsCount).isCalled.thenReturn(3);
 
     expect(house.getRoomsCount()).toBe(3);

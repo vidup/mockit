@@ -35,7 +35,7 @@ export function mockFunction<T extends (...args: any[]) => any>(
   return FunctionMock(original.name) as T;
 }
 
-export function mockInterface<T>(functionsToMock: Array<keyof T>): T {
+export function mockInterface<T>(...functionsToMock: Array<keyof T>): T {
   const mock = new InterfaceClassMock(functionsToMock as string[]);
   return mock as T;
 }
@@ -94,8 +94,8 @@ export class Mockit {
     return mock(_original);
   }
 
-  static mockInterface<T>(functionsToMock: Array<keyof T>): T {
-    return mockInterface(functionsToMock);
+  static mockInterface<T>(...functionsToMock: Array<keyof T>): T {
+    return mockInterface(...functionsToMock);
   }
 
   static mockFunction<T extends (...args: any[]) => any>(original: T): T {
