@@ -2,7 +2,7 @@
 
 Mockit solves the problem of [mocking the behaviour](https://martinfowler.com/articles/mocksArentStubs.html) of injected dependencies in Typescript.
 
-It gives you access to a simple API to mock functions, classes and even abstract classes, so that any type of dependency can be mocked with minimum effort and maximum flexibility.
+It gives you access to a simple API to mock functions, classes and even abstract classes and interfaces, so that any type of dependency can be mocked with minimum effort and maximum flexibility.
 
 You can then setup the behaviour of your mocks, make suppositions on how they will be called and verify that they were called as expected.
 
