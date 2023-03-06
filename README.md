@@ -247,26 +247,26 @@ You can currently set the following behaviours:
 
 ```ts
 function hello(...args: any[]) {}
-const mock = Mockit.mockFunction(hello);
+const mockedHello = Mockit.mockFunction(hello);
 
-mock(); // undefined
+mockedHello(); // undefined
 
-Mockit.when(mock).isCalled.thenReturn("hiii");
-mock(); // "hiii"
+when(mock).isCalled.thenReturn("hiii");
+mockedHello(); // "hiii"
 
-Mockit.when(mock).isCalled.thenThrow(new Error("hiii"));
-mock(); // throws Error("hiii")
+when(mock).isCalled.thenThrow(new Error("hiii"));
+mockedHello(); // throws Error("hiii")
 
-Mockit.when(mock).isCalled.thenResolve("hiii");
-mock(); // Promise.resolves("hiii");
+when(mock).isCalled.thenResolve("hiii");
+mockedHello(); // Promise.resolves("hiii");
 
-Mockit.when(mock).isCalled.thenReject(new Error("hiii"));
-mock(); // Promise.rejects(Error("hiii"));
+when(mock).isCalled.thenReject(new Error("hiii"));
+mockedHello(); // Promise.rejects(Error("hiii"));
 
-Mockit.when(mock).isCalled.thenCall((...args) => {
+when(mock).isCalled.thenCall((...args) => {
   console.log(args);
 });
-mock("hiii"); // logs ["hiii"]
+mockedHello("hiii"); // logs ["hiii"]
 ```
 
 ## Set behaviour for specific arguments
@@ -279,15 +279,15 @@ At that point the API is the same as the default behaviour.
 
 ```ts
 function hello(...args: any[]) {}
-const mock = Mockit.mockFunction(hello);
+const mockedHello = mockFunction(hello);
 
-Mockit.when(mock).isCalledWith("hiii").thenReturn("hiii");
-Mockit.when(mock).isCalledWith("hello").thenReturn("hello");
-Mockit.When(mock).isCalledWith("please throw").thenThrow(new Error("hiii"));
+when(mockedHello).isCalledWith("hiii").thenReturn("hiii");
+when(mockedHello).isCalledWith("hello").thenReturn("hello");
+When(mockedHello).isCalledWith("please throw").thenThrow(new Error("hiii"));
 
-mock("hiii"); // "hiii"
-mock("hello"); // "hello"
-mock("please throw"); // throws Error("hiii")
+mockedHello("hiii"); // "hiii"
+mockedHello("hello"); // "hello"
+mockedHello("please throw"); // throws Error("hiii")
 ```
 
 # Spies
@@ -324,17 +324,17 @@ Here's an example of how you can use the `calls` property:
 
 ```ts
 function hello(...args: any[]) {}
-const mock = Mockit.mockFunction(hello);
-const spy = Mockit.spy(mock);
+const mockedHello = mockFunction(hello);
+const spiedHello = Mockit.spy(mock);
 
-mock("hiii");
-mock("hello");
-mock("please throw");
+mockedHello("hiii");
+mockedHello("hello");
+mockedHello("please throw");
 
-spy.calls.length; // 3
-spy.calls[0].args; // ["hiii"]
-spy.calls[1].args; // ["hello"]
-spy.calls[2].args; // ["please throw"]
+spiedHello.calls.length; // 3
+spiedHello.calls[0].args; // ["hiii"]
+spiedHello.calls[1].args; // ["hello"]
+spiedHello.calls[2].args; // ["please throw"]
 
 // TODO: add behaviour examples since they're returned too
 ```
@@ -346,32 +346,32 @@ You can check if the mocked function has been called called with a few helpers M
 ```ts
 function hello(...args: any[]) {}
 
-const mock = Mockit.mockFunction(hello);
-const spy = Mockit.spy(mock);
+const mockedHello = mockFunction(hello);
+const spiedHello = Mockit.spy(mock);
 
-mock("hiii");
+mockedHello("hiii");
 
-spy.wasCalled.once; // true
-spy.wasCalled.twice; // false
-spy.wasCalled.atLeastOnce; // true
-spy.wasCalled.thrice; // false
-spy.wasCalled.nTimes(1); // true
+spiedHello.wasCalled.once; // true
+spiedHello.wasCalled.twice; // false
+spiedHello.wasCalled.atLeastOnce; // true
+spiedHello.wasCalled.thrice; // false
+spiedHello.wasCalled.nTimes(1); // true
 
-mock("hello");
+mockedHello("hello");
 
-spy.wasCalled.once; // false
-spy.wasCalled.twice; // true
-spy.wasCalled.atLeastOnce; // true
-spy.wasCalled.thrice; // false
-spy.wasCalled.nTimes(2); // true
+spiedHello.wasCalled.once; // false
+spiedHello.wasCalled.twice; // true
+spiedHello.wasCalled.atLeastOnce; // true
+spiedHello.wasCalled.thrice; // false
+spiedHello.wasCalled.nTimes(2); // true
 
-mock("please throw");
+mockedHello("please throw");
 
-spy.wasCalled.once; // false
-spy.wasCalled.twice; // false
-spy.wasCalled.atLeastOnce; // true
-spy.wasCalled.thrice; // true
-spy.wasCalled.nTimes(3); // true
+spiedHello.wasCalled.once; // false
+spiedHello.wasCalled.twice; // false
+spiedHello.wasCalled.atLeastOnce; // true
+spiedHello.wasCalled.thrice; // true
+spiedHello.wasCalled.nTimes(3); // true
 ```
 
 ## Has the function been called with specific arguments?
@@ -382,22 +382,22 @@ From there, you can use the same helpers as above.
 ```ts
 function hello(...args: any[]) {}
 
-const mock = Mockit.mockFunction(hello);
-const spy = Mockit.spy(mock);
+const mock = mockFunction(hello);
+const spiedHello = spy(mock);
 
-spy.wasCalledWith("hiii").once; // false
-spy.wasCalledWith("hiii").twice; // false
-spy.wasCalledWith("hiii").atLeastOnce; // false
-spy.wasCalledWith("hiii").thrice; // false
-spy.wasCalledWith("hiii").nTimes(1); // false
+spiedHello.wasCalledWith("hiii").once; // false
+spiedHello.wasCalledWith("hiii").twice; // false
+spiedHello.wasCalledWith("hiii").atLeastOnce; // false
+spiedHello.wasCalledWith("hiii").thrice; // false
+spiedHello.wasCalledWith("hiii").nTimes(1); // false
 
 mock("hiii");
 
-spy.wasCalledWith("hiii").once; // true
-spy.wasCalledWith("hiii").twice; // false
-spy.wasCalledWith("hiii").atLeastOnce; // true
-spy.wasCalledWith("hiii").thrice; // false
-spy.wasCalledWith("hiii").nTimes(1); // true
+spiedHello.wasCalledWith("hiii").once; // true
+spiedHello.wasCalledWith("hiii").twice; // false
+spiedHello.wasCalledWith("hiii").atLeastOnce; // true
+spiedHello.wasCalledWith("hiii").thrice; // false
+spiedHello.wasCalledWith("hiii").nTimes(1); // true
 
 // etc...
 ```
@@ -418,44 +418,44 @@ Here are a few examples:
 function hello(...args: any[]) {}
 
 const mock = Mockit.mockFunction(hello);
-const spy = Mockit.spy(mock);
+const spiedHello = Mockit.spy(mock);
 
 // String
-spy.wasCalledWith(z.string()).once; // false
+spiedHello.wasCalledWith(z.string()).once; // false
 mock("hiii");
-spy.wasCalledWith(z.string()).once; // true
+spiedHello.wasCalledWith(z.string()).once; // true
 
 // Email
-spy.wasCalledWith(z.string().email()).once; // false
+spiedHello.wasCalledWith(z.string().email()).once; // false
 mock("gracehopper@gmail.com");
-spy.wasCalledWith(z.string().email()).once; // true
+spiedHello.wasCalledWith(z.string().email()).once; // true
 
 // Uuid
-spy.wasCalledWith(z.string().uuid()).once; // false
+spiedHello.wasCalledWith(z.string().uuid()).once; // false
 mock("a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6");
-spy.wasCalledWith(z.string().uuid()).once; // true
+spiedHello.wasCalledWith(z.string().uuid()).once; // true
 
 // Negative number
-spy.wasCalledWith(z.number().negative()).once; // false
+spiedHello.wasCalledWith(z.number().negative()).once; // false
 mock(-1);
-spy.wasCalledWith(z.number().negative()).once; // true
+spiedHello.wasCalledWith(z.number().negative()).once; // true
 
 // Positive number
-spy.wasCalledWith(z.number().positive()).once; // false
+spiedHello.wasCalledWith(z.number().positive()).once; // false
 mock(1);
-spy.wasCalledWith(z.number().positive()).once; // true
+spiedHello.wasCalledWith(z.number().positive()).once; // true
 
 // Number between 10 and 20
-spy.wasCalledWith(z.number().min(10).max(20)).once; // false
+spiedHello.wasCalledWith(z.number().min(10).max(20)).once; // false
 mock(15);
-spy.wasCalledWith(z.number().min(10).max(20)).once; // true
+spiedHello.wasCalledWith(z.number().min(10).max(20)).once; // true
 
 // Array of strings
-spy.wasCalledWith(z.array(z.string())).once; // false
+spiedHello.wasCalledWith(z.array(z.string())).once; // false
 mock([1, 2, 3]);
-spy.wasCalledWith(z.array(z.string())).once; // false
+spiedHello.wasCalledWith(z.array(z.string())).once; // false
 mock(["1", "2", "3"]);
-spy.wasCalledWith(z.array(z.string())).once; // true
+spiedHello.wasCalledWith(z.array(z.string())).once; // true
 ```
 
 These are just a few basic examples, but you can user any zod schema. For more information I highly recommend that you check out the [Zod documentation](https://zod.dev/).
@@ -502,8 +502,12 @@ You can also check that a mock has not been called.
 import { mockFunction, suppose, verify } from "mockit";
 import { z } from "zod";
 
-function registerAdultAccount(...args: any[]) {}
-function registerMinorAccount(...args: any[]) {}
+function registerAdultAccount(...args: any[]) {
+  // ...whatever implementation
+}
+function registerMinorAccount(...args: any[]) {
+  // ...whatever implementation
+}
 const adultSchema = z.object({
   uuid: z.string().uuid(),
   name: z.string(),
@@ -576,13 +580,13 @@ Mocking objects is a great way to test your code, but it's already been done by 
 function hello(...args: any[]) {}
 
 const mock = Mockit.mock(hello);
-Mockit.when(mock).isCalledWith(z.schema({
+when(mock).isCalledWith(z.schema({
   name: z.string(),
   email: z.email(),
   age: z.number().min(18)
 })).thenReturn("major");
 
-Mockit.when(mock).isCalledWith(z.schema({
+when(mock).isCalledWith(z.schema({
   name: z.string(),
   email: z.email(),
   age: z.number().max(18)
