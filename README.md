@@ -1,3 +1,7 @@
+# DEPRECATED
+
+This package has been moved to another repository: [@vdstack/mockit](https://github.com/vdstack/mockit). It's still under active development over there !
+
 [![Wallaby.js](https://img.shields.io/badge/wallaby.js-powered-blue.svg?style=flat&logo=github)](https://wallabyjs.com/oss/)
 
 Mockit solves the problem of [mocking the behaviour](https://martinfowler.com/articles/mocksArentStubs.html) of injected dependencies in Typescript.
